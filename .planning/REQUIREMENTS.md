@@ -14,10 +14,10 @@
 - [ ] **GRID-05**: User can move placed furniture to a new grid position
 - [ ] **GRID-06**: User can remove placed furniture from the grid
 - [ ] **GRID-07**: User can rotate placed furniture (90/180/270 degrees)
-- [ ] **GRID-08**: User can pan and zoom the canvas viewport
+- [x] **GRID-08**: User can pan and zoom the canvas viewport
 - [ ] **GRID-09**: User can undo and redo actions (minimum 20 steps)
 - [ ] **GRID-10**: User sees a ghost preview of the item before placing it on the grid
-- [ ] **GRID-11**: Placed items render as colored rectangles with labels initially, replaced by top-down sprites when available
+- [x] **GRID-11**: Placed items render as colored rectangles with labels initially, replaced by top-down sprites when available
 - [ ] **GRID-12**: Put-target items (e.g. table lamps) can only be placed on put-base items (e.g. tables)
 
 ### Sprite Pipeline
@@ -108,10 +108,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GRID-05 | Phase 1 | Pending |
 | GRID-06 | Phase 1 | Pending |
 | GRID-07 | Phase 1 | Pending |
-| GRID-08 | Phase 1 | Pending |
+| GRID-08 | Phase 1 | Complete |
 | GRID-09 | Phase 1 | Pending |
 | GRID-10 | Phase 1 | Pending |
-| GRID-11 | Phase 1 | Pending |
+| GRID-11 | Phase 1 | Complete |
 | GRID-12 | Phase 1 | Pending |
 | SPRT-01 | Phase 5 | Pending |
 | SPRT-02 | Phase 5 | Pending |
