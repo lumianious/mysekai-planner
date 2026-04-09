@@ -1,14 +1,18 @@
 // ======== 应用根组件 ========
+// INPUT: editorStore.isEditorReady
+// OUTPUT: 根据编辑器状态切换欢迎界面 / 编辑器布局
+// POS: src/App.tsx — 应用入口视图路由
+
+import { useEditorStore } from './stores/editorStore'
+import { WelcomeScreen } from './components/welcome/WelcomeScreen'
+import { EditorLayout } from './components/layout/EditorLayout'
 
 function App() {
+  const isEditorReady = useEditorStore((s) => s.isEditorReady)
+
   return (
-    <div className="min-h-screen bg-surface text-text-primary">
-      <h1 className="text-2xl font-semibold text-center pt-8">
-        MySekai Planner
-      </h1>
-      <p className="text-text-muted text-center mt-2">
-        Loading...
-      </p>
+    <div className="h-screen bg-surface text-primary">
+      {isEditorReady ? <EditorLayout /> : <WelcomeScreen />}
     </div>
   )
 }
