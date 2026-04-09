@@ -7,8 +7,8 @@
 
 ### Grid Editor
 
-- [ ] **GRID-01**: User sees an accurate grid matching in-game MySekai outdoor area dimensions
-- [ ] **GRID-02**: User can select outdoor area level (1-5) with correct grid sizes (36x36 to 100x100)
+- [x] **GRID-01**: User sees an accurate grid matching in-game MySekai outdoor area dimensions
+- [x] **GRID-02**: User can select outdoor area level (1-5) with correct grid sizes (36x36 to 100x100)
 - [ ] **GRID-03**: Grid has two render layers: ground layer (roads, rugs) and furniture layer (everything else)
 - [ ] **GRID-04**: User can place furniture on the grid with snap-to-grid behavior
 - [ ] **GRID-05**: User can move placed furniture to a new grid position
@@ -101,8 +101,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GRID-01 | Phase 1 | Pending |
-| GRID-02 | Phase 1 | Pending |
+| GRID-01 | Phase 1 | Complete |
+| GRID-02 | Phase 1 | Complete |
 | GRID-03 | Phase 1 | Pending |
 | GRID-04 | Phase 1 | Pending |
 | GRID-05 | Phase 1 | Pending |
