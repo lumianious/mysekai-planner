@@ -9,6 +9,8 @@ import type { Fixture, FixtureMainGenre } from '../../types/editor'
 import { searchFixtures, filterByGenre } from '../../data/fixtures'
 import { CatalogSearch } from './CatalogSearch'
 import { CategoryFilter } from './CategoryFilter'
+import { CatalogGrid } from './CatalogGrid'
+import { useEditorStore } from '../../stores/editorStore'
 
 interface CatalogSidebarProps {
   fixtures: Fixture[]
@@ -20,6 +22,7 @@ export function CatalogSidebar({
   fixtures,
   mainGenres,
 }: CatalogSidebarProps) {
+  const activeFixtureId = useEditorStore((s) => s.activeFixtureId)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeGenreId, setActiveGenreId] = useState<number | null>(null)
   const [collapsed, setCollapsed] = useState(false)
@@ -79,11 +82,12 @@ export function CatalogSidebar({
         />
       </div>
 
-      {/* 缩略图网格（Task 2 替换此占位） */}
-      <div className="flex-1 overflow-hidden px-2 py-1">
-        <p className="text-xs text-muted text-center py-4">
-          {filteredFixtures.length} 件
-        </p>
+      {/* 虚拟化缩略图网格 */}
+      <div className="flex-1 overflow-hidden">
+        <CatalogGrid
+          fixtures={filteredFixtures}
+          activeFixtureId={activeFixtureId}
+        />
       </div>
     </div>
   )
