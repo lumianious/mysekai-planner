@@ -1,0 +1,150 @@
+# Requirements: MySekai Planner
+
+**Defined:** 2026-04-09
+**Core Value:** Users can visually plan their MySekai outdoor layout and know exactly what materials they need to build it.
+
+## v1 Requirements
+
+### Grid Editor
+
+- [ ] **GRID-01**: User sees an accurate grid matching in-game MySekai outdoor area dimensions
+- [ ] **GRID-02**: User can select outdoor area level (1-5) with correct grid sizes (36x36 to 100x100)
+- [ ] **GRID-03**: Grid has two render layers: ground layer (roads, rugs) and furniture layer (everything else)
+- [ ] **GRID-04**: User can place furniture on the grid with snap-to-grid behavior
+- [ ] **GRID-05**: User can move placed furniture to a new grid position
+- [ ] **GRID-06**: User can remove placed furniture from the grid
+- [ ] **GRID-07**: User can rotate placed furniture (90/180/270 degrees)
+- [ ] **GRID-08**: User can pan and zoom the canvas viewport
+- [ ] **GRID-09**: User can undo and redo actions (minimum 20 steps)
+- [ ] **GRID-10**: User sees a ghost preview of the item before placing it on the grid
+- [ ] **GRID-11**: Placed items render as colored rectangles with labels initially, replaced by top-down sprites when available
+- [ ] **GRID-12**: Put-target items (e.g. table lamps) can only be placed on put-base items (e.g. tables)
+
+### Sprite Pipeline
+
+- [ ] **SPRT-01**: Asset extraction pipeline downloads MySekai fixture 3D models from game bundles via sssekai
+- [ ] **SPRT-02**: Pipeline extracts 2D textures directly for flat items (roads, fences, floor surfaces)
+- [ ] **SPRT-03**: Pipeline renders orthographic top-down view of 3D furniture models via Blender headless scripting
+- [ ] **SPRT-04**: Pipeline outputs transparent PNG sprites at consistent resolution per grid unit
+- [ ] **SPRT-05**: Pipeline is batch-automated for all ~1,126 outdoor-placeable fixtures (excluding 113 indoor-only items) with no manual intervention
+- [ ] **SPRT-06**: Generated sprites are served as static assets alongside the web app on GitHub Pages
+- [ ] **SPRT-07**: Grid editor renders generated top-down sprites for placed items (replacing colored rectangles)
+
+### Furniture Catalog
+
+- [ ] **CATL-01**: User can browse a catalog of all MySekai fixtures sourced from sekai-master-db-diff
+- [ ] **CATL-02**: User can search fixtures by name (Japanese)
+- [ ] **CATL-03**: User can filter fixtures by category and sub-genre
+- [ ] **CATL-04**: Catalog displays CDN isometric thumbnail images from storage.sekai.best for visual identification
+
+### Cost Calculator
+
+- [ ] **COST-01**: User sees total material cost breakdown for the current blueprint (stone, iron, wood, etc.)
+- [ ] **COST-02**: User can input owned materials/furniture as inventory
+- [ ] **COST-03**: User sees remaining materials needed (total cost minus inventory)
+- [ ] **COST-04**: Inventory persists across sessions via localStorage
+
+### Persistence & Sharing
+
+- [ ] **PERS-01**: User's current design auto-saves to localStorage
+- [ ] **PERS-02**: User can load a previously saved design from localStorage
+- [ ] **PERS-03**: User can generate a shareable URL that encodes the current blueprint
+- [ ] **PERS-04**: User can import a design from a shared URL
+- [ ] **PERS-05**: URL encoding uses compact binary format with version byte (lz-string compressed)
+
+### Roads & Fences
+
+- [ ] **ROAD-01**: User can place road tiles on the ground layer using a paint/brush tool
+- [ ] **ROAD-02**: User can place rug/mat items on the ground layer
+- [ ] **ROAD-03**: User can place fence segments on the grid
+- [ ] **ROAD-04**: Ground layer items render beneath furniture layer items
+
+### Internationalization
+
+- [ ] **I18N-01**: UI text is available in Chinese and Japanese
+- [ ] **I18N-02**: Item names display in Japanese (matching in-game data)
+
+## v2 Requirements
+
+### Enhanced Visuals
+
+- **VIS-01**: Chinese translations for item names (requires localized data source)
+- **VIS-02**: Color variant selection for fixtures with multiple color options
+- **VIS-03**: Export design as downloadable PNG image
+
+### Advanced Editing
+
+- **EDIT-01**: Multi-select and bulk move/delete operations
+- **EDIT-02**: Keyboard shortcuts (Ctrl+Z undo, Delete remove, spacebar pan)
+- **EDIT-03**: Design templates and presets for common layouts
+
+### Pipeline Enhancements
+
+- **PIPE-01**: CI/CD automation to regenerate sprites on game updates (GitHub Actions)
+- **PIPE-02**: Sprite quality improvements (better lighting, materials in Blender renders)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Indoor room planning | Different grid system and constraints; outdoor-only focus for v1 |
+| In-game area editors (Wonderland, Street) | Separate game features unrelated to MySekai |
+| User accounts / backend | Static GitHub Pages hosting only; no server-side logic |
+| Real-time collaboration | Single-user editor; async sharing via URL is sufficient |
+| Mobile-native app | Web-first; responsive layout if feasible but not a priority |
+| Runtime 3D rendering in browser | Sprites are pre-generated offline; no 3D libraries shipped to client |
+| Replicating Unity NPR shaders perfectly | Basic Blender materials sufficient for top-down planning sprites |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| GRID-01 | — | Pending |
+| GRID-02 | — | Pending |
+| GRID-03 | — | Pending |
+| GRID-04 | — | Pending |
+| GRID-05 | — | Pending |
+| GRID-06 | — | Pending |
+| GRID-07 | — | Pending |
+| GRID-08 | — | Pending |
+| GRID-09 | — | Pending |
+| GRID-10 | — | Pending |
+| GRID-11 | — | Pending |
+| GRID-12 | — | Pending |
+| SPRT-01 | — | Pending |
+| SPRT-02 | — | Pending |
+| SPRT-03 | — | Pending |
+| SPRT-04 | — | Pending |
+| SPRT-05 | — | Pending |
+| SPRT-06 | — | Pending |
+| SPRT-07 | — | Pending |
+| CATL-01 | — | Pending |
+| CATL-02 | — | Pending |
+| CATL-03 | — | Pending |
+| CATL-04 | — | Pending |
+| COST-01 | — | Pending |
+| COST-02 | — | Pending |
+| COST-03 | — | Pending |
+| COST-04 | — | Pending |
+| PERS-01 | — | Pending |
+| PERS-02 | — | Pending |
+| PERS-03 | — | Pending |
+| PERS-04 | — | Pending |
+| PERS-05 | — | Pending |
+| ROAD-01 | — | Pending |
+| ROAD-02 | — | Pending |
+| ROAD-03 | — | Pending |
+| ROAD-04 | — | Pending |
+| I18N-01 | — | Pending |
+| I18N-02 | — | Pending |
+
+**Coverage:**
+- v1 requirements: 38 total
+- Mapped to phases: 0
+- Unmapped: 38 ⚠️
+
+---
+*Requirements defined: 2026-04-09*
+*Last updated: 2026-04-09 after initial definition*

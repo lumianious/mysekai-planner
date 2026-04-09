@@ -19,7 +19,8 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 - [ ] Top-down 2D grid editor matching in-game MySekai outdoor area dimensions
 - [ ] Place, move, rotate, and remove furniture/decorations on the grid
 - [ ] Furniture catalog with search/filter sourced from sekai.best data
-- [ ] Top-down 2D sprite rendering for placed items (research needed on availability)
+- [ ] Top-down 2D sprite rendering for placed items via offline pipeline (sssekai + Blender headless)
+- [ ] CDN isometric thumbnails from storage.sekai.best for catalog browsing
 - [ ] Material cost calculator — shows total crafting costs for current blueprint
 - [ ] Inventory input — users enter owned materials/furniture, see remaining costs
 - [ ] Inventory persistence via localStorage
@@ -39,13 +40,13 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 
 - **Sister project:** `pjsk` — a ProSeka merchandise database that already fetches data from `Sekai-World/sekai-master-db-diff` (GitHub) and uses `storage.sekai.best` CDN for card art. The data pipeline and API patterns are well understood.
 - **Data source:** Furniture information (crafting costs, dimensions, categories) is expected to be in sekai.best / sekai-master-db-diff. Needs validation during research.
-- **Sprite availability — KEY UNKNOWN:** In-game furniture appears as 3D models or textured 2D objects. Top-down 2D sprites may not exist in the data files. Research must determine: (1) whether sekai.best or game assets include top-down views, (2) if not, what fallback approach is viable (colored rectangles with labels, manual screenshots, generated sprites from 3D models).
+- **Sprite pipeline — RESOLVED:** No pre-rendered top-down sprites exist. CDN has isometric thumbnails (152x152 WebP) at `storage.sekai.best/sekai-jp-assets/mysekai/thumbnail/fixture/{assetbundleName}_1.webp` — useful for catalog browsing but wrong perspective for grid view. Solution: offline pipeline using sssekai (game asset extraction) + Blender headless scripting (orthographic top-down renders). Community precedent exists for extracting MySEKAI 3D models. sssekai is archived at v0.8.0 but mature. Colored rectangles serve as development placeholders until sprites are generated.
 - **Reference project:** [Happy Island Designer](https://eugeneration.github.io/HappyIslandDesigner/) — open-source Animal Crossing island planner. Similar concept adapted for Project Sekai's MySekai feature.
 
 ## Constraints
 
 - **Hosting:** GitHub Pages (static files only) — no server-side logic, no database
-- **Data pipeline:** Must work with sekai.best / Sekai-World GitHub data — no custom scraping of game client assets
+- **Data pipeline:** Fixture metadata from Sekai-World GitHub data; sprites generated via sssekai + Blender offline pipeline
 - **Grid accuracy:** Must match actual in-game MySekai outdoor area grid dimensions and tile sizes
 - **Language:** UI in Chinese + Japanese; game item names in Japanese only (matching in-game data)
 
@@ -57,6 +58,8 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 | localStorage for inventory | Only viable persistence for static hosting; no accounts to manage | — Pending |
 | URL hash for blueprint sharing | Proven pattern (Happy Island Designer); no server needed | — Pending |
 | sekai.best as primary data source | Already validated in pjsk project; richest ProSeka data available | — Pending |
+| sssekai + Blender for sprite generation | No top-down sprites exist on CDN; 3D models must be rendered offline | — Pending |
+| CDN thumbnails for catalog only | Isometric perspective doesn't work on top-down grid; use for browsing | — Pending |
 | Outdoor area only | Indoor areas are separate feature with different constraints; focus scope | — Pending |
 
 ## Evolution
