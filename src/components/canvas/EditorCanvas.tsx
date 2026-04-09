@@ -8,7 +8,10 @@ import { Stage } from 'react-konva'
 import type Konva from 'konva'
 import { useEditorStore } from '../../stores/editorStore'
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction'
+import { useKeyboard } from '../../hooks/useKeyboard'
+import { useEditorActions } from '../../hooks/useEditorActions'
 import { TILE_SIZE } from '../../utils/grid'
+import { getEffectiveSize } from '../../utils/grid'
 import { GridLayer } from './GridLayer'
 import { GroundLayer } from './GroundLayer'
 import { FurnitureLayer } from './FurnitureLayer'
@@ -75,13 +78,63 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
   const placedItems = useEditorStore((s) => s.placedItems)
   const toolMode = useEditorStore((s) => s.toolMode)
   const selectedItemId = useEditorStore((s) => s.selectedItemId)
-  const setSelectedItem = useEditorStore((s) => s.setSelectedItem)
-  const moveItem = useEditorStore((s) => s.moveItem)
-  const removeItem = useEditorStore((s) => s.removeItem)
 
   // ======== 鼠标网格坐标追踪（供 GhostPreview 使用） ========
 
   const [mouseGridPos, setMouseGridPos] = useState<{ x: number; y: number } | null>(null)
+
+  // ======== 目录悬停状态（防止数字键冲突） ========
+
+  const [isHoveringCatalog] = useState(false)
+
+  // ======== 编辑器复合动作 ========
+
+  const { handleCanvasClick, handleMoveItem } = useEditorActions(fixtureMap)
+
+  // ======== Tab 循环选择 ========
+
+  const handleCycleSelection = useCallback(() => {
+    const state = useEditorStore.getState()
+    if (!state.selectedItemId) return
+    const selectedItem = state.placedItems[state.selectedItemId]
+    if (!selectedItem) return
+
+    // 收集所有与选中物品有重叠的物品
+    const overlapping: PlacedItem[] = []
+    for (const item of Object.values(state.placedItems)) {
+      const fixture = fixtureMap.get(item.fixtureId)
+      if (!fixture) continue
+      const [w, d] = getEffectiveSize(fixture.gridSize, item.rotation)
+      // 检查是否与选中物品的左上角重叠
+      if (
+        selectedItem.x >= item.x &&
+        selectedItem.x < item.x + w &&
+        selectedItem.y >= item.y &&
+        selectedItem.y < item.y + d
+      ) {
+        overlapping.push(item)
+      }
+    }
+
+    if (overlapping.length <= 1) return
+
+    // 按 ID 排序以保持稳定顺序
+    overlapping.sort((a, b) => a.id.localeCompare(b.id))
+    const currentIdx = overlapping.findIndex((i) => i.id === state.selectedItemId)
+    const nextIdx = (currentIdx + 1) % overlapping.length
+    state.setSelectedItem(overlapping[nextIdx].id)
+  }, [fixtureMap])
+
+  // ======== 键盘快捷键 ========
+
+  useKeyboard({
+    containerRef,
+    onNudge: handleMoveItem,
+    onCycleSelection: handleCycleSelection,
+    isHoveringCatalog,
+  })
+
+  // ======== 鼠标移动处理 ========
 
   const handleMouseMove = useCallback(
     (e: { target: { getStage: () => Konva.Stage | null } }) => {
@@ -96,6 +149,12 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
     },
     [],
   )
+
+  // ======== 鼠标离开 — 清除鬼影预览 ========
+
+  const handleMouseLeave = useCallback(() => {
+    setMouseGridPos(null)
+  }, [])
 
   // ======== 物品按图层分组 ========
 
@@ -117,22 +176,23 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
 
   const handleItemClick = useCallback(
     (id: string) => {
-      if (toolMode === 'select') {
-        setSelectedItem(id)
-      } else if (toolMode === 'remove') {
-        removeItem(id)
+      const state = useEditorStore.getState()
+      if (state.toolMode === 'select') {
+        state.setSelectedItem(id)
+      } else if (state.toolMode === 'remove') {
+        state.removeItem(id)
       }
     },
-    [toolMode, setSelectedItem, removeItem],
+    [],
   )
 
   // ======== 物品拖拽处理 ========
 
   const handleItemDragEnd = useCallback(
     (id: string, x: number, y: number) => {
-      moveItem(id, x, y)
+      handleMoveItem(id, x, y)
     },
-    [moveItem],
+    [handleMoveItem],
   )
 
   // ======== Stage 拖拽结束（平移） ========
@@ -148,16 +208,33 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
     [setStagePos],
   )
 
-  // ======== Stage 空白区域点击（取消选中） ========
+  // ======== Stage 点击处理（stamp/remove/select 通过网格坐标分发） ========
 
   const handleStageClick = useCallback(
-    (e: { target: Konva.Stage | Konva.Node }) => {
+    (e: { target: Konva.Stage | Konva.Node; evt?: MouseEvent | TouchEvent }) => {
       const stage = (e.target as Konva.Node).getStage?.()
+      const state = useEditorStore.getState()
+
+      // 仅在 Stage 空白区域点击时处理
       if (e.target === stage) {
-        setSelectedItem(null)
+        if (!stage) return
+        const pointer = stage.getPointerPosition()
+        if (!pointer) return
+        const scale = stage.scaleX()
+        const gridX = Math.floor((pointer.x - stage.x()) / scale / TILE_SIZE)
+        const gridY = Math.floor((pointer.y - stage.y()) / scale / TILE_SIZE)
+
+        if (state.toolMode === 'stamp') {
+          handleCanvasClick(gridX, gridY)
+        } else if (state.toolMode === 'remove') {
+          // 移除模式下点击空白区域不做处理
+        } else {
+          // 选择模式下点击空白区域取消选中
+          state.setSelectedItem(null)
+        }
       }
     },
-    [setSelectedItem],
+    [handleCanvasClick],
   )
 
   return (
@@ -181,6 +258,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
         onTap={handleStageClick}
         onMouseMove={handleMouseMove}
         onPointerMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
       >
         {/* 网格底图（草地 + 网格线） */}
         <GridLayer
@@ -222,5 +300,5 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
   )
 }
 
-// 导出 stageRef 用于 Plan 06 键盘事件绑定
+// 导出 stageScale 供 StatusBar 使用
 export type { EditorCanvasProps }
