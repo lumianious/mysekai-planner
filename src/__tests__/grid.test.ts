@@ -11,8 +11,9 @@ describe('TILE_SIZE', () => {
 })
 
 describe('snapToGrid', () => {
-  it('对齐到最近的网格点 (47, 63) -> (48, 64)', () => {
-    expect(snapToGrid({ x: 47, y: 63 }, 32)).toEqual({ x: 48, y: 64 })
+  it('对齐到最近的网格点 (47, 63) -> (32, 64)', () => {
+    // 47/32=1.47 四舍五入=1 => 32; 63/32=1.97 四舍五入=2 => 64
+    expect(snapToGrid({ x: 47, y: 63 }, 32)).toEqual({ x: 32, y: 64 })
   })
 
   it('已对齐的坐标不变', () => {
@@ -21,7 +22,8 @@ describe('snapToGrid', () => {
 
   it('使用默认 TILE_SIZE', () => {
     const result = snapToGrid({ x: 47, y: 63 })
-    expect(result).toEqual({ x: 48, y: 64 })
+    // 默认 tileSize=32，同上
+    expect(result).toEqual({ x: 32, y: 64 })
   })
 
   it('(0, 0) 不变', () => {

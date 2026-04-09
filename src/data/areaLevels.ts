@@ -1,0 +1,17 @@
+import type { AreaLevel, GridSize } from '../types/editor'
+
+// ======== 区域等级配置 ========
+// 数据来源: mysekaiSiteLayouts.json (mysekaiLayoutType=floor)
+// 等级 1-2 共享 36x36 网格，区别在于 characterEntryMaxNum 和 putCostLimit
+
+export const AREA_LEVELS: Record<AreaLevel, { gridSize: GridSize; label: string }> = {
+  1: { gridSize: { width: 36, depth: 36 }, label: 'Lv.1' },
+  2: { gridSize: { width: 36, depth: 36 }, label: 'Lv.2' },
+  3: { gridSize: { width: 70, depth: 70 }, label: 'Lv.3' },
+  4: { gridSize: { width: 90, depth: 90 }, label: 'Lv.4' },
+  5: { gridSize: { width: 100, depth: 100 }, label: 'Lv.5' },
+}
+
+export function getGridSize(level: AreaLevel): GridSize {
+  return AREA_LEVELS[level].gridSize
+}
