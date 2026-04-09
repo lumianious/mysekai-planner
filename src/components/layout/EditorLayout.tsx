@@ -1,5 +1,5 @@
 // ======== 编辑器主布局 ========
-// INPUT: Toolbar, Hotbar, StatusBar, CatalogSidebar 组件, useFixtureData hook
+// INPUT: Toolbar, Hotbar, StatusBar, CatalogSidebar, EditorCanvas 组件, useFixtureData hook
 // OUTPUT: 编辑器整体布局壳（工具栏 + 目录侧边栏 + 画布区 + 热栏 + 状态栏）
 // POS: src/components/layout/EditorLayout.tsx — 编辑器页面骨架
 
@@ -7,6 +7,7 @@ import { Toolbar } from '../toolbar/Toolbar'
 import { Hotbar } from '../hotbar/Hotbar'
 import { StatusBar } from '../status/StatusBar'
 import { CatalogSidebar } from '../catalog/CatalogSidebar'
+import { EditorCanvas } from '../canvas/EditorCanvas'
 import { useFixtureData } from '../../hooks/useFixtureData'
 
 export function EditorLayout() {
@@ -36,12 +37,8 @@ export function EditorLayout() {
           />
         )}
 
-        {/* 画布区域（占位） */}
-        <div className="flex-1 bg-surface flex items-center justify-center">
-          <p className="text-muted text-sm">
-            从左侧目录选择家具开始布局
-          </p>
-        </div>
+        {/* 画布区域 */}
+        <EditorCanvas fixtureMap={fixtureMap} />
       </div>
 
       {/* 热栏 */}
