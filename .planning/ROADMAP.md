@@ -37,7 +37,7 @@ Plans:
 - [x] 01-02-PLAN.md — Fixture data layer (fetch, filter, search, CDN URLs) and Zustand editor store with undo/redo
 - [x] 01-03-PLAN.md — Welcome screen, editor layout shell, toolbar, hotbar, and status bar components
 - [x] 01-04-PLAN.md — Catalog sidebar with search, category chips, virtualized thumbnail grid, tooltips, hotbar assignment
-- [ ] 01-05-PLAN.md — Konva canvas with grid layers, placed item rendering, ghost preview, pan/zoom
+- [x] 01-05-PLAN.md — Konva canvas with grid layers, placed item rendering, ghost preview, pan/zoom
 - [ ] 01-06-PLAN.md — Editor interactions: keyboard shortcuts, tool modes, mandatory fixtures, undo/redo flash
 **UI hint**: yes
 
