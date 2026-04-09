@@ -74,6 +74,7 @@ export interface EditorState {
   previewRotation: Rotation  // 预览旋转（stamp 模式下鬼影的旋转角度）
   hotbar: HotbarSlot[]
   isEditorReady: boolean     // false = 显示欢迎界面
+  flashItemIds: string[]     // undo/redo 闪烁动画目标项
 
   // -- 动作 --
   placeItem: (item: Omit<PlacedItem, 'id'>) => void
@@ -89,4 +90,5 @@ export interface EditorState {
   assignHotbar: (slot: number, fixtureId: number) => void
   activateHotbar: (slot: number) => void
   startEditor: (level: AreaLevel) => void
+  triggerFlash: (ids: string[]) => void
 }

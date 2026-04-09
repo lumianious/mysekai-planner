@@ -1,12 +1,17 @@
 // ======== 状态栏 ========
-// INPUT: editorStore（areaLevel, gridSize, placedItems）
-// OUTPUT: 底部状态栏（区域等级、已配置数量、缩放比例）
+// INPUT: editorStore（areaLevel, gridSize, placedItems）, stageScale, mouseGridPos
+// OUTPUT: 底部状态栏（区域等级、已配置数量、缩放比例、鼠标坐标）
 // POS: src/components/status/StatusBar.tsx — 编辑器底部信息栏
 
 import { useEditorStore } from '../../stores/editorStore'
 import { AREA_LEVELS } from '../../data/areaLevels'
 
-export function StatusBar() {
+interface StatusBarProps {
+  stageScale?: number
+  mouseGridPos?: { x: number; y: number } | null
+}
+
+export function StatusBar({ stageScale = 1, mouseGridPos }: StatusBarProps) {
   const areaLevel = useEditorStore((s) => s.areaLevel)
   const gridSize = useEditorStore((s) => s.gridSize)
   const placedItems = useEditorStore((s) => s.placedItems)
@@ -25,8 +30,15 @@ export function StatusBar() {
 
       {/* 缩放比例 */}
       <span className="border-l border-default pl-4 ml-4">
-        缩放: 100%
+        缩放: {Math.round(stageScale * 100)}%
       </span>
+
+      {/* 鼠标网格坐标 */}
+      {mouseGridPos && (
+        <span className="border-l border-default pl-4 ml-4">
+          位置: ({mouseGridPos.x}, {mouseGridPos.y})
+        </span>
+      )}
     </div>
   )
 }

@@ -42,7 +42,7 @@ export function EditorLayout() {
       </div>
 
       {/* 热栏 */}
-      <Hotbar />
+      <Hotbar fixtureMap={fixtureMap} />
 
       {/* 状态栏 */}
       <StatusBar />

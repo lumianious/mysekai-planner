@@ -1,8 +1,8 @@
 // ======== 编辑器 Store 测试 ========
 
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import type { Fixture, Rotation } from '../types/editor'
-import { useEditorStore, buildOccupancyGrid, checkCanPlace } from '../stores/editorStore'
+import { useEditorStore, buildOccupancyGrid, checkCanPlace, undoWithFlash } from '../stores/editorStore'
 
 // ======== 测试前重置 store ========
 
@@ -19,6 +19,7 @@ beforeEach(() => {
     previewRotation: 0 as Rotation,
     hotbar: Array(9).fill(null).map(() => ({ fixtureId: null })),
     isEditorReady: false,
+    flashItemIds: [],
   })
   // 清除 undo/redo 历史
   useEditorStore.temporal.getState().clear()
@@ -241,6 +242,36 @@ describe('startEditor', () => {
     expect(state.gridSize).toEqual({ width: 70, depth: 70 })
     expect(state.isEditorReady).toBe(true)
   })
+
+  it('auto-places 2 system fixtures (gate and house)', () => {
+    useEditorStore.getState().startEditor(3)
+    const state = useEditorStore.getState()
+    const items = Object.values(state.placedItems)
+    expect(items).toHaveLength(2)
+    // 两者都是系统物品
+    expect(items.every((item) => item.isSystem === true)).toBe(true)
+  })
+
+  it('system items have isSystem=true and furniture layer', () => {
+    useEditorStore.getState().startEditor(1)
+    const items = Object.values(useEditorStore.getState().placedItems)
+    for (const item of items) {
+      expect(item.isSystem).toBe(true)
+      expect(item.layer).toBe('furniture')
+    }
+  })
+
+  it('system fixtures cannot be removed', () => {
+    useEditorStore.getState().startEditor(1)
+    const items = Object.values(useEditorStore.getState().placedItems)
+    expect(items).toHaveLength(2)
+    // 尝试删除每个系统物品
+    for (const item of items) {
+      useEditorStore.getState().removeItem(item.id)
+    }
+    // 系统物品仍然存在
+    expect(Object.values(useEditorStore.getState().placedItems)).toHaveLength(2)
+  })
 })
 
 // ======== previewRotation 测试 ========
@@ -452,5 +483,77 @@ describe('occupancy grid', () => {
     // furniture 层在同一位置应该可以放置
     const canPlace = checkCanPlace(furnitureGrid, 5, 5, 2, 2, 36, 36)
     expect(canPlace).toBe(true)
+  })
+})
+
+// ======== triggerFlash 测试 ========
+
+describe('triggerFlash', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('sets flashItemIds and clears after 300ms', () => {
+    useEditorStore.getState().triggerFlash(['id-1', 'id-2'])
+    expect(useEditorStore.getState().flashItemIds).toEqual(['id-1', 'id-2'])
+
+    // 300ms 后应清除
+    vi.advanceTimersByTime(300)
+    expect(useEditorStore.getState().flashItemIds).toEqual([])
+  })
+
+  it('empty ids array is a no-op for visual but still sets state', () => {
+    useEditorStore.getState().triggerFlash([])
+    expect(useEditorStore.getState().flashItemIds).toEqual([])
+  })
+})
+
+// ======== undoWithFlash / redoWithFlash 测试 ========
+
+describe('undoWithFlash / redoWithFlash', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('undoWithFlash triggers flash on items that reappear', async () => {
+    useEditorStore.getState().placeItem({
+      fixtureId: 1,
+      x: 5,
+      y: 5,
+      rotation: 0,
+      layer: 'furniture',
+      isSystem: false,
+    })
+    const placedId = Object.keys(useEditorStore.getState().placedItems)[0]
+
+    // 移动物品（产生可追踪的变化）
+    useEditorStore.getState().moveItem(placedId, 10, 10)
+
+    // 等待 zundo 处理
+    vi.useRealTimers()
+    await new Promise((r) => setTimeout(r, 100))
+    vi.useFakeTimers()
+
+    undoWithFlash()
+
+    // 物品位置被撤销回 (5,5)
+    const item = useEditorStore.getState().placedItems[placedId]
+    expect(item.x).toBe(5)
+    expect(item.y).toBe(5)
+
+    // 闪烁应被触发
+    expect(useEditorStore.getState().flashItemIds).toContain(placedId)
+
+    // 300ms 后清除
+    vi.advanceTimersByTime(300)
+    expect(useEditorStore.getState().flashItemIds).toEqual([])
   })
 })

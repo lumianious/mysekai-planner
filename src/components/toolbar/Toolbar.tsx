@@ -3,6 +3,7 @@
 // OUTPUT: 顶部工具栏（模式切换、覆盖切换、撤销重做、区域等级选择）
 // POS: src/components/toolbar/Toolbar.tsx — 编辑器顶部工具栏
 
+import { useState, useEffect, useCallback } from 'react'
 import {
   MousePointer2,
   Stamp,
@@ -14,10 +15,34 @@ import {
 } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { useEditorStore } from '../../stores/editorStore'
+import { useEditorStore, undoWithFlash, redoWithFlash } from '../../stores/editorStore'
 import { AREA_LEVELS } from '../../data/areaLevels'
 import { ToolButton } from './ToolButton'
 import type { AreaLevel, ToolMode } from '../../types/editor'
+
+// ======== temporal 状态订阅 Hook ========
+// zundo 的 temporal store 不是 React 响应式的，需要手动订阅
+
+function useTemporalState() {
+  const [canUndo, setCanUndo] = useState(false)
+  const [canRedo, setCanRedo] = useState(false)
+
+  useEffect(() => {
+    // 初始状态
+    const temporal = useEditorStore.temporal.getState()
+    setCanUndo(temporal.pastStates.length > 0)
+    setCanRedo(temporal.futureStates.length > 0)
+
+    // 订阅 temporal 变化
+    const unsub = useEditorStore.temporal.subscribe((state) => {
+      setCanUndo(state.pastStates.length > 0)
+      setCanRedo(state.futureStates.length > 0)
+    })
+    return unsub
+  }, [])
+
+  return { canUndo, canRedo }
+}
 
 export function Toolbar() {
   const toolMode = useEditorStore((s) => s.toolMode)
@@ -27,6 +52,11 @@ export function Toolbar() {
   const areaLevel = useEditorStore((s) => s.areaLevel)
   const gridSize = useEditorStore((s) => s.gridSize)
   const setAreaLevel = useEditorStore((s) => s.setAreaLevel)
+
+  const { canUndo, canRedo } = useTemporalState()
+
+  const handleUndo = useCallback(() => undoWithFlash(), [])
+  const handleRedo = useCallback(() => redoWithFlash(), [])
 
   // ---- 工具模式按钮配置 ----
   const toolButtons: Array<{
@@ -96,20 +126,16 @@ export function Toolbar() {
           label="撤销"
           shortcut="Ctrl+Z"
           isActive={false}
-          onClick={() => {
-            // TODO: 撤销功能将在 Plan 02 完整 store 中接入 zundo temporal
-          }}
-          disabled={false}
+          onClick={handleUndo}
+          disabled={!canUndo}
         />
         <ToolButton
           icon={Redo2}
           label="重做"
           shortcut="Ctrl+Y"
           isActive={false}
-          onClick={() => {
-            // TODO: 重做功能将在 Plan 02 完整 store 中接入 zundo temporal
-          }}
-          disabled={false}
+          onClick={handleRedo}
+          disabled={!canRedo}
         />
 
         {/* 右侧区域 — 区域等级选择 */}

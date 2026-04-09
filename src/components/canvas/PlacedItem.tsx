@@ -1,14 +1,16 @@
 // ======== 放置物品组件 ========
 // INPUT: PlacedItem, Fixture, isSelected, toolMode, stageScale
-// OUTPUT: Konva Group（彩色矩形 + 名称标签 + 选中指示器 + 系统锁标识）
+// OUTPUT: Konva Group（彩色矩形 + 名称标签 + 选中指示器 + 系统锁标识 + 闪烁动画）
 // POS: src/components/canvas/PlacedItem.tsx — 单个放置物品的画布渲染
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Group, Rect, Text } from 'react-konva'
+import Konva from 'konva'
 import type { KonvaEventObject } from 'konva/lib/Node'
 import { TILE_SIZE } from '../../utils/grid'
 import { getEffectiveSize } from '../../utils/grid'
 import { getFixtureColor } from '../../utils/color'
+import { useEditorStore } from '../../stores/editorStore'
 import type { PlacedItem as PlacedItemType, Fixture, ToolMode } from '../../types/editor'
 
 interface PlacedItemProps {
@@ -70,6 +72,26 @@ export const PlacedItem = React.memo(function PlacedItem({
   const [w, d] = getEffectiveSize(fixture.gridSize, item.rotation)
   const pixelWidth = w * TILE_SIZE
   const pixelHeight = d * TILE_SIZE
+  const flashRectRef = useRef<Konva.Rect>(null)
+
+  // ======== 闪烁动画（undo/redo 反馈） ========
+
+  const flashItemIds = useEditorStore((s) => s.flashItemIds)
+
+  useEffect(() => {
+    if (flashItemIds.includes(item.id) && flashRectRef.current) {
+      const node = flashRectRef.current
+      node.opacity(1)
+      const tween = new Konva.Tween({
+        node,
+        duration: 0.3,
+        opacity: 0,
+        easing: Konva.Easings.EaseOut,
+        onFinish: () => tween.destroy(),
+      })
+      tween.play()
+    }
+  }, [flashItemIds, item.id])
 
   // 点击事件处理
   const handleClick = useCallback(
@@ -156,6 +178,18 @@ export const PlacedItem = React.memo(function PlacedItem({
           listening={false}
         />
       )}
+
+      {/* undo/redo 闪烁覆盖层 */}
+      <Rect
+        ref={flashRectRef}
+        width={pixelWidth}
+        height={pixelHeight}
+        stroke="#39c5bb"
+        strokeWidth={2 / stageScale}
+        opacity={0}
+        listening={false}
+        cornerRadius={2}
+      />
     </Group>
   )
 })

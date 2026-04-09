@@ -89,6 +89,7 @@ export const useEditorStore = create<EditorState>()(
       previewRotation: 0 as Rotation,
       hotbar: Array(9).fill(null).map(() => ({ fixtureId: null })),
       isEditorReady: false,
+      flashItemIds: [],
 
       // -- 动作 --
 
@@ -174,12 +175,50 @@ export const useEditorStore = create<EditorState>()(
         }
       },
 
-      startEditor: (level: AreaLevel) =>
+      startEditor: (level: AreaLevel) => {
+        const grid = getGridSize(level)
+        // D-23: 自动放置必要建筑（门和房子）
+        // TODO: 从 mysekaiSystemFixtures.json 获取真实 ID
+        const gateId = crypto.randomUUID()
+        const houseId = crypto.randomUUID()
+        const gateX = Math.floor(grid.width / 2) - 1
+        const gateY = grid.depth - 3
+        const houseX = Math.floor(grid.width / 2) - 2
+        const houseY = Math.floor(grid.depth / 2) - 2
+
         set({
           areaLevel: level,
-          gridSize: getGridSize(level),
+          gridSize: grid,
           isEditorReady: true,
-        }),
+          placedItems: {
+            [gateId]: {
+              id: gateId,
+              fixtureId: -1, // 占位 ID — 门
+              x: gateX,
+              y: gateY,
+              rotation: 0 as Rotation,
+              layer: 'furniture' as const,
+              isSystem: true,
+            },
+            [houseId]: {
+              id: houseId,
+              fixtureId: -2, // 占位 ID — 房子
+              x: houseX,
+              y: houseY,
+              rotation: 0 as Rotation,
+              layer: 'furniture' as const,
+              isSystem: true,
+            },
+          },
+        })
+      },
+
+      triggerFlash: (ids: string[]) => {
+        set({ flashItemIds: ids })
+        setTimeout(() => {
+          set({ flashItemIds: [] })
+        }, 300)
+      },
     }),
     {
       limit: 50, // 超过 GRID-09 最低 20 步要求
@@ -193,3 +232,41 @@ export const useEditorStore = create<EditorState>()(
     },
   ),
 )
+
+// ======== 撤销/重做带闪烁动画 ========
+
+function findChangedItemIds(
+  before: Record<string, { x: number; y: number; rotation: Rotation }>,
+  after: Record<string, { x: number; y: number; rotation: Rotation }>,
+): string[] {
+  const ids = new Set<string>()
+  // 新增或变更的项
+  for (const [id, item] of Object.entries(after)) {
+    const prev = before[id]
+    if (!prev || prev.x !== item.x || prev.y !== item.y || prev.rotation !== item.rotation) {
+      ids.add(id)
+    }
+  }
+  // 注意：已删除的项在 after 中不存在，无法对其执行闪烁动画
+  return Array.from(ids)
+}
+
+export function undoWithFlash() {
+  const beforeItems = useEditorStore.getState().placedItems
+  useEditorStore.temporal.getState().undo()
+  const afterItems = useEditorStore.getState().placedItems
+  const changedIds = findChangedItemIds(beforeItems, afterItems)
+  if (changedIds.length > 0) {
+    useEditorStore.getState().triggerFlash(changedIds)
+  }
+}
+
+export function redoWithFlash() {
+  const beforeItems = useEditorStore.getState().placedItems
+  useEditorStore.temporal.getState().redo()
+  const afterItems = useEditorStore.getState().placedItems
+  const changedIds = findChangedItemIds(beforeItems, afterItems)
+  if (changedIds.length > 0) {
+    useEditorStore.getState().triggerFlash(changedIds)
+  }
+}
