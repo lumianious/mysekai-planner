@@ -2,7 +2,7 @@
 // 数据来源: sekai-master-db-diff (GitHub)
 // CDN 缩略图: storage.sekai.best
 
-import type { Fixture, FixtureMainGenre, FixtureSubGenre, ItemLayer } from '../types/editor'
+import type { Fixture, ItemLayer } from '../types/editor'
 
 const DATA_BASE_URL = 'https://raw.githubusercontent.com/Sekai-World/sekai-master-db-diff/main'
 
