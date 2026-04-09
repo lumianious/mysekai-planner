@@ -9,13 +9,13 @@
 
 - [x] **GRID-01**: User sees an accurate grid matching in-game MySekai outdoor area dimensions
 - [x] **GRID-02**: User can select outdoor area level (1-5) with correct grid sizes (36x36 to 100x100)
-- [ ] **GRID-03**: Grid has two render layers: ground layer (roads, rugs) and furniture layer (everything else)
-- [ ] **GRID-04**: User can place furniture on the grid with snap-to-grid behavior
-- [ ] **GRID-05**: User can move placed furniture to a new grid position
-- [ ] **GRID-06**: User can remove placed furniture from the grid
-- [ ] **GRID-07**: User can rotate placed furniture (90/180/270 degrees)
+- [x] **GRID-03**: Grid has two render layers: ground layer (roads, rugs) and furniture layer (everything else)
+- [x] **GRID-04**: User can place furniture on the grid with snap-to-grid behavior
+- [x] **GRID-05**: User can move placed furniture to a new grid position
+- [x] **GRID-06**: User can remove placed furniture from the grid
+- [x] **GRID-07**: User can rotate placed furniture (90/180/270 degrees)
 - [ ] **GRID-08**: User can pan and zoom the canvas viewport
-- [ ] **GRID-09**: User can undo and redo actions (minimum 20 steps)
+- [x] **GRID-09**: User can undo and redo actions (minimum 20 steps)
 - [ ] **GRID-10**: User sees a ghost preview of the item before placing it on the grid
 - [ ] **GRID-11**: Placed items render as colored rectangles with labels initially, replaced by top-down sprites when available
 - [ ] **GRID-12**: Put-target items (e.g. table lamps) can only be placed on put-base items (e.g. tables)
@@ -32,10 +32,10 @@
 
 ### Furniture Catalog
 
-- [ ] **CATL-01**: User can browse a catalog of all MySekai fixtures sourced from sekai-master-db-diff
-- [ ] **CATL-02**: User can search fixtures by name (Japanese)
-- [ ] **CATL-03**: User can filter fixtures by category and sub-genre
-- [ ] **CATL-04**: Catalog displays CDN isometric thumbnail images from storage.sekai.best for visual identification
+- [x] **CATL-01**: User can browse a catalog of all MySekai fixtures sourced from sekai-master-db-diff
+- [x] **CATL-02**: User can search fixtures by name (Japanese)
+- [x] **CATL-03**: User can filter fixtures by category and sub-genre
+- [x] **CATL-04**: Catalog displays CDN isometric thumbnail images from storage.sekai.best for visual identification
 
 ### Cost Calculator
 
@@ -103,13 +103,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | GRID-01 | Phase 1 | Complete |
 | GRID-02 | Phase 1 | Complete |
-| GRID-03 | Phase 1 | Pending |
-| GRID-04 | Phase 1 | Pending |
-| GRID-05 | Phase 1 | Pending |
-| GRID-06 | Phase 1 | Pending |
-| GRID-07 | Phase 1 | Pending |
+| GRID-03 | Phase 1 | Complete |
+| GRID-04 | Phase 1 | Complete |
+| GRID-05 | Phase 1 | Complete |
+| GRID-06 | Phase 1 | Complete |
+| GRID-07 | Phase 1 | Complete |
 | GRID-08 | Phase 1 | Pending |
-| GRID-09 | Phase 1 | Pending |
+| GRID-09 | Phase 1 | Complete |
 | GRID-10 | Phase 1 | Pending |
 | GRID-11 | Phase 1 | Pending |
 | GRID-12 | Phase 1 | Pending |
@@ -120,10 +120,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPRT-05 | Phase 5 | Pending |
 | SPRT-06 | Phase 5 | Pending |
 | SPRT-07 | Phase 5 | Pending |
-| CATL-01 | Phase 1 | Pending |
-| CATL-02 | Phase 1 | Pending |
-| CATL-03 | Phase 1 | Pending |
-| CATL-04 | Phase 1 | Pending |
+| CATL-01 | Phase 1 | Complete |
+| CATL-02 | Phase 1 | Complete |
+| CATL-03 | Phase 1 | Complete |
+| CATL-04 | Phase 1 | Complete |
 | COST-01 | Phase 4 | Pending |
 | COST-02 | Phase 4 | Pending |
 | COST-03 | Phase 4 | Pending |
