@@ -31,7 +31,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can select a furniture item from the catalog, see a ghost preview on the grid, and place it with snap-to-grid behavior
   4. User can move, rotate (90/180/270), and remove placed items; items render as colored rectangles with labels on the correct layer
   5. User can pan and zoom the canvas, and undo/redo at least 20 actions
-**Plans**: TBD
+**Plans:** 6 plans
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffold, TypeScript types, test infra, area level config, grid/color utilities
+- [ ] 01-02-PLAN.md — Fixture data layer (fetch, filter, search, CDN URLs) and Zustand editor store with undo/redo
+- [ ] 01-03-PLAN.md — Welcome screen, editor layout shell, toolbar, hotbar, and status bar components
+- [ ] 01-04-PLAN.md — Catalog sidebar with search, category chips, virtualized thumbnail grid, tooltips, hotbar assignment
+- [ ] 01-05-PLAN.md — Konva canvas with grid layers, placed item rendering, ghost preview, pan/zoom
+- [ ] 01-06-PLAN.md — Editor interactions: keyboard shortcuts, tool modes, mandatory fixtures, undo/redo flash
 **UI hint**: yes
 
 ### Phase 2: Roads, Fences & Ground Layer
@@ -97,7 +104,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Core Editor | 0/TBD | Not started | - |
+| 1. Foundation & Core Editor | 0/6 | Planning complete | - |
 | 2. Roads, Fences & Ground Layer | 0/TBD | Not started | - |
 | 3. Persistence & Sharing | 0/TBD | Not started | - |
 | 4. Cost Calculator & Inventory | 0/TBD | Not started | - |
