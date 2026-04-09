@@ -12,6 +12,7 @@ import { TILE_SIZE } from '../../utils/grid'
 import { GridLayer } from './GridLayer'
 import { GroundLayer } from './GroundLayer'
 import { FurnitureLayer } from './FurnitureLayer'
+import { GhostPreview } from './GhostPreview'
 import type { Fixture, PlacedItem, ToolMode } from '../../types/editor'
 
 // ======== 光标映射 ========
@@ -80,7 +81,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
 
   // ======== 鼠标网格坐标追踪（供 GhostPreview 使用） ========
 
-  const [_mouseGridPos, setMouseGridPos] = useState<{ x: number; y: number } | null>(null)
+  const [mouseGridPos, setMouseGridPos] = useState<{ x: number; y: number } | null>(null)
 
   const handleMouseMove = useCallback(
     (e: { target: { getStage: () => Konva.Stage | null } }) => {
@@ -210,7 +211,12 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
           onItemDragEnd={handleItemDragEnd}
         />
 
-        {/* GhostPreview 将在 Task 2 中添加 */}
+        {/* 鬼影预览（第4层，最顶层覆盖） */}
+        <GhostPreview
+          fixtureMap={fixtureMap}
+          stageScale={stageScale}
+          mouseGridPos={mouseGridPos}
+        />
       </Stage>
     </div>
   )
