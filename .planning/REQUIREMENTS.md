@@ -101,50 +101,50 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GRID-01 | — | Pending |
-| GRID-02 | — | Pending |
-| GRID-03 | — | Pending |
-| GRID-04 | — | Pending |
-| GRID-05 | — | Pending |
-| GRID-06 | — | Pending |
-| GRID-07 | — | Pending |
-| GRID-08 | — | Pending |
-| GRID-09 | — | Pending |
-| GRID-10 | — | Pending |
-| GRID-11 | — | Pending |
-| GRID-12 | — | Pending |
-| SPRT-01 | — | Pending |
-| SPRT-02 | — | Pending |
-| SPRT-03 | — | Pending |
-| SPRT-04 | — | Pending |
-| SPRT-05 | — | Pending |
-| SPRT-06 | — | Pending |
-| SPRT-07 | — | Pending |
-| CATL-01 | — | Pending |
-| CATL-02 | — | Pending |
-| CATL-03 | — | Pending |
-| CATL-04 | — | Pending |
-| COST-01 | — | Pending |
-| COST-02 | — | Pending |
-| COST-03 | — | Pending |
-| COST-04 | — | Pending |
-| PERS-01 | — | Pending |
-| PERS-02 | — | Pending |
-| PERS-03 | — | Pending |
-| PERS-04 | — | Pending |
-| PERS-05 | — | Pending |
-| ROAD-01 | — | Pending |
-| ROAD-02 | — | Pending |
-| ROAD-03 | — | Pending |
-| ROAD-04 | — | Pending |
-| I18N-01 | — | Pending |
-| I18N-02 | — | Pending |
+| GRID-01 | Phase 1 | Pending |
+| GRID-02 | Phase 1 | Pending |
+| GRID-03 | Phase 1 | Pending |
+| GRID-04 | Phase 1 | Pending |
+| GRID-05 | Phase 1 | Pending |
+| GRID-06 | Phase 1 | Pending |
+| GRID-07 | Phase 1 | Pending |
+| GRID-08 | Phase 1 | Pending |
+| GRID-09 | Phase 1 | Pending |
+| GRID-10 | Phase 1 | Pending |
+| GRID-11 | Phase 1 | Pending |
+| GRID-12 | Phase 1 | Pending |
+| SPRT-01 | Phase 5 | Pending |
+| SPRT-02 | Phase 5 | Pending |
+| SPRT-03 | Phase 5 | Pending |
+| SPRT-04 | Phase 5 | Pending |
+| SPRT-05 | Phase 5 | Pending |
+| SPRT-06 | Phase 5 | Pending |
+| SPRT-07 | Phase 5 | Pending |
+| CATL-01 | Phase 1 | Pending |
+| CATL-02 | Phase 1 | Pending |
+| CATL-03 | Phase 1 | Pending |
+| CATL-04 | Phase 1 | Pending |
+| COST-01 | Phase 4 | Pending |
+| COST-02 | Phase 4 | Pending |
+| COST-03 | Phase 4 | Pending |
+| COST-04 | Phase 4 | Pending |
+| PERS-01 | Phase 3 | Pending |
+| PERS-02 | Phase 3 | Pending |
+| PERS-03 | Phase 3 | Pending |
+| PERS-04 | Phase 3 | Pending |
+| PERS-05 | Phase 3 | Pending |
+| ROAD-01 | Phase 2 | Pending |
+| ROAD-02 | Phase 2 | Pending |
+| ROAD-03 | Phase 2 | Pending |
+| ROAD-04 | Phase 2 | Pending |
+| I18N-01 | Phase 6 | Pending |
+| I18N-02 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 38 total
-- Mapped to phases: 0
-- Unmapped: 38 ⚠️
+- Mapped to phases: 38
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 after initial definition*
+*Last updated: 2026-04-09 after roadmap creation*
