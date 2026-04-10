@@ -13,7 +13,7 @@ This roadmap delivers a browser-based 2D grid editor for planning MySekai outdoo
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation & Core Editor** - Scaffold the app, build the layered canvas grid, furniture catalog, and complete place/move/remove/rotate workflow with colored rectangles
-- [ ] **Phase 2: Roads, Fences & Ground Layer** - Paint brush and segment tools for roads, rugs, and fences on the ground layer
+- [x] **Phase 2: Roads, Fences & Ground Layer** - Paint brush and segment tools for roads, rugs, and fences on the ground layer (completed 2026-04-10)
 - [ ] **Phase 3: Persistence & Sharing** - Auto-save to localStorage, load designs, and share/import blueprints via URL
 - [ ] **Phase 4: Cost Calculator & Inventory** - Material cost breakdown, inventory input, and remaining-cost calculation
 - [ ] **Phase 5: Sprite Pipeline** - Offline Python/Blender pipeline to extract and render top-down sprites, integrate into grid editor
@@ -50,7 +50,7 @@ Plans:
   2. User can place rug/mat items on the ground layer
   3. User can place fence segments on the grid
   4. Ground-layer items (roads, rugs) always render beneath furniture-layer items
-**Plans:** 5 plans
+**Plans:** 5/5 plans complete
 Plans:
 - [x] 02-01-PLAN.md — Schema fix (Fixture.handleType + layoutType) + getGroundSubtype classifier + road→ground routing
 - [x] 02-02-PLAN.md — Brush tool mode infrastructure: ToolMode, zundo batching helpers, toolbar button, P shortcut, auto-switch routing
@@ -111,7 +111,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Core Editor | 0/6 | Planning complete | - |
-| 2. Roads, Fences & Ground Layer | 0/5 | Planning complete | - |
+| 2. Roads, Fences & Ground Layer | 0/5 | Complete    | 2026-04-10 |
 | 3. Persistence & Sharing | 0/TBD | Not started | - |
 | 4. Cost Calculator & Inventory | 0/TBD | Not started | - |
 | 5. Sprite Pipeline | 0/TBD | Not started | - |
