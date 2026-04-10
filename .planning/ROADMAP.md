@@ -50,7 +50,13 @@ Plans:
   2. User can place rug/mat items on the ground layer
   3. User can place fence segments on the grid
   4. Ground-layer items (roads, rugs) always render beneath furniture-layer items
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 02-01-PLAN.md — Schema fix (Fixture.handleType + layoutType) + getGroundSubtype classifier + road→ground routing
+- [ ] 02-02-PLAN.md — Brush tool mode infrastructure: ToolMode, zundo batching helpers, toolbar button, P shortcut, auto-switch routing
+- [ ] 02-03-PLAN.md — Drag-paint for roads/color-tiles + drag-erase for remove mode + Bresenham rasterizer + ghost preview
+- [ ] 02-04-PLAN.md — Fence line tool: click-start → click-end → axis-snap ghost → confirm/cancel overlay
+- [ ] 02-05-PLAN.md — Dashed grid overlay refinement (D-46) matching in-game visual
 **UI hint**: yes
 
 ### Phase 3: Persistence & Sharing
@@ -105,7 +111,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Core Editor | 0/6 | Planning complete | - |
-| 2. Roads, Fences & Ground Layer | 0/TBD | Not started | - |
+| 2. Roads, Fences & Ground Layer | 0/5 | Planning complete | - |
 | 3. Persistence & Sharing | 0/TBD | Not started | - |
 | 4. Cost Calculator & Inventory | 0/TBD | Not started | - |
 | 5. Sprite Pipeline | 0/TBD | Not started | - |
