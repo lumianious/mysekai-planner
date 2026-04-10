@@ -7,7 +7,7 @@ import { Layer, Rect, Text } from 'react-konva'
 import { useEditorStore } from '../../stores/editorStore'
 import { TILE_SIZE } from '../../utils/grid'
 import { checkGhostValidity } from '../../utils/ghostPreview'
-import { getItemLayer } from '../../data/fixtures'
+import { getItemLayer, getBrushInteraction } from '../../data/fixtures'
 import type { Fixture } from '../../types/editor'
 
 // ======== 颜色常量 ========
@@ -34,8 +34,12 @@ export function GhostPreview({
   const overwriteEnabled = useEditorStore((s) => s.overwriteEnabled)
   const previewRotation = useEditorStore((s) => s.previewRotation)
 
-  // 只在 stamp 模式且有选中家具时渲染
-  if (toolMode !== 'stamp' || activeFixtureId === null || !mouseGridPos) {
+  // Stamp 模式 + brush 模式（drag-paint 子模式）都显示鬼影
+  const showGhost =
+    (toolMode === 'stamp' || toolMode === 'brush') &&
+    activeFixtureId !== null &&
+    mouseGridPos !== null
+  if (!showGhost) {
     return <Layer listening={false} />
   }
 
@@ -44,11 +48,25 @@ export function GhostPreview({
     return <Layer listening={false} />
   }
 
+  // Brush 模式下按 step 对齐鬼影位置；fence 线工具鬼影由 plan 02-04 处理，这里隐藏
+  let ghostX = mouseGridPos.x
+  let ghostY = mouseGridPos.y
+  if (toolMode === 'brush') {
+    const interaction = getBrushInteraction(fixture)
+    if (interaction === 'drag-paint') {
+      const step = fixture.gridSize.width
+      ghostX = Math.floor(mouseGridPos.x / step) * step
+      ghostY = Math.floor(mouseGridPos.y / step) * step
+    } else if (interaction === 'line-tool') {
+      return <Layer listening={false} />
+    }
+  }
+
   const layer = getItemLayer(fixture)
 
   const result = checkGhostValidity(
-    mouseGridPos.x,
-    mouseGridPos.y,
+    ghostX,
+    ghostY,
     fixture,
     previewRotation,
     layer,
@@ -65,8 +83,8 @@ export function GhostPreview({
   return (
     <Layer listening={false}>
       <Rect
-        x={mouseGridPos.x * TILE_SIZE}
-        y={mouseGridPos.y * TILE_SIZE}
+        x={ghostX * TILE_SIZE}
+        y={ghostY * TILE_SIZE}
         width={pixelWidth}
         height={pixelHeight}
         fill={color}
@@ -76,8 +94,8 @@ export function GhostPreview({
         cornerRadius={2}
       />
       <Text
-        x={mouseGridPos.x * TILE_SIZE}
-        y={mouseGridPos.y * TILE_SIZE}
+        x={ghostX * TILE_SIZE}
+        y={ghostY * TILE_SIZE}
         width={pixelWidth}
         height={pixelHeight}
         text={fixture.name}
