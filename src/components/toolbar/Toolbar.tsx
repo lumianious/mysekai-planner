@@ -12,6 +12,7 @@ import {
   Redo2,
   Replace,
   Map,
+  Paintbrush,
 } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
@@ -74,6 +75,13 @@ export function Toolbar() {
       icon: Stamp,
       label: '放置',
       shortcut: 'B',
+      activeClassName: 'bg-accent text-surface',
+    },
+    {
+      mode: 'brush',
+      icon: Paintbrush,
+      label: '画刷',
+      shortcut: 'P',
       activeClassName: 'bg-accent text-surface',
     },
     {

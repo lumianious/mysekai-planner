@@ -35,12 +35,17 @@ export function useKeyboard({
         case 'b':
           state.setToolMode('stamp')
           return
+        case 'p':
+          state.setToolMode('brush')
+          return
         case 'x':
           state.setToolMode('remove')
           return
         case 'escape':
           state.setSelectedItem(null)
-          if (state.toolMode === 'stamp') state.setActiveFixture(null)
+          if (state.toolMode === 'stamp' || state.toolMode === 'brush') {
+            state.setActiveFixture(null)
+          }
           return
         case 'z':
           if (e.ctrlKey || e.metaKey) {

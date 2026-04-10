@@ -26,6 +26,8 @@ function getCursor(toolMode: ToolMode): string {
       return 'default'
     case 'stamp':
       return 'crosshair'
+    case 'brush':
+      return 'cell' // 区别于 stamp 的 crosshair，视觉上表示"格子画刷"
     case 'remove':
       return 'pointer'
     default:
