@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-04-10T09:53:54.747Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-04-10T09:57:21.679Z"
 last_activity: 2026-04-10 -- Phase 2 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 11
-  completed_plans: 7
+  completed_plans: 8
   percent: 17
 ---
 
@@ -56,6 +56,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 01 P04 | 6min | 2 tasks | 8 files |
 | Phase 01 P06 | 8min | 3 tasks | 11 files |
 | Phase 02 P05 | 2min | 1 tasks | 1 files |
+| Phase 02 P01 | 4min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current work:
 - [Phase 01]: useKeyboard hook uses getState() for non-reactive keyboard handling to avoid re-render cascades
 - [Phase 01]: Undo/redo flash uses Konva.Tween with 300ms EaseOut on canvas-rendered items
 - [Phase 02]: [Phase 02]: Dashed grid (D-46) uses dash=[4/stageScale, 3/stageScale] and stroke rgba(255,255,255,0.22) for zoom-invariant visual consistency
+- [Phase 02]: [Phase 02]: mysekaiFixtureHandleType is the canonical brush-target discriminator (cleanly partitions 26 roads/color-tiles and 7 fences)
+- [Phase 02]: [Phase 02]: 'floor_appearance' layoutType stays on furniture layer (parallels 'wall_appearance')
+- [Phase 02]: [Phase 02]: Rug classification uses layoutType='rug' (not handleType) to preserve Phase 1 routing
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T09:53:54.744Z
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-04-10T09:57:21.674Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

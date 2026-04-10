@@ -54,7 +54,7 @@
 
 ### Roads & Fences
 
-- [ ] **ROAD-01**: User can place road tiles on the ground layer using a paint/brush tool
+- [x] **ROAD-01**: User can place road tiles on the ground layer using a paint/brush tool
 - [ ] **ROAD-02**: User can place rug/mat items on the ground layer
 - [ ] **ROAD-03**: User can place fence segments on the grid
 - [x] **ROAD-04**: Ground layer items render beneath furniture layer items
@@ -133,7 +133,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERS-03 | Phase 3 | Pending |
 | PERS-04 | Phase 3 | Pending |
 | PERS-05 | Phase 3 | Pending |
-| ROAD-01 | Phase 2 | Pending |
+| ROAD-01 | Phase 2 | Complete |
 | ROAD-02 | Phase 2 | Pending |
 | ROAD-03 | Phase 2 | Pending |
 | ROAD-04 | Phase 2 | Complete |
