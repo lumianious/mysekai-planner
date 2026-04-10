@@ -20,10 +20,32 @@ export interface Fixture {
   gridSize: GridSize                    // 占地尺寸（格子数）
   colorCode: string                     // 颜色代码（可能为空）
   mysekaiFixtureType: 'normal' | 'system' | 'surface_appearance'
-  mysekaiFixtureMainGenreId: number     // 主分类 FK
+  mysekaiFixtureMainGenreId: number     // 主分类 FK（12=道 13=柵 31=カラータイル）
   mysekaiFixtureSubGenreId: number      // 子分类 FK
+  // 交互句柄类型 — 用于 Brush 工具决定拖拽画刷 vs 线工具
+  // 'road'  → 道/カラータイル（拖拽画刷）
+  // 'fence' → 柵（线工具）
+  // 其余值保留以支持现有家具
+  mysekaiFixtureHandleType:
+    | 'none'
+    | 'block'
+    | 'light'
+    | 'road'
+    | 'windowpane'
+    | 'clock'
+    | 'fence'
+    | 'idle_timeline'
+    | 'block_transparent'
   mysekaiSettableSiteType: 'home' | 'room' | 'any'
-  mysekaiSettableLayoutType: 'floor' | 'wall' | 'rug' | 'wall_appearance'
+  // 放置布局类型 — Phase 1 缺失 'road' 和 'floor_appearance'，导致道路/地面外观
+  // 被错误路由到家具层（违反 ROAD-04 / D-41）
+  mysekaiSettableLayoutType:
+    | 'floor'
+    | 'wall'
+    | 'rug'
+    | 'wall_appearance'
+    | 'road'
+    | 'floor_appearance'
   mysekaiFixturePutType: 'none' | 'put_base' | 'put_target'
 }
 

@@ -17,6 +17,7 @@ function makeFixture(overrides: Partial<Fixture> = {}): Fixture {
     mysekaiFixtureType: 'normal',
     mysekaiFixtureMainGenreId: 1,
     mysekaiFixtureSubGenreId: 1,
+    mysekaiFixtureHandleType: 'none',
     mysekaiSettableSiteType: 'home',
     mysekaiSettableLayoutType: 'floor',
     mysekaiFixturePutType: 'none',
