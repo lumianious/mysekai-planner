@@ -16,6 +16,7 @@ import {
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction'
 import { useKeyboard } from '../../hooks/useKeyboard'
 import { useEditorActions } from '../../hooks/useEditorActions'
+import { useFenceLineTool } from '../../hooks/useFenceLineTool'
 import { TILE_SIZE } from '../../utils/grid'
 import { getEffectiveSize } from '../../utils/grid'
 import { rasterizeLine } from '../../utils/rasterize'
@@ -24,6 +25,8 @@ import { GridLayer } from './GridLayer'
 import { GroundLayer } from './GroundLayer'
 import { FurnitureLayer } from './FurnitureLayer'
 import { GhostPreview } from './GhostPreview'
+import { FenceLineTool } from './FenceLineTool'
+import { FenceConfirmOverlay } from './FenceConfirmOverlay'
 import type { Fixture, PlacedItem, ToolMode } from '../../types/editor'
 
 // ======== 光标映射 ========
@@ -88,10 +91,23 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
   const placedItems = useEditorStore((s) => s.placedItems)
   const toolMode = useEditorStore((s) => s.toolMode)
   const selectedItemId = useEditorStore((s) => s.selectedItemId)
+  // D-34: 订阅 activeFixtureId 使 activeFenceFixture 在用户切换家具时重算
+  const activeFixtureId = useEditorStore((s) => s.activeFixtureId)
 
   // ======== 鼠标网格坐标追踪（供 GhostPreview 使用） ========
 
   const [mouseGridPos, setMouseGridPos] = useState<{ x: number; y: number } | null>(null)
+
+  // ======== 围栏线工具状态机 (D-34) ========
+  // 剥离到 useFenceLineTool Hook 以将 EditorCanvas.tsx 行数压回 CLAUDE.md 800 限制内
+  const {
+    fenceState,
+    activeFenceFixture,
+    handleFenceClick,
+    handleFenceMouseMove,
+    confirmFenceLine,
+    cancelFenceLine,
+  } = useFenceLineTool({ toolMode, activeFixtureId, fixtureMap })
 
   // ======== 编辑器复合动作 ========
 
@@ -138,6 +154,8 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
     onNudge: handleMoveItem,
     onCycleSelection: handleCycleSelection,
     fixtureMap,
+    onFenceConfirm: confirmFenceLine,
+    onFenceCancel: cancelFenceLine,
   })
 
   // ======== 拖拽画刷状态机 (D-31, D-33) ========
@@ -269,6 +287,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
       const state = useEditorStore.getState()
 
       // --- 画刷拖拽起点 ---
+      // D-34: 围栏线工具使用 click 事件（非 mousedown drag），因此这里仅处理 drag-paint
       if (state.toolMode === 'brush' && state.activeFixtureId !== null) {
         const fixture = fixtureMap.get(state.activeFixtureId)
         if (!fixture) return
@@ -283,7 +302,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
           paintTileIfAllowed(p.gridX, p.gridY, fixture)
           return
         }
-        // fence 线工具在 plan 02-04 实现
+        // fence 线工具走 handleStageClick 分支
       }
 
       // --- 移除拖拽起点 (D-42) ---
@@ -324,6 +343,10 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
       const gridY = Math.floor((pointer.y - stage.y()) / scale / TILE_SIZE)
       setMouseGridPos({ x: gridX, y: gridY })
 
+      // --- 围栏线工具 picking-end 实时吸附 (D-34, D-35) ---
+      // 委托给 useFenceLineTool.handleFenceMouseMove —— 内部自守 phase 与引用相等
+      handleFenceMouseMove(gridX, gridY)
+
       // --- 画刷拖拽推进 (D-33) ---
       if (isPaintingRef.current) {
         const state = useEditorStore.getState()
@@ -361,7 +384,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
         lastErasedTileRef.current = { x: gridX, y: gridY }
       }
     },
-    [fixtureMap, paintTileIfAllowed, eraseGroundTileIfAny],
+    [fixtureMap, paintTileIfAllowed, eraseGroundTileIfAny, handleFenceMouseMove],
   )
 
   // ======== 鼠标离开 — 清除鬼影预览 + R-06 清理 ========
@@ -436,11 +459,18 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
         const pointer = stage.getPointerPosition()
         if (!pointer) return
         const scale = stage.scaleX()
-        const gridX = Math.floor((pointer.x - stage.x()) / scale / TILE_SIZE)
-        const gridY = Math.floor((pointer.y - stage.y()) / scale / TILE_SIZE)
+        const rawGridX = Math.floor((pointer.x - stage.x()) / scale / TILE_SIZE)
+        const rawGridY = Math.floor((pointer.y - stage.y()) / scale / TILE_SIZE)
+
+        // --- 围栏线工具点击路由 (D-34) ---
+        // 委托给 useFenceLineTool.handleFenceClick —— 状态机三段式
+        if (activeFenceFixture) {
+          handleFenceClick(rawGridX, rawGridY)
+          return
+        }
 
         if (state.toolMode === 'stamp') {
-          handleCanvasClick(gridX, gridY)
+          handleCanvasClick(rawGridX, rawGridY)
         } else if (state.toolMode === 'remove') {
           // 移除模式下点击空白区域不做处理
         } else {
@@ -449,13 +479,13 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
         }
       }
     },
-    [handleCanvasClick],
+    [handleCanvasClick, activeFenceFixture, handleFenceClick],
   )
 
   return (
     <div
       ref={containerRef}
-      className="flex-1 bg-surface overflow-hidden"
+      className="relative flex-1 bg-surface overflow-hidden"
       style={{ cursor: getCursor(toolMode) }}
     >
       <Stage
@@ -514,7 +544,36 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
           stageScale={stageScale}
           mouseGridPos={mouseGridPos}
         />
+
+        {/* 围栏线工具鬼影（D-34）— 仅在 picking-end / confirming 阶段渲染 */}
+        {activeFenceFixture &&
+          (fenceState.phase === 'picking-end' ||
+            fenceState.phase === 'confirming') && (
+            <FenceLineTool
+              start={fenceState.start}
+              end={fenceState.end}
+              fixture={activeFenceFixture}
+              fixtureMap={fixtureMap}
+            />
+          )}
       </Stage>
+
+      {/* 围栏确认内联 UI（D-36）— 容器本地像素坐标 = grid * TILE_SIZE * scale + stagePos */}
+      {activeFenceFixture &&
+        fenceState.phase === 'confirming' &&
+        fenceState.end && (
+          <FenceConfirmOverlay
+            pixelX={
+              (fenceState.end.x + activeFenceFixture.gridSize.width) *
+                TILE_SIZE *
+                stageScale +
+              stagePos.x
+            }
+            pixelY={fenceState.end.y * TILE_SIZE * stageScale + stagePos.y}
+            onConfirm={confirmFenceLine}
+            onCancel={cancelFenceLine}
+          />
+        )}
     </div>
   )
 }
