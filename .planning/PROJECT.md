@@ -12,20 +12,19 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Top-down 2D grid editor matching in-game MySekai outdoor area dimensions (Phase 1)
+- [x] Place, move, rotate, and remove furniture/decorations on the grid (Phase 1)
+- [x] Furniture catalog with search/filter sourced from sekai.best data (Phase 1)
+- [x] CDN isometric thumbnails from storage.sekai.best for catalog browsing (Phase 1)
+- [x] Road and fence placement tools (Phase 2)
 
 ### Active
 
-- [ ] Top-down 2D grid editor matching in-game MySekai outdoor area dimensions
-- [ ] Place, move, rotate, and remove furniture/decorations on the grid
-- [ ] Furniture catalog with search/filter sourced from sekai.best data
 - [ ] Top-down 2D sprite rendering for placed items via offline pipeline (sssekai + Blender headless)
-- [ ] CDN isometric thumbnails from storage.sekai.best for catalog browsing
 - [ ] Material cost calculator — shows total crafting costs for current blueprint
 - [ ] Inventory input — users enter owned materials/furniture, see remaining costs
 - [ ] Inventory persistence via localStorage
 - [ ] Blueprint sharing via URL hash encoding (paste link to share/import designs)
-- [ ] Road and fence placement tools
 - [ ] Bilingual UI (Chinese + Japanese), item names in Japanese
 
 ### Out of Scope
@@ -80,4 +79,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after initialization*
+*Last updated: 2026-04-10 after Phase 2 completion*
