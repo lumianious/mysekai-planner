@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-04-10T10:10:24.892Z"
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-04-10T10:23:41.059Z"
 last_activity: 2026-04-10
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
   percent: 17
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 2 (roads-fences-ground-layer) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-10
 
@@ -58,6 +58,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P05 | 2min | 1 tasks | 1 files |
 | Phase 02 P01 | 4min | 2 tasks | 7 files |
 | Phase 02 P02 | 8min | 2 tasks | 10 files |
+| Phase 02 P03 | 8min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - [Phase 02]: endStrokeBatch commits by pushing the pre-stroke snapshot directly into temporal.pastStates (not by triggering a post-stroke setState); zundo's default setState hook captures the current (post-stroke) state as pastState, which would make undo restore to the post-stroke state — the opposite of what's wanted
 - [Phase 02]: setActiveFixture and activateHotbar distinguish undefined fixture (Phase 1 backward-compat → stamp) from null fixture (explicit → select), keeping the optional second arg non-breaking
 - [Phase 02]: Module-level _preStrokeSnapshot acts as both the rollback reference and the idempotency guard; endStrokeBatch is a no-op when the guard is null (mouseup/mouseleave/window.blur race collapses safely)
+- [Phase 02]: [Phase 02]: 4-connected Bresenham splits simultaneous X+Y moves into consecutive single-axis steps so high-velocity drag-paint leaves no gaps (D-33)
+- [Phase 02]: [Phase 02]: endStrokeIfActive clears refs BEFORE endStrokeBatch() so concurrent mouseup/mouseleave/window.blur collapse into one commit (R-06)
+- [Phase 02]: [Phase 02]: Overwrite OFF skips occupied tiles but continues the stroke (Photoshop paint semantics, not abort-on-collision)
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T10:10:11.095Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-04-10T10:23:27.623Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None

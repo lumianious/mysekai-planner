@@ -54,7 +54,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Schema fix (Fixture.handleType + layoutType) + getGroundSubtype classifier + road→ground routing
 - [x] 02-02-PLAN.md — Brush tool mode infrastructure: ToolMode, zundo batching helpers, toolbar button, P shortcut, auto-switch routing
-- [ ] 02-03-PLAN.md — Drag-paint for roads/color-tiles + drag-erase for remove mode + Bresenham rasterizer + ghost preview
+- [x] 02-03-PLAN.md — Drag-paint for roads/color-tiles + drag-erase for remove mode + Bresenham rasterizer + ghost preview
 - [ ] 02-04-PLAN.md — Fence line tool: click-start → click-end → axis-snap ghost → confirm/cancel overlay
 - [x] 02-05-PLAN.md — Dashed grid overlay refinement (D-46) matching in-game visual
 **UI hint**: yes
