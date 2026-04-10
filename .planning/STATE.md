@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-04-10T10:23:41.059Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-04-10T10:41:38.823Z"
 last_activity: 2026-04-10
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 17
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 2 (roads-fences-ground-layer) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-04-10
 
@@ -59,6 +59,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P01 | 4min | 2 tasks | 7 files |
 | Phase 02 P02 | 8min | 2 tasks | 10 files |
 | Phase 02 P03 | 8min | 2 tasks | 6 files |
+| Phase 02 P04 | 11min | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,9 @@ Recent decisions affecting current work:
 - [Phase 02]: [Phase 02]: 4-connected Bresenham splits simultaneous X+Y moves into consecutive single-axis steps so high-velocity drag-paint leaves no gaps (D-33)
 - [Phase 02]: [Phase 02]: endStrokeIfActive clears refs BEFORE endStrokeBatch() so concurrent mouseup/mouseleave/window.blur collapse into one commit (R-06)
 - [Phase 02]: [Phase 02]: Overwrite OFF skips occupied tiles but continues the stroke (Photoshop paint semantics, not abort-on-collision)
+- [Phase 02]: [Phase 02]: Fence state machine extracted to useFenceLineTool.ts to keep EditorCanvas.tsx under CLAUDE.md 800-line limit and isolate three-phase logic from drag-paint refs
+- [Phase 02]: [Phase 02]: onFenceCancel returns boolean so useKeyboard can swallow Escape only when a fence line is actually active — avoids duplicate phase check in the hook
+- [Phase 02]: [Phase 02]: Mode/fixture reset uses React prev-props-in-state pattern instead of useEffect(setState) to satisfy react-hooks/set-state-in-effect lint rule
 
 ### Pending Todos
 
@@ -105,6 +109,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T10:23:27.623Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-04-10T10:41:26.585Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
