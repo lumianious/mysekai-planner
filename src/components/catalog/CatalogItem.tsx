@@ -20,8 +20,9 @@ export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
   const setActiveFixture = useEditorStore((s) => s.setActiveFixture)
 
   const handleClick = useCallback(() => {
-    setActiveFixture(fixture.id)
-  }, [fixture.id, setActiveFixture])
+    // D-30 / D-39: 传 fixture 让 store 根据 handleType 路由 brush vs stamp
+    setActiveFixture(fixture.id, fixture)
+  }, [fixture, setActiveFixture])
 
   const fallbackColor = getFixtureColor(
     fixture.mysekaiFixtureMainGenreId,

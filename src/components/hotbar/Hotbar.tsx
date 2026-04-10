@@ -35,7 +35,7 @@ export function Hotbar({ fixtureMap }: HotbarProps) {
                   ? 'bg-surface/50 border border-default/50 hover:bg-surface-hover'
                   : 'bg-surface border border-default hover:border-accent/50'
               }`}
-            onClick={() => activateHotbar(slotNumber)}
+            onClick={() => activateHotbar(slotNumber, fixture ?? null)}
           >
             {isEmpty ? (
               <span className="text-muted/30 text-xs font-mono">{slotNumber}</span>

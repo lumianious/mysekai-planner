@@ -5,17 +5,21 @@
 
 import { useEffect, useCallback } from 'react'
 import { useEditorStore, getHoveredFixtureId } from '../stores/editorStore'
+import type { Fixture } from '../types/editor'
 
 interface UseKeyboardOptions {
   containerRef: React.RefObject<HTMLDivElement | null>
   onNudge?: (itemId: string, newX: number, newY: number) => void
   onCycleSelection?: () => void
+  // D-30: 用于在 1-9 激活热栏时解析 fixture，以便 activateHotbar 路由到 brush/stamp
+  fixtureMap?: Map<number, Fixture>
 }
 
 export function useKeyboard({
   containerRef,
   onNudge,
   onCycleSelection,
+  fixtureMap,
 }: UseKeyboardOptions) {
   // 键盘事件处理器 — 使用 getState() 避免选择器导致的频繁重渲染
   const handleKeyDown = useCallback(
@@ -74,7 +78,14 @@ export function useKeyboard({
           e.preventDefault()
           state.assignHotbar(parseInt(e.key), hoveredId)
         } else {
-          state.activateHotbar(parseInt(e.key))
+          // D-30: 解析 fixture 让 activateHotbar 根据 handleType 路由到 brush/stamp
+          const slot = parseInt(e.key)
+          const hotbarSlot = state.hotbar[slot - 1]
+          const fixture =
+            hotbarSlot?.fixtureId != null
+              ? fixtureMap?.get(hotbarSlot.fixtureId) ?? null
+              : null
+          state.activateHotbar(slot, fixture)
         }
         return
       }
@@ -107,7 +118,7 @@ export function useKeyboard({
         return
       }
     },
-    [onNudge, onCycleSelection],
+    [onNudge, onCycleSelection, fixtureMap],
   )
 
   useEffect(() => {

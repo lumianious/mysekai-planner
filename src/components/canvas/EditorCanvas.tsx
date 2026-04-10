@@ -127,6 +127,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
     containerRef,
     onNudge: handleMoveItem,
     onCycleSelection: handleCycleSelection,
+    fixtureMap,
   })
 
   // ======== 鼠标移动处理 ========

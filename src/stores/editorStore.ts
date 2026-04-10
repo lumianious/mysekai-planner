@@ -15,6 +15,7 @@ import type {
 } from '../types/editor'
 import { getGridSize } from '../data/areaLevels'
 import { tileKey, getEffectiveSize, isInBounds } from '../utils/grid'
+import { getBrushInteraction } from '../data/fixtures'
 
 // ======== 旋转辅助 ========
 
@@ -31,6 +32,24 @@ function cycleRotation(current: Rotation, direction: 'cw' | 'ccw'): Rotation {
 let _hoveredFixtureId: number | null = null
 export function setHoveredFixtureId(id: number | null) { _hoveredFixtureId = id }
 export function getHoveredFixtureId() { return _hoveredFixtureId }
+
+// ======== 工具模式路由 ========
+// INPUT: fixture（可为 null）
+// OUTPUT: 'brush' | 'stamp' | 'select'
+// POS: src/stores/editorStore.ts — 供 setActiveFixture 和 activateHotbar 共享，
+//      保证从目录点击或 1-9 热栏激活走同一路由 (RESEARCH 未决问题 2)
+//
+// 规则（D-30 / D-39）：
+//   道 / カラータイル / 柵 → brush（拖拽画刷或线工具，由后续 Wave 3/4 实现）
+//   地毯 / 普通家具      → stamp（保留 Phase 1 行为）
+//   null                → select
+
+export function pickToolModeForFixture(fixture: Fixture | null): ToolMode {
+  if (!fixture) return 'select'
+  const interaction = getBrushInteraction(fixture)
+  if (interaction !== null) return 'brush'
+  return 'stamp'
+}
 
 // ======== 占用网格 ========
 
@@ -149,10 +168,18 @@ export const useEditorStore = create<EditorState>()(
           gridSize: getGridSize(level),
         }),
 
-      setActiveFixture: (fixtureId: number | null) =>
+      // D-30 / D-39: 传入 fixture 以让 store 根据 handleType 自动选择 brush vs stamp 模式。
+      // 为保持 Phase 1 兼容：fixture 完全省略（undefined）时回退为 stamp，让尚未更新的
+      // 调用点仍按 Phase 1 行为工作。fixture === null 则走 pickToolModeForFixture(null)='select'。
+      setActiveFixture: (fixtureId: number | null, fixture?: Fixture | null) =>
         set({
           activeFixtureId: fixtureId,
-          toolMode: fixtureId !== null ? 'stamp' : 'select',
+          toolMode:
+            fixtureId !== null
+              ? fixture === undefined
+                ? 'stamp'
+                : pickToolModeForFixture(fixture)
+              : 'select',
           previewRotation: 0 as Rotation, // 新家具重置预览旋转
         }),
 
@@ -174,11 +201,17 @@ export const useEditorStore = create<EditorState>()(
           return { hotbar }
         }),
 
-      activateHotbar: (slot: number) => {
+      // 与 setActiveFixture 同样：fixture 省略 → stamp（Phase 1 行为），
+      // 传 null → 走路由（select），传 Fixture → 按 handleType 路由 brush/stamp。
+      activateHotbar: (slot: number, fixture?: Fixture | null) => {
         const state = get()
         const fixtureId = state.hotbar[slot - 1]?.fixtureId
         if (fixtureId !== null && fixtureId !== undefined) {
-          set({ activeFixtureId: fixtureId, toolMode: 'stamp' })
+          set({
+            activeFixtureId: fixtureId,
+            toolMode:
+              fixture === undefined ? 'stamp' : pickToolModeForFixture(fixture),
+          })
         }
       },
 
@@ -277,5 +310,64 @@ export function redoWithFlash() {
   const changedIds = findChangedItemIds(beforeItems, afterItems)
   if (changedIds.length > 0) {
     useEditorStore.getState().triggerFlash(changedIds)
+  }
+}
+
+// ======== 时间旅行批量操作 (D-43) ========
+// INPUT: 一个 stroke 开始和结束标记（供 EditorCanvas 拖拽画刷 / 围栏线工具使用）
+// OUTPUT: 拖拽过程中的多次 placeItem/removeItem 调用合并为单个 undo 步骤
+// POS: src/stores/editorStore.ts — 封装 zundo 2.3.0 的 pause/resume API
+//
+// 原理（见 RESEARCH.md §2）：
+//   1. startStrokeBatch 捕获 stroke 开始前的 placedItems 快照，再调 temporal.pause()
+//      暂停 history 写入
+//   2. 调用方在 stroke 内自由 placeItem/removeItem（因 tracking 暂停，无 history 产生）
+//   3. endStrokeBatch 调 temporal.resume()，然后直接将 **stroke 开始前的快照** 作为
+//      单条 pastState 推入 temporal 历史，使 undo 正确恢复到 stroke 之前。未来历史被清空。
+//      这里不能简单调 setState 触发一次记录 —— 那样 zundo 捕获的 pastState 是
+//      stroke 结束后的最新状态，undo 无法回到 stroke 之前（见 temporalBatch.test.ts
+//      "undo of a batched stroke" 失败推导）。
+//
+// 幂等性（R-06 清理竞态）：endStrokeBatch 可能被 mouseup + mouseleave + window.blur
+// 多次调用；只有第一次（当 tracking 处于暂停 **且** 存在 stroke 快照时）才真正 commit，
+// 后续调用为 no-op，不产生重复 history 条目。
+
+let _preStrokeSnapshot: Record<string, PlacedItem> | null = null
+
+const TEMPORAL_LIMIT = 50 // 必须与上方 temporal({ limit }) 保持一致
+
+export function startStrokeBatch(): void {
+  _preStrokeSnapshot = useEditorStore.getState().placedItems
+  useEditorStore.temporal.getState().pause()
+}
+
+export function endStrokeBatch(): void {
+  const temporal = useEditorStore.temporal.getState()
+  // 幂等：仅在 tracking 处于暂停 **且** 有活动的 stroke 快照时才 commit
+  if (!temporal.isTracking && _preStrokeSnapshot !== null) {
+    const snapshot = _preStrokeSnapshot
+    _preStrokeSnapshot = null
+    temporal.resume()
+    // 直接向 temporal store 写入一条 pastState（stroke 开始前的 placedItems 快照）
+    // 并清空 futureStates —— 这复刻了 zundo _handleSet 的行为但绕过其 pastState 捕获逻辑
+    const current = temporal.pastStates
+    const next =
+      current.length >= TEMPORAL_LIMIT
+        ? [...current.slice(1), { placedItems: snapshot }]
+        : [...current, { placedItems: snapshot }]
+    useEditorStore.temporal.setState({
+      pastStates: next,
+      futureStates: [],
+    })
+  }
+}
+
+// 便捷同步包装：在单个同步块内完成多次变更
+export function withBatchedUndo(fn: () => void): void {
+  startStrokeBatch()
+  try {
+    fn()
+  } finally {
+    endStrokeBatch()
   }
 }
