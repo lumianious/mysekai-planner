@@ -13,29 +13,27 @@ interface CatalogSearchProps {
 export function CatalogSearch({ value, onChange }: CatalogSearchProps) {
   return (
     <div className="relative">
-      {/* 搜索图标 */}
       <Search
-        size={16}
-        className="absolute left-2 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+        size={14}
+        className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
       />
-
-      {/* 输入框 */}
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="搜索家具..."
-        className="w-full h-9 bg-surface border border-default rounded-md pl-8 pr-8 text-sm text-primary placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none"
+        className="w-full h-8 bg-surface border border-default rounded-lg pl-8 pr-8
+          text-xs text-primary placeholder:text-muted/50
+          focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none
+          transition-colors"
       />
-
-      {/* 清除按钮 */}
       {value.length > 0 && (
         <button
           type="button"
           onClick={() => onChange('')}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
         >
-          <X size={16} />
+          <X size={14} />
         </button>
       )}
     </div>

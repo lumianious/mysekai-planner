@@ -1,6 +1,6 @@
 // ======== 虚拟化缩略图网格 ========
 // INPUT: filteredFixtures, activeFixtureId
-// OUTPUT: 使用 TanStack Virtual 的 2 列虚拟化网格
+// OUTPUT: 使用 TanStack Virtual 的 3 列虚拟化网格
 // POS: src/components/catalog/CatalogGrid.tsx — 家具缩略图虚拟滚动列表
 
 import { useRef } from 'react'
@@ -14,7 +14,7 @@ interface CatalogGridProps {
   activeFixtureId: number | null
 }
 
-const COLUMNS = 2
+const COLUMNS = 3
 
 export function CatalogGrid({ fixtures, activeFixtureId }: CatalogGridProps) {
   const parentRef = useRef<HTMLDivElement>(null)
@@ -23,7 +23,7 @@ export function CatalogGrid({ fixtures, activeFixtureId }: CatalogGridProps) {
   const virtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 152,
+    estimateSize: () => 96,
     overscan: 5,
   })
 
@@ -31,8 +31,8 @@ export function CatalogGrid({ fixtures, activeFixtureId }: CatalogGridProps) {
     <Tooltip.Provider delayDuration={400}>
       <div
         ref={parentRef}
-        className="h-full overflow-auto"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: '#3a3a52 transparent' }}
+        className="h-full overflow-auto px-2 pt-2"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#3a3a56 transparent' }}
       >
         <div
           style={{
@@ -55,7 +55,7 @@ export function CatalogGrid({ fixtures, activeFixtureId }: CatalogGridProps) {
                   height: virtualRow.size,
                 }}
               >
-                <div className="grid grid-cols-2 gap-2 px-2">
+                <div className="grid grid-cols-3 gap-1.5">
                   {rowFixtures.map((fixture) => (
                     <CatalogItem
                       key={fixture.id}
@@ -69,8 +69,7 @@ export function CatalogGrid({ fixtures, activeFixtureId }: CatalogGridProps) {
           })}
         </div>
 
-        {/* 总数 */}
-        <p className="text-xs text-muted text-center py-2">
+        <p className="text-[10px] text-muted/50 text-center py-2">
           {fixtures.length} 件
         </p>
       </div>

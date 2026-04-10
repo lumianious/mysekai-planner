@@ -26,6 +26,12 @@ function cycleRotation(current: Rotation, direction: 'cw' | 'ccw'): Rotation {
   return ROTATIONS[newIdx]
 }
 
+// ======== 目录悬停追踪（模块级，无 re-render） ========
+
+let _hoveredFixtureId: number | null = null
+export function setHoveredFixtureId(id: number | null) { _hoveredFixtureId = id }
+export function getHoveredFixtureId() { return _hoveredFixtureId }
+
 // ======== 占用网格 ========
 
 export type OccupancyGrid = Map<string, string> // tileKey -> itemId
@@ -90,6 +96,7 @@ export const useEditorStore = create<EditorState>()(
       hotbar: Array(9).fill(null).map(() => ({ fixtureId: null })),
       isEditorReady: false,
       flashItemIds: [],
+      stageScale: 1,
 
       // -- 动作 --
 
@@ -219,6 +226,8 @@ export const useEditorStore = create<EditorState>()(
           set({ flashItemIds: [] })
         }, 300)
       },
+
+      setStageScale: (scale: number) => set({ stageScale: scale }),
     }),
     {
       limit: 50, // 超过 GRID-09 最低 20 步要求

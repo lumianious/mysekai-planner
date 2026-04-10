@@ -4,7 +4,7 @@
 // POS: src/components/catalog/CatalogSidebar.tsx — 家具目录容器
 
 import { useState } from 'react'
-import { ChevronsLeft, Package } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import type { Fixture, FixtureMainGenre } from '../../types/editor'
 import { searchFixtures, filterByGenre } from '../../data/fixtures'
 import { CatalogSearch } from './CatalogSearch'
@@ -27,60 +27,58 @@ export function CatalogSidebar({
   const [activeGenreId, setActiveGenreId] = useState<number | null>(null)
   const [collapsed, setCollapsed] = useState(false)
 
-  // 搜索 + 分类过滤管线
   const filteredFixtures = filterByGenre(
     searchFixtures(fixtures, searchQuery),
     activeGenreId,
     null,
   )
 
-  // ======== 折叠状态 ========
-
   if (collapsed) {
     return (
-      <div className="w-12 bg-surface-raised border-r border-default flex-shrink-0 flex flex-col items-center pt-2">
+      <div className="w-10 bg-surface-raised border-r border-default flex-shrink-0 flex flex-col items-center pt-2">
         <button
           type="button"
           onClick={() => setCollapsed(false)}
-          className="p-2 text-muted hover:text-primary hover:bg-surface-hover rounded-md"
+          className="p-1.5 text-muted hover:text-accent hover:bg-surface-hover rounded-lg transition-colors"
           title="展开目录"
         >
-          <Package size={20} />
+          <ChevronsRight size={18} />
         </button>
       </div>
     )
   }
 
-  // ======== 展开状态 ========
-
   return (
     <div className="w-72 bg-surface-raised border-r border-default flex-shrink-0 flex flex-col">
       {/* 标题行 */}
-      <div className="flex items-center justify-between px-3 py-2">
-        <span className="text-sm font-semibold text-primary">家具目录</span>
+      <div className="flex items-center justify-between px-3 h-9 border-b border-default">
+        <span className="text-xs font-semibold text-muted uppercase tracking-wider">家具目录</span>
         <button
           type="button"
           onClick={() => setCollapsed(true)}
-          className="p-1 text-muted hover:text-primary hover:bg-surface-hover rounded-md"
+          className="p-1 text-muted hover:text-accent hover:bg-surface-hover rounded-md transition-colors"
           title="折叠目录"
         >
-          <ChevronsLeft className="h-6 w-6" />
+          <ChevronsLeft size={16} />
         </button>
       </div>
 
       {/* 搜索框 */}
-      <div className="px-3">
+      <div className="px-2 pt-2">
         <CatalogSearch value={searchQuery} onChange={setSearchQuery} />
       </div>
 
       {/* 分类芯片 */}
-      <div className="px-2">
+      <div className="px-1">
         <CategoryFilter
           genres={mainGenres}
           activeGenreId={activeGenreId}
           onSelect={setActiveGenreId}
         />
       </div>
+
+      {/* 分隔线 */}
+      <div className="mx-2 border-t border-default" />
 
       {/* 虚拟化缩略图网格 */}
       <div className="flex-1 overflow-hidden">

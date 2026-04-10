@@ -4,20 +4,18 @@
 // POS: src/hooks/useKeyboard.ts — 编辑器全局键盘事件处理
 
 import { useEffect, useCallback } from 'react'
-import { useEditorStore } from '../stores/editorStore'
+import { useEditorStore, getHoveredFixtureId } from '../stores/editorStore'
 
 interface UseKeyboardOptions {
   containerRef: React.RefObject<HTMLDivElement | null>
   onNudge?: (itemId: string, newX: number, newY: number) => void
   onCycleSelection?: () => void
-  isHoveringCatalog: boolean
 }
 
 export function useKeyboard({
   containerRef,
   onNudge,
   onCycleSelection,
-  isHoveringCatalog,
 }: UseKeyboardOptions) {
   // 键盘事件处理器 — 使用 getState() 避免选择器导致的频繁重渲染
   const handleKeyDown = useCallback(
@@ -69,9 +67,15 @@ export function useKeyboard({
         return
       }
 
-      // 热栏数字键（目录悬停时不触发，由 CatalogItem 的 onKeyDown 处理）
-      if (e.key >= '1' && e.key <= '9' && !isHoveringCatalog) {
-        state.activateHotbar(parseInt(e.key))
+      // 热栏数字键 — 悬停目录项时分配到热栏，否则激活热栏槽位
+      if (e.key >= '1' && e.key <= '9') {
+        const hoveredId = getHoveredFixtureId()
+        if (hoveredId !== null) {
+          e.preventDefault()
+          state.assignHotbar(parseInt(e.key), hoveredId)
+        } else {
+          state.activateHotbar(parseInt(e.key))
+        }
         return
       }
 
@@ -103,26 +107,25 @@ export function useKeyboard({
         return
       }
     },
-    [isHoveringCatalog, onNudge, onCycleSelection],
+    [onNudge, onCycleSelection],
   )
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
-    // Safari-safe focus (Pitfall 1 from RESEARCH.md)
-    // tabIndex={-1} 允许程序化 focus 但不进入 Tab 顺序
     container.tabIndex = -1
     container.style.outline = 'none'
 
-    container.addEventListener('keydown', handleKeyDown)
+    // 绑定到 window 使得悬停目录时也能接收键盘事件（1-9 热栏分配）
+    window.addEventListener('keydown', handleKeyDown)
 
-    // 点击容器时获取焦点，确保键盘事件被捕获
+    // 点击容器时获取焦点
     const handleClick = () => container.focus()
     container.addEventListener('click', handleClick)
 
     return () => {
-      container.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', handleKeyDown)
       container.removeEventListener('click', handleClick)
     }
   }, [containerRef, handleKeyDown])

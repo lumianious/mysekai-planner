@@ -17,7 +17,7 @@ export function Hotbar({ fixtureMap }: HotbarProps) {
   const activateHotbar = useEditorStore((s) => s.activateHotbar)
 
   return (
-    <div className="h-14 bg-surface-raised border-t border-default flex items-center justify-center gap-2 flex-shrink-0">
+    <div className="h-12 bg-surface-raised border-t border-default flex items-center justify-center gap-1 flex-shrink-0 px-4">
       {hotbar.map((slot, index) => {
         const slotNumber = index + 1
         const isActive = slot.fixtureId !== null && slot.fixtureId === activeFixtureId
@@ -27,19 +27,19 @@ export function Hotbar({ fixtureMap }: HotbarProps) {
         return (
           <button
             key={slotNumber}
-            className={`w-12 h-12 rounded-md relative flex items-center justify-center
-              cursor-pointer transition-colors overflow-hidden
+            className={`w-10 h-10 rounded-lg relative flex items-center justify-center
+              cursor-pointer transition-all duration-100 overflow-hidden
               ${isActive
-                ? 'border-2 border-accent ring-1 ring-accent/30 bg-surface'
-                : 'border border-default bg-surface hover:bg-surface-hover'
+                ? 'ring-2 ring-accent bg-surface shadow-[0_0_8px_rgba(57,197,187,0.3)]'
+                : isEmpty
+                  ? 'bg-surface/50 border border-default/50 hover:bg-surface-hover'
+                  : 'bg-surface border border-default hover:border-accent/50'
               }`}
             onClick={() => activateHotbar(slotNumber)}
           >
             {isEmpty ? (
-              // 空槽位 — 显示编号
-              <span className="text-muted text-xs">{slotNumber}</span>
+              <span className="text-muted/30 text-xs font-mono">{slotNumber}</span>
             ) : (
-              // 已分配槽位 — 显示 CDN 缩略图 + 编号徽标
               <>
                 {fixture && (
                   <img
@@ -52,7 +52,7 @@ export function Hotbar({ fixtureMap }: HotbarProps) {
                 {!fixture && (
                   <span className="text-muted text-xs">{slotNumber}</span>
                 )}
-                <span className="absolute top-0 left-0 text-xs bg-black/60 text-white px-1 rounded-br-sm">
+                <span className="absolute top-0 left-0 text-[9px] bg-black/70 text-white/80 px-1 rounded-br-md font-mono">
                   {slotNumber}
                 </span>
               </>

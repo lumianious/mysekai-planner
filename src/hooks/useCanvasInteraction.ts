@@ -5,18 +5,23 @@
 
 import { useState, useCallback } from 'react'
 import type { KonvaEventObject } from 'konva/lib/Node'
+import { useEditorStore } from '../stores/editorStore'
 
 // ======== 缩放常量 ========
 
 const SCALE_BY = 1.05
-const MIN_SCALE = 0.15 // 适配 100x100 网格 (100*32=3200px @ 0.15 ≈ 480px 视口)
-const MAX_SCALE = 3.0  // 细节检查
+const MIN_SCALE = 0.15
+const MAX_SCALE = 3.0
 
 export function useCanvasInteraction() {
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
-  const [stageScale, setStageScale] = useState(1)
+  const [stageScale, setStageScaleLocal] = useState(1)
 
-  // 基于指针位置的滚轮缩放 (Pattern 3 from RESEARCH.md)
+  const setStageScale = useCallback((scale: number) => {
+    setStageScaleLocal(scale)
+    useEditorStore.getState().setStageScale(scale)
+  }, [])
+
   const handleWheel = useCallback((e: KonvaEventObject<WheelEvent>) => {
     e.evt.preventDefault()
     const stage = e.target.getStage()
@@ -31,7 +36,6 @@ export function useCanvasInteraction() {
       y: (pointer.y - stage.y()) / oldScale,
     }
 
-    // trackpad pinch 发送 ctrlKey，需要反转方向
     const direction = e.evt.deltaY > 0 ? -1 : 1
     const newScale = Math.min(
       MAX_SCALE,
@@ -43,7 +47,7 @@ export function useCanvasInteraction() {
       x: pointer.x - mousePointTo.x * newScale,
       y: pointer.y - mousePointTo.y * newScale,
     })
-  }, [])
+  }, [setStageScale])
 
   return { stagePos, setStagePos, stageScale, handleWheel }
 }

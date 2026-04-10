@@ -16,31 +16,32 @@ export function CategoryFilter({
   activeGenreId,
   onSelect,
 }: CategoryFilterProps) {
-  const baseChip =
-    'px-2 py-1 rounded-full text-xs font-normal cursor-pointer whitespace-nowrap transition-colors'
-  const defaultChip = `${baseChip} bg-surface text-muted border border-default`
-  const activeChip = `${baseChip} bg-accent/15 text-accent border-accent`
-
   return (
     <div
-      className="overflow-x-auto flex gap-1.5 py-2 px-1"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      className="overflow-x-auto flex flex-wrap gap-1 py-2 px-1"
+      style={{ scrollbarWidth: 'none' }}
     >
-      {/* "全部" 芯片 */}
       <button
         type="button"
-        className={activeGenreId === null ? activeChip : defaultChip}
+        className={`px-2.5 py-1 rounded-md text-xs cursor-pointer transition-all
+          ${activeGenreId === null
+            ? 'bg-accent text-surface font-medium'
+            : 'bg-surface text-muted hover:text-primary hover:bg-surface-hover'
+          }`}
         onClick={() => onSelect(null)}
       >
         全部
       </button>
 
-      {/* 各分类芯片 */}
       {genres.map((genre) => (
         <button
           key={genre.id}
           type="button"
-          className={activeGenreId === genre.id ? activeChip : defaultChip}
+          className={`px-2.5 py-1 rounded-md text-xs cursor-pointer transition-all
+            ${activeGenreId === genre.id
+              ? 'bg-accent text-surface font-medium'
+              : 'bg-surface text-muted hover:text-primary hover:bg-surface-hover'
+            }`}
           onClick={() => onSelect(genre.id)}
         >
           {genre.name}

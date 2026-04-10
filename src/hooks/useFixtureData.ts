@@ -36,8 +36,17 @@ export function useFixtureData() {
         if (controller.signal.aborted) return
 
         const outdoorFixtures = filterOutdoorFixtures(allFixtures)
+
+        // 只保留有户外家具的分类，排除 id=1 的 "すべて" 元分类（由 "全部" 按钮代替）
+        const genreIdsWithItems = new Set(
+          outdoorFixtures.map((f) => f.mysekaiFixtureMainGenreId),
+        )
+        const relevantGenres = genres.filter(
+          (g) => g.id !== 1 && genreIdsWithItems.has(g.id),
+        )
+
         setFixtures(outdoorFixtures)
-        setMainGenres(genres)
+        setMainGenres(relevantGenres)
       } catch (err) {
         if (controller.signal.aborted) return
         setError('家具数据加载失败，请刷新页面重试')

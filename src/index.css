@@ -1,14 +1,37 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #1e1e2e;
-  --color-surface-raised: #2a2a3e;
-  --color-surface-hover: #363650;
+  /* 背景层级 */
+  --color-surface: #1a1a2e;
+  --color-surface-raised: #242440;
+  --color-surface-hover: #2e2e50;
+  --color-surface-active: #383860;
+
+  /* 强调色 — Project Sekai 蓝绿 */
   --color-accent: #39c5bb;
+  --color-accent-dim: #39c5bb26;
   --color-destructive: #ef4444;
   --color-valid: #22c55e;
   --color-selection: #3b82f6;
-  --color-text-primary: #e4e4ef;
-  --color-text-muted: #8888a0;
-  --color-border-default: #3a3a52;
+
+  /* 文本 */
+  --color-primary: #e8e8f0;
+  --color-muted: #9090a8;
+
+  /* 边框 */
+  --color-default: #3a3a56;
+}
+
+/* 全局滚动条 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3a3a56; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4a4a66; }
+
+body {
+  margin: 0;
+  background: #1a1a2e;
+  color: #e8e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }

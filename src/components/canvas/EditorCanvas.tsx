@@ -83,10 +83,6 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
 
   const [mouseGridPos, setMouseGridPos] = useState<{ x: number; y: number } | null>(null)
 
-  // ======== 目录悬停状态（防止数字键冲突） ========
-
-  const [isHoveringCatalog] = useState(false)
-
   // ======== 编辑器复合动作 ========
 
   const { handleCanvasClick, handleMoveItem } = useEditorActions(fixtureMap)
@@ -131,7 +127,6 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
     containerRef,
     onNudge: handleMoveItem,
     onCycleSelection: handleCycleSelection,
-    isHoveringCatalog,
   })
 
   // ======== 鼠标移动处理 ========

@@ -30,21 +30,21 @@ export function ToolButton({
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
         <button
-          className={`h-8 w-8 rounded-md flex items-center justify-center transition-colors
-            ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-            ${isActive ? activeClassName : 'bg-transparent hover:bg-surface-hover text-primary'}`}
+          className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-100
+            ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
+            ${isActive ? activeClassName : 'text-muted hover:text-primary hover:bg-surface-hover'}`}
           onClick={disabled ? undefined : onClick}
           aria-label={label}
           aria-pressed={isActive}
           disabled={disabled}
         >
-          <Icon size={18} />
+          <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
         </button>
       </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content
-          className="rounded-md bg-surface-raised border border-default px-2 py-1 text-xs text-primary shadow-md"
-          sideOffset={6}
+          className="rounded-lg bg-surface-raised border border-default px-2.5 py-1.5 text-xs text-primary shadow-xl"
+          sideOffset={8}
         >
           {tooltipText}
           <Tooltip.Arrow className="fill-surface-raised" />

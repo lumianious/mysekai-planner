@@ -1,44 +1,26 @@
 // ======== 状态栏 ========
-// INPUT: editorStore（areaLevel, gridSize, placedItems）, stageScale, mouseGridPos
+// INPUT: editorStore（areaLevel, gridSize, placedItems, stageScale）
 // OUTPUT: 底部状态栏（区域等级、已配置数量、缩放比例、鼠标坐标）
 // POS: src/components/status/StatusBar.tsx — 编辑器底部信息栏
 
 import { useEditorStore } from '../../stores/editorStore'
 import { AREA_LEVELS } from '../../data/areaLevels'
 
-interface StatusBarProps {
-  stageScale?: number
-  mouseGridPos?: { x: number; y: number } | null
-}
-
-export function StatusBar({ stageScale = 1, mouseGridPos }: StatusBarProps) {
+export function StatusBar() {
   const areaLevel = useEditorStore((s) => s.areaLevel)
   const gridSize = useEditorStore((s) => s.gridSize)
   const placedItems = useEditorStore((s) => s.placedItems)
+  const stageScale = useEditorStore((s) => s.stageScale)
 
   const itemCount = Object.keys(placedItems).length
 
   return (
-    <div className="h-8 bg-surface-raised border-t border-default flex items-center px-4 text-xs text-muted flex-shrink-0">
-      {/* 区域等级 */}
-      <span>区域等级: {AREA_LEVELS[areaLevel].label} ({gridSize.width}x{gridSize.depth})</span>
-
-      {/* 分隔线 */}
-      <span className="border-l border-default pl-4 ml-4">
-        已配置: {itemCount}件
-      </span>
-
-      {/* 缩放比例 */}
-      <span className="border-l border-default pl-4 ml-4">
-        缩放: {Math.round(stageScale * 100)}%
-      </span>
-
-      {/* 鼠标网格坐标 */}
-      {mouseGridPos && (
-        <span className="border-l border-default pl-4 ml-4">
-          位置: ({mouseGridPos.x}, {mouseGridPos.y})
-        </span>
-      )}
+    <div className="h-7 bg-surface border-t border-default flex items-center px-4 text-[11px] text-muted flex-shrink-0 gap-4 font-mono">
+      <span>{AREA_LEVELS[areaLevel].label} ({gridSize.width}×{gridSize.depth})</span>
+      <span className="text-default">|</span>
+      <span>配置: <span className="text-primary">{itemCount}</span> 件</span>
+      <span className="text-default">|</span>
+      <span>缩放: <span className="text-primary">{Math.round(stageScale * 100)}%</span></span>
     </div>
   )
 }

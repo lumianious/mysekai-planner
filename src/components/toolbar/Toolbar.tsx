@@ -21,19 +21,16 @@ import { ToolButton } from './ToolButton'
 import type { AreaLevel, ToolMode } from '../../types/editor'
 
 // ======== temporal 状态订阅 Hook ========
-// zundo 的 temporal store 不是 React 响应式的，需要手动订阅
 
 function useTemporalState() {
   const [canUndo, setCanUndo] = useState(false)
   const [canRedo, setCanRedo] = useState(false)
 
   useEffect(() => {
-    // 初始状态
     const temporal = useEditorStore.temporal.getState()
     setCanUndo(temporal.pastStates.length > 0)
     setCanRedo(temporal.futureStates.length > 0)
 
-    // 订阅 temporal 变化
     const unsub = useEditorStore.temporal.subscribe((state) => {
       setCanUndo(state.pastStates.length > 0)
       setCanRedo(state.futureStates.length > 0)
@@ -58,7 +55,6 @@ export function Toolbar() {
   const handleUndo = useCallback(() => undoWithFlash(), [])
   const handleRedo = useCallback(() => redoWithFlash(), [])
 
-  // ---- 工具模式按钮配置 ----
   const toolButtons: Array<{
     mode: ToolMode
     icon: React.ElementType
@@ -91,34 +87,35 @@ export function Toolbar() {
 
   return (
     <Tooltip.Provider delayDuration={300}>
-      <div className="h-10 bg-surface-raised border-b border-default flex items-center px-2 gap-1 flex-shrink-0">
+      <div className="h-11 bg-surface-raised border-b border-default flex items-center px-3 gap-1.5 flex-shrink-0">
         {/* 工具模式按钮组 */}
-        {toolButtons.map((btn) => (
-          <ToolButton
-            key={btn.mode}
-            icon={btn.icon}
-            label={btn.label}
-            shortcut={btn.shortcut}
-            isActive={toolMode === btn.mode}
-            activeClassName={btn.activeClassName}
-            onClick={() => setToolMode(btn.mode)}
-          />
-        ))}
+        <div className="flex items-center gap-0.5 bg-surface rounded-lg p-0.5">
+          {toolButtons.map((btn) => (
+            <ToolButton
+              key={btn.mode}
+              icon={btn.icon}
+              label={btn.label}
+              shortcut={btn.shortcut}
+              isActive={toolMode === btn.mode}
+              activeClassName={btn.activeClassName}
+              onClick={() => setToolMode(btn.mode)}
+            />
+          ))}
+        </div>
 
-        {/* 分隔线 */}
-        <div className="w-px h-6 bg-border-default mx-1" />
+        {/* 分隔 */}
+        <div className="w-px h-6 bg-default mx-1" />
 
-        {/* 覆盖模式切换 */}
+        {/* 覆盖模式 */}
         <ToolButton
           icon={Replace}
           label="覆盖模式"
           isActive={overwriteEnabled}
-          activeClassName="bg-accent/20 border border-accent text-accent"
+          activeClassName="bg-accent/20 text-accent ring-1 ring-accent/40"
           onClick={toggleOverwrite}
         />
 
-        {/* 分隔线 */}
-        <div className="w-px h-6 bg-border-default mx-1" />
+        <div className="w-px h-6 bg-default mx-1" />
 
         {/* 撤销/重做 */}
         <ToolButton
@@ -138,19 +135,23 @@ export function Toolbar() {
           disabled={!canRedo}
         />
 
-        {/* 右侧区域 — 区域等级选择 */}
+        {/* 右侧 — 区域等级 */}
         <div className="ml-auto">
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className="h-8 rounded-md flex items-center gap-2 px-2
-                bg-transparent hover:bg-surface-hover text-primary text-sm cursor-pointer">
-                <Map size={16} />
-                <span>{AREA_LEVELS[areaLevel].label} ({gridSize.width}x{gridSize.depth})</span>
+              <button className="h-8 rounded-lg flex items-center gap-2 px-3
+                bg-surface hover:bg-surface-hover text-primary text-sm cursor-pointer
+                border border-default transition-colors">
+                <Map size={14} className="text-accent" />
+                <span>{AREA_LEVELS[areaLevel].label}</span>
+                <span className="text-muted font-mono text-xs">
+                  {gridSize.width}×{gridSize.depth}
+                </span>
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
               <DropdownMenu.Content
-                className="rounded-md bg-surface-raised border border-default shadow-lg p-1 min-w-[140px]"
+                className="rounded-lg bg-surface-raised border border-default shadow-xl p-1 min-w-[160px]"
                 sideOffset={4}
                 align="end"
               >
@@ -160,14 +161,17 @@ export function Toolbar() {
                     return (
                       <DropdownMenu.Item
                         key={level}
-                        className={`rounded-sm px-2 py-1.5 text-sm cursor-pointer outline-none
+                        className={`rounded-md px-3 py-2 text-sm cursor-pointer outline-none flex items-center justify-between
                           ${areaLevel === level
                             ? 'bg-accent/15 text-accent'
                             : 'text-primary hover:bg-surface-hover'
                           }`}
                         onSelect={() => setAreaLevel(level)}
                       >
-                        {config.label} ({config.gridSize.width}x{config.gridSize.depth})
+                        <span>{config.label}</span>
+                        <span className="text-xs text-muted font-mono">
+                          {config.gridSize.width}×{config.gridSize.depth}
+                        </span>
                       </DropdownMenu.Item>
                     )
                   },

@@ -1,6 +1,6 @@
 // ======== 目录缩略图卡片 ========
 // INPUT: fixture 数据, isActive 选中状态
-// OUTPUT: 带尺寸徽章、Tooltip、热栏绑定的缩略图卡片
+// OUTPUT: 带尺寸徽章、Tooltip 的缩略图卡片，悬停时设置全局 hoveredFixtureId
 // POS: src/components/catalog/CatalogItem.tsx — 单个家具目录项
 
 import { useState, useCallback } from 'react'
@@ -8,7 +8,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { Fixture } from '../../types/editor'
 import { getThumbnailUrl } from '../../data/fixtures'
 import { getFixtureColor } from '../../utils/color'
-import { useEditorStore } from '../../stores/editorStore'
+import { useEditorStore, setHoveredFixtureId } from '../../stores/editorStore'
 
 interface CatalogItemProps {
   fixture: Fixture
@@ -17,28 +17,11 @@ interface CatalogItemProps {
 
 export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
   const [imgError, setImgError] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
   const setActiveFixture = useEditorStore((s) => s.setActiveFixture)
-  const assignHotbar = useEditorStore((s) => s.assignHotbar)
 
-  // 点击：设为当前家具并进入 stamp 模式
   const handleClick = useCallback(() => {
     setActiveFixture(fixture.id)
   }, [fixture.id, setActiveFixture])
-
-  // 热栏绑定：悬停时按 1-9 分配到对应热栏槽位
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (!isHovered) return
-      const key = e.key
-      if (key >= '1' && key <= '9') {
-        e.preventDefault()
-        e.stopPropagation()
-        assignHotbar(parseInt(key, 10), fixture.id)
-      }
-    },
-    [isHovered, fixture.id, assignHotbar],
-  )
 
   const fallbackColor = getFixtureColor(
     fixture.mysekaiFixtureMainGenreId,
@@ -49,13 +32,15 @@ export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
         <div
-          className={`aspect-square rounded-md bg-surface-hover overflow-hidden cursor-pointer relative
-            ${isActive ? 'ring-2 ring-accent' : 'hover:ring-1 hover:ring-accent/50'}`}
+          className={`aspect-square rounded-lg overflow-hidden cursor-pointer relative
+            transition-all duration-100
+            ${isActive
+              ? 'ring-2 ring-accent ring-offset-1 ring-offset-surface-raised'
+              : 'hover:ring-1 hover:ring-accent/40'
+            }`}
           onClick={handleClick}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onKeyDown={handleKeyDown}
-          tabIndex={0}
+          onMouseEnter={() => setHoveredFixtureId(fixture.id)}
+          onMouseLeave={() => setHoveredFixtureId(null)}
           role="button"
           aria-label={fixture.name}
         >
@@ -65,35 +50,38 @@ export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
               src={getThumbnailUrl(fixture.assetbundleName)}
               alt={fixture.name}
               loading="lazy"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain bg-surface"
               onError={() => setImgError(true)}
             />
           ) : (
             <div
-              className="w-full h-full"
+              className="w-full h-full flex items-center justify-center"
               style={{ backgroundColor: fallbackColor }}
-            />
+            >
+              <span className="text-[8px] text-white/70 text-center leading-tight px-0.5 line-clamp-2">
+                {fixture.name}
+              </span>
+            </div>
           )}
 
-          {/* 尺寸徽章 (WxD) */}
-          <span className="absolute bottom-0 right-0 px-1 py-0.5 text-xs bg-black/60 text-white rounded-tl-sm">
-            {fixture.gridSize.width}x{fixture.gridSize.depth}
+          {/* 尺寸徽章 */}
+          <span className="absolute bottom-0 right-0 px-1 text-[10px] bg-black/70 text-white/90 rounded-tl-md font-mono">
+            {fixture.gridSize.width}×{fixture.gridSize.depth}
           </span>
         </div>
       </Tooltip.Trigger>
 
       <Tooltip.Portal>
         <Tooltip.Content
-          className="rounded-md bg-surface-raised border border-default px-2 py-1.5 shadow-md z-50"
+          className="rounded-lg bg-surface-raised border border-default px-3 py-2 shadow-xl z-50 max-w-[200px]"
           sideOffset={6}
+          side="right"
         >
-          {/* 名称 */}
-          <div className="text-sm font-normal text-primary">
+          <div className="text-sm text-primary font-medium">
             {fixture.name}
           </div>
-          {/* 尺寸 */}
-          <div className="text-xs text-muted">
-            {fixture.gridSize.width}x{fixture.gridSize.depth}
+          <div className="text-xs text-muted mt-0.5">
+            {fixture.gridSize.width}×{fixture.gridSize.depth} タイル
           </div>
           <Tooltip.Arrow className="fill-surface-raised" />
         </Tooltip.Content>

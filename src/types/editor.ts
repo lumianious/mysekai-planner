@@ -75,6 +75,7 @@ export interface EditorState {
   hotbar: HotbarSlot[]
   isEditorReady: boolean     // false = 显示欢迎界面
   flashItemIds: string[]     // undo/redo 闪烁动画目标项
+  stageScale: number         // 画布缩放比例（供 StatusBar 读取）
 
   // -- 动作 --
   placeItem: (item: Omit<PlacedItem, 'id'>) => void
@@ -91,4 +92,5 @@ export interface EditorState {
   activateHotbar: (slot: number) => void
   startEditor: (level: AreaLevel) => void
   triggerFlash: (ids: string[]) => void
+  setStageScale: (scale: number) => void
 }
