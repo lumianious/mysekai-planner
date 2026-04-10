@@ -1,6 +1,6 @@
 // ======== 网格图层 ========
 // INPUT: gridWidth, gridDepth, stageScale
-// OUTPUT: Konva Layer 包含草地纹理背景 + 半透明网格线
+// OUTPUT: Konva Layer 包含草地纹理背景 + 虚线网格线 (D-46 匹配游戏叠层)
 // POS: src/components/canvas/GridLayer.tsx — 渲染网格底图
 
 import React, { useEffect, useState } from 'react'
@@ -42,6 +42,10 @@ function GridLines({
   const totalWidth = gridWidth * TILE_SIZE
   const totalDepth = gridDepth * TILE_SIZE
   const strokeWidth = 1 / stageScale // 保持 1px 视觉宽度
+  // ======== D-46 虚线网格 ========
+  // 匹配游戏内叠层；dash/gap 同样按 stageScale 反向缩放以保持视觉一致
+  const dashLength = 4 / stageScale
+  const gapLength = 3 / stageScale
 
   // 垂直线
   for (let col = 0; col <= gridWidth; col++) {
@@ -50,8 +54,9 @@ function GridLines({
       <Line
         key={`v-${col}`}
         points={[x, 0, x, totalDepth]}
-        stroke="rgba(255, 255, 255, 0.08)"
+        stroke="rgba(255, 255, 255, 0.22)"
         strokeWidth={strokeWidth}
+        dash={[dashLength, gapLength]}
         listening={false}
       />,
     )
@@ -64,8 +69,9 @@ function GridLines({
       <Line
         key={`h-${row}`}
         points={[0, y, totalWidth, y]}
-        stroke="rgba(255, 255, 255, 0.08)"
+        stroke="rgba(255, 255, 255, 0.22)"
         strokeWidth={strokeWidth}
+        dash={[dashLength, gapLength]}
         listening={false}
       />,
     )
