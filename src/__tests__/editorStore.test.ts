@@ -323,6 +323,49 @@ describe('setActiveFixture', () => {
 
 // ======== undo/redo 测试 ========
 
+// ======== 地毯 Stamp 回归测试 (ROAD-02 / D-39) ========
+
+describe('rug stamp regression (ROAD-02)', () => {
+  const rugFixture: Fixture = {
+    id: 900,
+    name: 'テストラグ',
+    pronunciation: 'てすとらぐ',
+    assetbundleName: 'rug',
+    gridSize: { width: 3, depth: 3 },
+    colorCode: '#00FF00',
+    mysekaiFixtureType: 'normal',
+    mysekaiFixtureMainGenreId: 5,
+    mysekaiFixtureSubGenreId: 1,
+    mysekaiFixtureHandleType: 'none',
+    mysekaiSettableSiteType: 'home',
+    mysekaiSettableLayoutType: 'rug',
+    mysekaiFixturePutType: 'none',
+  }
+
+  it('clicking a rug fixture still enters stamp mode (D-39)', () => {
+    useEditorStore.getState().setActiveFixture(rugFixture.id, rugFixture)
+    expect(useEditorStore.getState().toolMode).toBe('stamp')
+    expect(useEditorStore.getState().activeFixtureId).toBe(rugFixture.id)
+  })
+
+  it('placing a rug produces a single undo step', async () => {
+    const beforeLen = useEditorStore.temporal.getState().pastStates.length
+    useEditorStore.getState().placeItem({
+      fixtureId: rugFixture.id,
+      x: 5,
+      y: 5,
+      rotation: 0,
+      layer: 'ground',
+      isSystem: false,
+    })
+    // 等待 zundo 异步记录
+    await new Promise((r) => setTimeout(r, 50))
+    const afterLen = useEditorStore.temporal.getState().pastStates.length
+    expect(afterLen - beforeLen).toBe(1)
+    expect(Object.keys(useEditorStore.getState().placedItems)).toHaveLength(1)
+  })
+})
+
 describe('undo/redo', () => {
   it('undo after placeItem restores previous state (empty placedItems)', async () => {
     useEditorStore.getState().placeItem({

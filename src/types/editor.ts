@@ -1,6 +1,6 @@
 // ======== 编辑器核心类型 ========
 
-export type ToolMode = 'select' | 'stamp' | 'remove'
+export type ToolMode = 'select' | 'stamp' | 'remove' | 'brush'
 export type Rotation = 0 | 90 | 180 | 270
 export type ItemLayer = 'ground' | 'furniture'
 export type AreaLevel = 1 | 2 | 3 | 4 | 5
@@ -106,12 +106,14 @@ export interface EditorState {
   removeItem: (id: string) => void
   setToolMode: (mode: ToolMode) => void
   setAreaLevel: (level: AreaLevel) => void
-  setActiveFixture: (fixtureId: number | null) => void
+  // D-30 / D-39: 可选 fixture 参数让 store 根据 handleType 自动路由 brush vs stamp 模式
+  // 省略 fixture 时回退到旧行为（stamp），保持 Phase 1 兼容
+  setActiveFixture: (fixtureId: number | null, fixture?: Fixture | null) => void
   setSelectedItem: (id: string | null) => void
   toggleOverwrite: () => void
   rotatePreview: (direction: 'cw' | 'ccw') => void
   assignHotbar: (slot: number, fixtureId: number) => void
-  activateHotbar: (slot: number) => void
+  activateHotbar: (slot: number, fixture?: Fixture | null) => void
   startEditor: (level: AreaLevel) => void
   triggerFlash: (ids: string[]) => void
   setStageScale: (scale: number) => void
