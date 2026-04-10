@@ -240,6 +240,44 @@ describe('getItemLayer', () => {
   })
 })
 
+// ======== getItemLayer — Phase 2 road fix 回归测试 ========
+
+describe('getItemLayer — Phase 2 road fix (ROAD-04)', () => {
+  it("classifies layoutType='road' as ground layer", () => {
+    const road: Fixture = {
+      id: 111,
+      name: '土の道',
+      pronunciation: 'つちのみち',
+      assetbundleName: 'mdl_non2001_road_soil1',
+      gridSize: { width: 2, depth: 2 },
+      colorCode: '',
+      mysekaiFixtureType: 'normal',
+      mysekaiFixtureMainGenreId: 12,
+      mysekaiFixtureSubGenreId: 22,
+      mysekaiFixtureHandleType: 'road',
+      mysekaiSettableSiteType: 'home',
+      mysekaiSettableLayoutType: 'road',
+      mysekaiFixturePutType: 'none',
+    }
+    expect(getItemLayer(road)).toBe('ground')
+  })
+
+  it("still classifies layoutType='floor' as ground (regression)", () => {
+    const floor = { ...mockFixtures[0], mysekaiSettableLayoutType: 'floor' as const }
+    expect(getItemLayer(floor)).toBe('ground')
+  })
+
+  it("still classifies layoutType='rug' as ground (regression)", () => {
+    const rug = { ...mockFixtures[0], mysekaiSettableLayoutType: 'rug' as const }
+    expect(getItemLayer(rug)).toBe('ground')
+  })
+
+  it("classifies layoutType='wall' as furniture (regression)", () => {
+    const wall = { ...mockFixtures[0], mysekaiSettableLayoutType: 'wall' as const }
+    expect(getItemLayer(wall)).toBe('furniture')
+  })
+})
+
 // ======== getSystemFixtures 测试 ========
 
 describe('getSystemFixtures', () => {
