@@ -66,13 +66,13 @@ export function getThumbnailUrl(assetbundleName: string): string {
 }
 
 // ======== 图层判定 ========
-// floor/rug → ground 层，wall 及其他 → furniture 层
+// floor/rug/road → ground 层，wall 及其他 → furniture 层
+// NOTE: 'floor_appearance' 表面外观贴花仍归 furniture 层（与 'wall_appearance' 一致）
+//       不参与 ground 层碰撞，由未来任务决定
 
 export function getItemLayer(fixture: Fixture): ItemLayer {
-  if (
-    fixture.mysekaiSettableLayoutType === 'floor' ||
-    fixture.mysekaiSettableLayoutType === 'rug'
-  ) {
+  const lt = fixture.mysekaiSettableLayoutType
+  if (lt === 'floor' || lt === 'rug' || lt === 'road') {
     return 'ground'
   }
   return 'furniture'
@@ -87,4 +87,54 @@ export function getSystemFixtures(fixtures: Fixture[]): Fixture[] {
       f.mysekaiFixtureType === 'system' &&
       f.mysekaiSettableSiteType !== 'room',
   )
+}
+
+// ======== 地面物品子类型分类 ========
+// INPUT: fixture
+// OUTPUT: 'road' | 'color-tile' | 'fence' | 'rug' | null
+// POS: src/data/fixtures.ts — 驱动 Brush 工具模式下的交互模式选择
+//
+// 分类权威字段为 mysekaiFixtureHandleType（在 RESEARCH.md §1 中发现）：
+//   - 'fence' → 柵 (7 个)
+//   - 'road'  → 道 (6 个 mainGenreId=12) 或 カラータイル (20 个 mainGenreId=31)
+// 地毯不用 handleType，改用 layoutType 以保持与 Phase 1 一致。
+
+export type GroundSubtype = 'road' | 'color-tile' | 'fence' | 'rug'
+
+export function getGroundSubtype(fixture: Fixture): GroundSubtype | null {
+  // 柵 — handleType 权威标记
+  if (fixture.mysekaiFixtureHandleType === 'fence') return 'fence'
+
+  // 道 / カラータイル — 都使用 handleType='road'，通过 mainGenreId 区分
+  if (fixture.mysekaiFixtureHandleType === 'road') {
+    if (fixture.mysekaiFixtureMainGenreId === 31) return 'color-tile'
+    return 'road' // 默认 mainGenreId === 12 (`道`)
+  }
+
+  // 地毯 — 使用现有 layoutType 分类（与 Phase 1 getItemLayer 一致）
+  if (fixture.mysekaiSettableLayoutType === 'rug') return 'rug'
+
+  return null
+}
+
+// ======== Brush 工具资格检查 ========
+// 判断某家具能否通过 Brush 工具放置（道/柵/カラータイル 即可，地毯用 Stamp 模式）
+
+export function isBrushEligible(fixture: Fixture): boolean {
+  const s = getGroundSubtype(fixture)
+  return s === 'road' || s === 'color-tile' || s === 'fence'
+}
+
+// ======== Brush 交互模式选择 ========
+// 'drag-paint' → 拖拽画刷（道、カラータイル）
+// 'line-tool'  → 起点-终点-确认 线工具（柵）
+// null         → 非 Brush 目标（地毯走 Stamp，其他家具走 Stamp）
+
+export function getBrushInteraction(
+  fixture: Fixture,
+): 'drag-paint' | 'line-tool' | null {
+  const s = getGroundSubtype(fixture)
+  if (s === 'road' || s === 'color-tile') return 'drag-paint'
+  if (s === 'fence') return 'line-tool'
+  return null
 }
