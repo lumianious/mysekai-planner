@@ -64,7 +64,7 @@ Plans:
 **Goal:** Re-architect fences as edge-based items (stored as `{x, y, orientation: 'h' | 'v'}` on the grid lattice) and unify roads/color-tiles/fences under a single hold-drag interaction. Fences should snap to the line *between* tiles and coexist with road tiles on the same grid square. Drag is axis-locked for fences (no diagonals).
 **Requirements**: ROAD-03 (corrected — supersedes Phase 2 fence line tool)
 **Depends on:** Phase 2
-**Plans:** 0 plans
+**Plans:** 5 plans
 **UI hint**: yes
 
 **Why inserted:** Phase 2 closed Fence as a tile-based item placed via click-line tool (D-34, D-35, D-36). User feedback during human verification revealed two architectural mistakes:
@@ -82,7 +82,11 @@ Plans:
 - Phase 3 URL encoding must accommodate the new edge type alongside existing PlacedItem schema
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 02.1 to break down)
+- [ ] 02.1-01-PLAN.md — Delete Phase 2 fence line tool and rename brush-interaction discriminator to drag-paint-edge
+- [ ] 02.1-02-PLAN.md — PlacedEdge type, edgeRasterize utility, placedEdges store slice with extended zundo partialize
+- [ ] 02.1-03-PLAN.md — Unified drag handler: paintEdgeStroke helper + axis-lock + edge-aware remove mode
+- [ ] 02.1-04-PLAN.md — FenceLayer rendering between GroundLayer and FurnitureLayer + human visual verification
+- [ ] 02.1-05-PLAN.md — Tests: edgeRasterize unit tests + fenceEdgeBrush integration tests (axis-lock, undo, coexistence)
 
 ### Phase 3: Persistence & Sharing
 **Goal**: Users can save their designs locally and share/import blueprints via URL
