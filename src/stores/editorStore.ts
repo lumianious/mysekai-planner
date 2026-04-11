@@ -7,6 +7,7 @@ import { temporal } from 'zundo'
 import type {
   EditorState,
   PlacedItem,
+  PlacedEdge,
   ToolMode,
   AreaLevel,
   Rotation,
@@ -107,6 +108,8 @@ export const useEditorStore = create<EditorState>()(
       areaLevel: 1 as AreaLevel,
       gridSize: { width: 36, depth: 36 },
       placedItems: {},
+      // ---------- Phase 02.1 边数据 ----------
+      placedEdges: {} as Record<string, PlacedEdge>,
       selectedItemId: null,
       toolMode: 'select' as ToolMode,
       activeFixtureId: null,
@@ -158,6 +161,28 @@ export const useEditorStore = create<EditorState>()(
           const { [id]: _, ...rest } = state.placedItems
           return { placedItems: rest, selectedItemId: null }
         }),
+
+      // ---------- Phase 02.1 边操作 ----------
+      placeEdge: (edge: Omit<PlacedEdge, 'id'>) =>
+        set((state) => {
+          const id = crypto.randomUUID()
+          return {
+            placedEdges: {
+              ...state.placedEdges,
+              [id]: { ...edge, id },
+            },
+          }
+        }),
+
+      removeEdge: (id: string) =>
+        set((state) => {
+          if (!(id in state.placedEdges)) return state
+          const next = { ...state.placedEdges }
+          delete next[id]
+          return { placedEdges: next }
+        }),
+
+      clearEdges: () => set({ placedEdges: {} }),
 
       setToolMode: (mode: ToolMode) =>
         set({ toolMode: mode, selectedItemId: null }),
@@ -230,6 +255,8 @@ export const useEditorStore = create<EditorState>()(
           areaLevel: level,
           gridSize: grid,
           isEditorReady: true,
+          // Phase 02.1 Pitfall 6: startEditor 重置必须同步清空 placedEdges
+          placedEdges: {},
           placedItems: {
             [gateId]: {
               id: gateId,
@@ -264,13 +291,17 @@ export const useEditorStore = create<EditorState>()(
     }),
     {
       limit: 50, // 超过 GRID-09 最低 20 步要求
-      // 只追踪 placedItems 变化，不追踪 UI 状态
+      // 只追踪 placedItems 和 placedEdges 变化，不追踪 UI 状态
+      // Phase 02.1 Pitfall 2: partialize 必须同时包含 placedEdges，
+      // 否则边操作将从 undo 历史静默丢失
       partialize: (state) => ({
         placedItems: state.placedItems,
+        placedEdges: state.placedEdges,
       }),
-      // 判断 partialized 状态是否相同，避免非 placedItems 变更产生冗余历史
+      // 判断 partialized 状态是否相同，避免 UI 变更产生冗余历史
       equality: (pastState, currentState) =>
-        pastState.placedItems === currentState.placedItems,
+        pastState.placedItems === currentState.placedItems &&
+        pastState.placedEdges === currentState.placedEdges,
     },
   ),
 )
@@ -332,12 +363,22 @@ export function redoWithFlash() {
 // 多次调用；只有第一次（当 tracking 处于暂停 **且** 存在 stroke 快照时）才真正 commit，
 // 后续调用为 no-op，不产生重复 history 条目。
 
-let _preStrokeSnapshot: Record<string, PlacedItem> | null = null
+// Phase 02.1: 快照同时包含 placedItems 和 placedEdges，与 partialize 形状保持一致
+interface StrokeSnapshot {
+  placedItems: Record<string, PlacedItem>
+  placedEdges: Record<string, PlacedEdge>
+}
+
+let _preStrokeSnapshot: StrokeSnapshot | null = null
 
 const TEMPORAL_LIMIT = 50 // 必须与上方 temporal({ limit }) 保持一致
 
 export function startStrokeBatch(): void {
-  _preStrokeSnapshot = useEditorStore.getState().placedItems
+  const s = useEditorStore.getState()
+  _preStrokeSnapshot = {
+    placedItems: s.placedItems,
+    placedEdges: s.placedEdges,
+  }
   useEditorStore.temporal.getState().pause()
 }
 
@@ -348,13 +389,13 @@ export function endStrokeBatch(): void {
     const snapshot = _preStrokeSnapshot
     _preStrokeSnapshot = null
     temporal.resume()
-    // 直接向 temporal store 写入一条 pastState（stroke 开始前的 placedItems 快照）
+    // 直接向 temporal store 写入一条 pastState（stroke 开始前的快照）
     // 并清空 futureStates —— 这复刻了 zundo _handleSet 的行为但绕过其 pastState 捕获逻辑
     const current = temporal.pastStates
     const next =
       current.length >= TEMPORAL_LIMIT
-        ? [...current.slice(1), { placedItems: snapshot }]
-        : [...current, { placedItems: snapshot }]
+        ? [...current.slice(1), snapshot]
+        : [...current, snapshot]
     useEditorStore.temporal.setState({
       pastStates: next,
       futureStates: [],
