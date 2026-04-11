@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02.1-01-PLAN.md
-last_updated: "2026-04-11T06:21:45.948Z"
-last_activity: 2026-04-10
+stopped_at: Completed 02.1-03-PLAN.md
+last_updated: "2026-04-11T06:32:04.295Z"
+last_activity: 2026-04-11
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 16
-  completed_plans: 12
+  completed_plans: 14
   percent: 75
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 02.1
-Plan: 02 (next — edge data model and store slice)
-Status: In progress (Plan 01 complete)
+Plan: 04 (next — fence layer rendering)
+Status: In progress (Plans 01-03 complete)
 Last activity: 2026-04-11
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [████████░░] 75%
 | Phase 02 P03 | 8min | 2 tasks | 6 files |
 | Phase 02 P04 | 11min | 1 tasks | 7 files |
 | Phase 02.1 P01 | 8min | 3 tasks | 9 files |
+| Phase 02.1 P03 | 15min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,8 @@ Recent decisions affecting current work:
 - [Phase 02]: [Phase 02]: onFenceCancel returns boolean so useKeyboard can swallow Escape only when a fence line is actually active — avoids duplicate phase check in the hook
 - [Phase 02]: [Phase 02]: Mode/fixture reset uses React prev-props-in-state pattern instead of useEffect(setState) to satisfy react-hooks/set-state-in-effect lint rule
 - [Phase 02.1]: [Phase 02.1]: Brush discriminator renamed 'line-tool' -> 'drag-paint-edge' (symmetric with 'drag-paint'); Phase 2 fence line-tool surface deleted wholesale — no transitional code
+- [Phase 02.1]: Unified drag handler: direct branching over strategy pattern (Option A, simplicity-first); three mutually-exclusive ref guards dispatch to helpers from one handleMouseMove
+- [Phase 02.1]: Edge erase runs BEFORE tile erase (top-layer priority) via exact lattice match edge.x===cursor.rawGridX && edge.y===cursor.rawGridY
 
 ### Pending Todos
 
@@ -115,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T06:21:45.946Z
-Stopped at: Completed 02.1-01-PLAN.md
+Last session: 2026-04-11T06:32:04.293Z
+Stopped at: Completed 02.1-03-PLAN.md
 Resume file: None
