@@ -59,6 +59,31 @@ Plans:
 - [x] 02-05-PLAN.md — Dashed grid overlay refinement (D-46) matching in-game visual
 **UI hint**: yes
 
+### Phase 02.1: Fence edge-based model and unified drag tool (INSERTED)
+
+**Goal:** Re-architect fences as edge-based items (stored as `{x, y, orientation: 'h' | 'v'}` on the grid lattice) and unify roads/color-tiles/fences under a single hold-drag interaction. Fences should snap to the line *between* tiles and coexist with road tiles on the same grid square. Drag is axis-locked for fences (no diagonals).
+**Requirements**: ROAD-03 (corrected — supersedes Phase 2 fence line tool)
+**Depends on:** Phase 2
+**Plans:** 0 plans
+**UI hint**: yes
+
+**Why inserted:** Phase 2 closed Fence as a tile-based item placed via click-line tool (D-34, D-35, D-36). User feedback during human verification revealed two architectural mistakes:
+  1. Fences in MySekai live on grid lines (edges), not in tile cells — they sit *between* tiles and coexist with roads
+  2. The interaction should be unified: roads, color tiles, AND fences all use hold-drag (dragging "draws a line" — for roads it fills tiles, for fences it fills edges)
+
+**Replaces from Phase 2:**
+- D-34, D-35, D-36 (fence click-line tool with confirm overlay) → superseded by drag-paint
+- `useFenceLineTool.ts`, `FenceLineTool.tsx`, `FenceConfirmOverlay.tsx` → to be deleted
+- `fenceLineTool.test.ts` → replaced with edge-based fence drag tests
+
+**New constraints:**
+- Fence drag is axis-locked: dominant drag direction (Δx vs Δy) determines whether the stroke lays horizontal or vertical edges; diagonals collapse to the dominant axis (no L-shapes from a single drag)
+- Fences and roads share the same `'brush'` ToolMode and the same drag handler but route to different occupancy grids (tile occupancy vs new edge occupancy)
+- Phase 3 URL encoding must accommodate the new edge type alongside existing PlacedItem schema
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 02.1 to break down)
+
 ### Phase 3: Persistence & Sharing
 **Goal**: Users can save their designs locally and share/import blueprints via URL
 **Depends on**: Phase 2

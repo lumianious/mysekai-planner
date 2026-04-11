@@ -63,6 +63,10 @@ Progress: [██░░░░░░░░] 17%
 
 ## Accumulated Context
 
+### Roadmap Evolution
+
+- **2026-04-11** — Phase 02.1 inserted after Phase 2: "Fence edge-based model and unified drag tool" (URGENT). Reason: human verification revealed two architectural mistakes in Phase 2's fence implementation — (1) fences should live on grid lines/edges, not in tile cells, so they can coexist with road tiles on the same grid square; (2) fence interaction should be unified with road drag-paint, not a separate click-line tool. Phase 02.1 will re-architect fences as edge-based items `{x, y, orientation: 'h' | 'v'}`, delete the line-tool components/hook/test added in 02-04, and apply axis-locked drag-paint (no diagonals). Replaces Phase 2 D-34/D-35/D-36.
+
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
