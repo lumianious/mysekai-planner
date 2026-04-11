@@ -19,12 +19,24 @@ import { useEditorActions } from '../../hooks/useEditorActions'
 import { TILE_SIZE } from '../../utils/grid'
 import { getEffectiveSize } from '../../utils/grid'
 import { rasterizeLine } from '../../utils/rasterize'
+import {
+  edgeKey,
+  dominantAxis,
+  rasterizeEdgeLine,
+  buildEdgeOccupancySet,
+  checkCanPlaceEdge,
+} from '../../utils/edgeRasterize'
 import { getBrushInteraction } from '../../data/fixtures'
 import { GridLayer } from './GridLayer'
 import { GroundLayer } from './GroundLayer'
 import { FurnitureLayer } from './FurnitureLayer'
 import { GhostPreview } from './GhostPreview'
-import type { Fixture, PlacedItem, ToolMode } from '../../types/editor'
+import type {
+  Fixture,
+  PlacedItem,
+  ToolMode,
+  EdgeOrientation,
+} from '../../types/editor'
 
 // ======== 光标映射 ========
 
@@ -149,6 +161,13 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
   const isErasingRef = useRef(false)
   const lastErasedTileRef = useRef<{ x: number; y: number } | null>(null)
 
+  // ======== 边绘制拖拽状态机（Phase 02.1 ROAD-03） ========
+  // 首次跨格样本锁定轴向；后续样本投影到锁定轴；渐进提交边
+  const isEdgePaintingRef = useRef(false)
+  const edgeStrokeStartRef = useRef<{ x: number; y: number } | null>(null)
+  const lastEdgePointRef = useRef<{ x: number; y: number } | null>(null)
+  const edgeStrokeAxisRef = useRef<EdgeOrientation | null>(null)
+
   // ======== 光标 → 格子坐标辅助 ========
   // 返回原始格子坐标 + 按 step 对齐的画刷格子坐标（v1 step=2）
   const pointerToGrid = useCallback(
@@ -218,9 +237,21 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
   )
 
   // ======== 单 tile 擦除（仅 ground，D-42） ========
+  // Phase 02.1 扩展：同一位置先擦边（顶层），再擦地面瓦片
+  // 匹配规则：光标 raw 格点 (rawGridX,rawGridY) 即目标边的 (x,y)
+  //   - 'h' 边 (x,y,'h')：该格子的上边
+  //   - 'v' 边 (x,y,'v')：该格子的左边
+  // 即"触碰光标所在格的上边或左边"的边将被擦除
   const eraseGroundTileIfAny = useCallback(
     (rawGridX: number, rawGridY: number) => {
       const state = useEditorStore.getState()
+      // ---------- 1) 先擦边（顶层优先） ----------
+      for (const e of Object.values(state.placedEdges)) {
+        if (e.x === rawGridX && e.y === rawGridY) {
+          state.removeEdge(e.id)
+        }
+      }
+      // ---------- 2) 再擦 ground 瓦片 ----------
       for (const item of Object.values(state.placedItems)) {
         if (item.layer !== 'ground') continue
         const fixture = fixtureMap.get(item.fixtureId)
@@ -240,6 +271,84 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
     [fixtureMap],
   )
 
+  // ======== 边绘制：轴锁 + 渐进提交 + 占用校验 ========
+  // 所有 ref 由 handleStageMouseDown 在 'drag-paint-edge' 分支初始化
+  // 首次跨格样本触发 dominantAxis 锁定；后续样本投影到锁定轴
+  const paintEdgeStroke = useCallback(
+    (p: { rawGridX: number; rawGridY: number }, fixture: Fixture) => {
+      const start = edgeStrokeStartRef.current
+      const last = lastEdgePointRef.current
+      if (!start || !last) return
+
+      const dxTotal = p.rawGridX - start.x
+      const dyTotal = p.rawGridY - start.y
+
+      // 首次跨格样本锁定轴向（|dx|==|dy| 偏水平）
+      if (edgeStrokeAxisRef.current === null) {
+        if (dxTotal === 0 && dyTotal === 0) return
+        edgeStrokeAxisRef.current = dominantAxis(dxTotal, dyTotal)
+      }
+
+      const axis = edgeStrokeAxisRef.current
+      const projected =
+        axis === 'h'
+          ? { x: p.rawGridX, y: start.y }
+          : { x: start.x, y: p.rawGridY }
+      if (projected.x === last.x && projected.y === last.y) return
+
+      const state = useEditorStore.getState()
+      const edgeSet = buildEdgeOccupancySet(state.placedEdges)
+      const newEdges = rasterizeEdgeLine(last, projected, axis, fixture.id)
+      const gw = state.gridSize.width
+      const gd = state.gridSize.depth
+      for (const edge of newEdges) {
+        if (checkCanPlaceEdge(edgeSet, edge.x, edge.y, edge.orientation, gw, gd)) {
+          state.placeEdge(edge)
+          edgeSet.add(edgeKey(edge.x, edge.y, edge.orientation))
+        }
+        // 占用 → 跳过，继续笔画（与瓦片刷 overwrite=OFF 一致）
+      }
+      lastEdgePointRef.current = projected
+    },
+    [],
+  )
+
+  // ======== 瓦片画刷推进（提取出 handleMouseMove 以遵守 50 行函数限制） ========
+  const advanceTilePaint = useCallback(
+    (gridX: number, gridY: number, fixture: Fixture) => {
+      const step = fixture.gridSize.width
+      const snappedX = Math.floor(gridX / step) * step
+      const snappedY = Math.floor(gridY / step) * step
+      const last = lastPaintedTileRef.current
+      if (last && last.x === snappedX && last.y === snappedY) return
+      const tiles = last
+        ? rasterizeLine(last.x, last.y, snappedX, snappedY, step)
+        : [{ x: snappedX, y: snappedY }]
+      // 跳过第一个 tile —— 它是 last 本身（已绘制）
+      for (let i = last ? 1 : 0; i < tiles.length; i++) {
+        paintTileIfAllowed(tiles[i].x, tiles[i].y, fixture)
+      }
+      lastPaintedTileRef.current = { x: snappedX, y: snappedY }
+    },
+    [paintTileIfAllowed],
+  )
+
+  // ======== 擦除画刷推进（提取出 handleMouseMove） ========
+  const advanceErase = useCallback(
+    (gridX: number, gridY: number) => {
+      const last = lastErasedTileRef.current
+      if (last && last.x === gridX && last.y === gridY) return
+      const tiles = last
+        ? rasterizeLine(last.x, last.y, gridX, gridY, 1)
+        : [{ x: gridX, y: gridY }]
+      for (let i = last ? 1 : 0; i < tiles.length; i++) {
+        eraseGroundTileIfAny(tiles[i].x, tiles[i].y)
+      }
+      lastErasedTileRef.current = { x: gridX, y: gridY }
+    },
+    [eraseGroundTileIfAny],
+  )
+
   // ======== stroke 结束（R-06 幂等清理） ========
   // 设计上幂等：ref 在调用 endStrokeBatch() 之前清除，因此并发的第二次调用
   // （例如 mouseleave 在 mouseup 之后触发，或 window.blur 与任一方竞态）
@@ -254,6 +363,14 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
     if (isErasingRef.current) {
       isErasingRef.current = false
       lastErasedTileRef.current = null
+      endStrokeBatch()
+    }
+    // Phase 02.1 — 边绘制清理（refs 先清后调用，R-06 幂等）
+    if (isEdgePaintingRef.current) {
+      isEdgePaintingRef.current = false
+      edgeStrokeStartRef.current = null
+      lastEdgePointRef.current = null
+      edgeStrokeAxisRef.current = null
       endStrokeBatch()
     }
   }, [])
@@ -283,7 +400,17 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
           paintTileIfAllowed(p.gridX, p.gridY, fixture)
           return
         }
-        // 围栏 (drag-paint-edge) 分支由 Plan 03 在此处添加
+        // --- 围栏边绘制拖拽起点（Phase 02.1） ---
+        if (interaction === 'drag-paint-edge') {
+          const p = pointerToGrid(stage, 1)
+          if (!p) return
+          startStrokeBatch()
+          isEdgePaintingRef.current = true
+          edgeStrokeStartRef.current = { x: p.rawGridX, y: p.rawGridY }
+          lastEdgePointRef.current = { x: p.rawGridX, y: p.rawGridY }
+          edgeStrokeAxisRef.current = null
+          return
+        }
       }
 
       // --- 移除拖拽起点 (D-42) ---
@@ -324,44 +451,30 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
       const gridY = Math.floor((pointer.y - stage.y()) / scale / TILE_SIZE)
       setMouseGridPos({ x: gridX, y: gridY })
 
-      // --- 画刷拖拽推进 (D-33) ---
-      if (isPaintingRef.current) {
-        const state = useEditorStore.getState()
-        const fixture =
-          state.activeFixtureId !== null
-            ? fixtureMap.get(state.activeFixtureId)
-            : undefined
-        if (!fixture) return
-        const step = fixture.gridSize.width
-        const snappedX = Math.floor(gridX / step) * step
-        const snappedY = Math.floor(gridY / step) * step
-        const last = lastPaintedTileRef.current
-        if (last && last.x === snappedX && last.y === snappedY) return
-        const tiles = last
-          ? rasterizeLine(last.x, last.y, snappedX, snappedY, step)
-          : [{ x: snappedX, y: snappedY }]
-        // 跳过第一个 tile —— 它是 last 本身（已绘制）
-        for (let i = last ? 1 : 0; i < tiles.length; i++) {
-          paintTileIfAllowed(tiles[i].x, tiles[i].y, fixture)
-        }
-        lastPaintedTileRef.current = { x: snappedX, y: snappedY }
+      // --- 活动 fixture 查询（画刷/边绘制分支共享） ---
+      const activeFixture = (() => {
+        const id = useEditorStore.getState().activeFixtureId
+        return id !== null ? fixtureMap.get(id) : undefined
+      })()
+
+      // --- 边绘制拖拽推进（Phase 02.1） ---
+      if (isEdgePaintingRef.current) {
+        if (!activeFixture) return
+        paintEdgeStroke({ rawGridX: gridX, rawGridY: gridY }, activeFixture)
         return
       }
-
+      // --- 瓦片画刷拖拽推进 (D-33) ---
+      if (isPaintingRef.current) {
+        if (!activeFixture) return
+        advanceTilePaint(gridX, gridY, activeFixture)
+        return
+      }
       // --- 移除拖拽推进 (D-42) ---
       if (isErasingRef.current) {
-        const last = lastErasedTileRef.current
-        if (last && last.x === gridX && last.y === gridY) return
-        const tiles = last
-          ? rasterizeLine(last.x, last.y, gridX, gridY, 1)
-          : [{ x: gridX, y: gridY }]
-        for (let i = last ? 1 : 0; i < tiles.length; i++) {
-          eraseGroundTileIfAny(tiles[i].x, tiles[i].y)
-        }
-        lastErasedTileRef.current = { x: gridX, y: gridY }
+        advanceErase(gridX, gridY)
       }
     },
-    [fixtureMap, paintTileIfAllowed, eraseGroundTileIfAny],
+    [fixtureMap, paintEdgeStroke, advanceTilePaint, advanceErase],
   )
 
   // ======== 鼠标离开 — 清除鬼影预览 + R-06 清理 ========
