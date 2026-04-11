@@ -13,12 +13,6 @@ interface UseKeyboardOptions {
   onCycleSelection?: () => void
   // D-30: 用于在 1-9 激活热栏时解析 fixture，以便 activateHotbar 路由到 brush/stamp
   fixtureMap?: Map<number, Fixture>
-  // D-34: Enter 在围栏 confirming 阶段提交；无围栏则 no-op
-  onFenceConfirm?: () => void
-  // D-34: Escape 在围栏 picking-end / confirming 阶段取消当前线；
-  // 返回 true 表示确实有围栏线被取消（吞掉 Escape），
-  // 返回 false 表示没有进行中的围栏线（回落到标准 Escape 行为）。
-  onFenceCancel?: () => boolean
 }
 
 export function useKeyboard({
@@ -26,21 +20,12 @@ export function useKeyboard({
   onNudge,
   onCycleSelection,
   fixtureMap,
-  onFenceConfirm,
-  onFenceCancel,
 }: UseKeyboardOptions) {
   // 键盘事件处理器 — 使用 getState() 避免选择器导致的频繁重渲染
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const state = useEditorStore.getState()
       const { undo, redo } = useEditorStore.temporal.getState()
-
-      // D-34: Enter 在围栏 confirming 阶段提交（无围栏则 callback 自 no-op）
-      if (e.key === 'Enter') {
-        e.preventDefault()
-        onFenceConfirm?.()
-        return
-      }
 
       // 全局快捷键
       switch (e.key.toLowerCase()) {
@@ -57,8 +42,6 @@ export function useKeyboard({
           state.setToolMode('remove')
           return
         case 'escape':
-          // D-34: 围栏线在进行中 → 吞掉 Escape（不 deselect，不清 activeFixture）
-          if (onFenceCancel?.()) return
           state.setSelectedItem(null)
           if (state.toolMode === 'stamp' || state.toolMode === 'brush') {
             state.setActiveFixture(null)
@@ -140,7 +123,7 @@ export function useKeyboard({
         return
       }
     },
-    [onNudge, onCycleSelection, fixtureMap, onFenceConfirm, onFenceCancel],
+    [onNudge, onCycleSelection, fixtureMap],
   )
 
   useEffect(() => {

@@ -48,7 +48,7 @@ export function GhostPreview({
     return <Layer listening={false} />
   }
 
-  // Brush 模式下按 step 对齐鬼影位置；fence 线工具鬼影由 plan 02-04 处理，这里隐藏
+  // Brush 模式下按 step 对齐鬼影位置；围栏 edge 鬼影由 FenceLayer (Plan 04) 处理，这里隐藏
   let ghostX = mouseGridPos.x
   let ghostY = mouseGridPos.y
   if (toolMode === 'brush') {
@@ -57,7 +57,7 @@ export function GhostPreview({
       const step = fixture.gridSize.width
       ghostX = Math.floor(mouseGridPos.x / step) * step
       ghostY = Math.floor(mouseGridPos.y / step) * step
-    } else if (interaction === 'line-tool') {
+    } else if (interaction === 'drag-paint-edge') {
       return <Layer listening={false} />
     }
   }

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-04-10T10:49:46.363Z"
+stopped_at: Completed 02.1-01-PLAN.md
+last_updated: "2026-04-11T06:21:45.948Z"
 last_activity: 2026-04-10
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 2
-  total_plans: 11
-  completed_plans: 11
-  percent: 17
+  total_plans: 16
+  completed_plans: 12
+  percent: 75
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** Users can visually plan their MySekai outdoor layout and know exactly what materials they need to build it.
-**Current focus:** Phase 2 — roads-fences-ground-layer
+**Current focus:** Phase 02.1 — fence edge-based model and unified drag tool
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-10
+Phase: 02.1
+Plan: 02 (next — edge data model and store slice)
+Status: In progress (Plan 01 complete)
+Last activity: 2026-04-11
 
-Progress: [██░░░░░░░░] 17%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P02 | 8min | 2 tasks | 10 files |
 | Phase 02 P03 | 8min | 2 tasks | 6 files |
 | Phase 02 P04 | 11min | 1 tasks | 7 files |
+| Phase 02.1 P01 | 8min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,7 @@ Recent decisions affecting current work:
 - [Phase 02]: [Phase 02]: Fence state machine extracted to useFenceLineTool.ts to keep EditorCanvas.tsx under CLAUDE.md 800-line limit and isolate three-phase logic from drag-paint refs
 - [Phase 02]: [Phase 02]: onFenceCancel returns boolean so useKeyboard can swallow Escape only when a fence line is actually active — avoids duplicate phase check in the hook
 - [Phase 02]: [Phase 02]: Mode/fixture reset uses React prev-props-in-state pattern instead of useEffect(setState) to satisfy react-hooks/set-state-in-effect lint rule
+- [Phase 02.1]: [Phase 02.1]: Brush discriminator renamed 'line-tool' -> 'drag-paint-edge' (symmetric with 'drag-paint'); Phase 2 fence line-tool surface deleted wholesale — no transitional code
 
 ### Pending Todos
 
@@ -113,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T10:41:26.585Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-04-11T06:21:45.946Z
+Stopped at: Completed 02.1-01-PLAN.md
 Resume file: None

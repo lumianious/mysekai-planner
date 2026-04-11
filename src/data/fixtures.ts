@@ -126,15 +126,15 @@ export function isBrushEligible(fixture: Fixture): boolean {
 }
 
 // ======== Brush 交互模式选择 ========
-// 'drag-paint' → 拖拽画刷（道、カラータイル）
-// 'line-tool'  → 起点-终点-确认 线工具（柵）
-// null         → 非 Brush 目标（地毯走 Stamp，其他家具走 Stamp）
+// 'drag-paint'      → 拖拽画刷（道、カラータイル）—— 目标是 tile 格子
+// 'drag-paint-edge' → 拖拽画刷（柵）—— 目标是网格边缘（格子之间），Plan 02/03 实现
+// null              → 非 Brush 目标（地毯走 Stamp，其他家具走 Stamp）
 
 export function getBrushInteraction(
   fixture: Fixture,
-): 'drag-paint' | 'line-tool' | null {
+): 'drag-paint' | 'drag-paint-edge' | null {
   const s = getGroundSubtype(fixture)
   if (s === 'road' || s === 'color-tile') return 'drag-paint'
-  if (s === 'fence') return 'line-tool'
+  if (s === 'fence') return 'drag-paint-edge'
   return null
 }
