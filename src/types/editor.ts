@@ -76,6 +76,33 @@ export interface PlacedItem {
   isSystem: boolean   // gate/house = true，不可删除
 }
 
+// ========================================
+// 边数据模型（Phase 02.1）
+// 围栏等实体存在于网格格点的边上，而非格子内
+// ========================================
+
+export type EdgeOrientation = 'h' | 'v'
+
+/**
+ * 放置在网格边上的实体（目前仅围栏使用）
+ *
+ * 坐标语义：
+ *   orientation='h'：位于格子(x,y)的上边（y-1 与 y 的分界）
+ *     有效范围：0 ≤ x < W, 0 ≤ y ≤ D
+ *   orientation='v'：位于格子(x,y)的左边（x-1 与 x 的分界）
+ *     有效范围：0 ≤ x ≤ W, 0 ≤ y < D
+ *
+ * Phase 3 URL 编码备注：
+ *   序列化建议 orientation 使用 0='h' / 1='v' 以减少 URL 长度
+ */
+export interface PlacedEdge {
+  id: string
+  fixtureId: number
+  x: number
+  y: number
+  orientation: EdgeOrientation
+}
+
 // ======== 热栏 ========
 
 export interface HotbarSlot {
@@ -89,6 +116,7 @@ export interface EditorState {
   areaLevel: AreaLevel
   gridSize: GridSize
   placedItems: Record<string, PlacedItem>
+  placedEdges: Record<string, PlacedEdge>  // Phase 02.1 边数据（围栏等）
   selectedItemId: string | null
   toolMode: ToolMode
   activeFixtureId: number | null
@@ -104,6 +132,10 @@ export interface EditorState {
   moveItem: (id: string, x: number, y: number) => void
   rotateItem: (id: string, direction: 'cw' | 'ccw') => void
   removeItem: (id: string) => void
+  // Phase 02.1 边操作
+  placeEdge: (edge: Omit<PlacedEdge, 'id'>) => void
+  removeEdge: (id: string) => void
+  clearEdges: () => void
   setToolMode: (mode: ToolMode) => void
   setAreaLevel: (level: AreaLevel) => void
   // D-30 / D-39: 可选 fixture 参数让 store 根据 handleType 自动路由 brush vs stamp 模式
