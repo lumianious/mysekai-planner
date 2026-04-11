@@ -140,8 +140,8 @@ describe('getBrushInteraction', () => {
     expect(getBrushInteraction(colorTile)).toBe('drag-paint')
   })
 
-  it("returns 'line-tool' for fence", () => {
-    expect(getBrushInteraction(fence)).toBe('line-tool')
+  it("returns 'drag-paint-edge' for fence", () => {
+    expect(getBrushInteraction(fence)).toBe('drag-paint-edge')
   })
 
   it('returns null for rug and regular furniture', () => {
