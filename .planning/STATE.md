@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02.1-03-PLAN.md
-last_updated: "2026-04-11T06:32:04.295Z"
+stopped_at: Completed 02.1-04-PLAN.md
+last_updated: "2026-04-15T05:17:34.187Z"
 last_activity: 2026-04-11
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 16
-  completed_plans: 14
-  percent: 75
+  completed_plans: 15
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 02.1
-Plan: 04 (next — fence layer rendering)
-Status: In progress (Plans 01-03 complete)
+Plan: 05 (next — tests edge rasterize and brush)
+Status: In progress (Plans 01-04 complete)
 Last activity: 2026-04-11
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 88%
 | Phase 02 P04 | 11min | 1 tasks | 7 files |
 | Phase 02.1 P01 | 8min | 3 tasks | 9 files |
 | Phase 02.1 P03 | 15min | 2 tasks | 2 files |
+| Phase 02.1 P04 | 12min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,7 @@ Recent decisions affecting current work:
 - [Phase 02.1]: [Phase 02.1]: Brush discriminator renamed 'line-tool' -> 'drag-paint-edge' (symmetric with 'drag-paint'); Phase 2 fence line-tool surface deleted wholesale — no transitional code
 - [Phase 02.1]: Unified drag handler: direct branching over strategy pattern (Option A, simplicity-first); three mutually-exclusive ref guards dispatch to helpers from one handleMouseMove
 - [Phase 02.1]: Edge erase runs BEFORE tile erase (top-layer priority) via exact lattice match edge.x===cursor.rawGridX && edge.y===cursor.rawGridY
+- [Phase 02.1]: FenceLayer renders edges as 6px-thick rects centered on grid lattice lines via half-thickness offset; fixtureMap passed as prop matching existing GroundLayer pattern
 
 ### Pending Todos
 
@@ -118,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T06:32:04.293Z
-Stopped at: Completed 02.1-03-PLAN.md
+Last session: 2026-04-15T05:17:34.184Z
+Stopped at: Completed 02.1-04-PLAN.md
 Resume file: None

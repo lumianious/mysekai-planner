@@ -29,6 +29,7 @@ import {
 import { getBrushInteraction } from '../../data/fixtures'
 import { GridLayer } from './GridLayer'
 import { GroundLayer } from './GroundLayer'
+import { FenceLayer } from './FenceLayer'
 import { FurnitureLayer } from './FurnitureLayer'
 import { GhostPreview } from './GhostPreview'
 import type {
@@ -609,6 +610,9 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
           onItemClick={handleItemClick}
           onItemDragEnd={handleItemDragEnd}
         />
+
+        {/* 围栏边层（Phase 02.1）— 位于地面层之上、家具层之下 */}
+        <FenceLayer fixtureMap={fixtureMap} />
 
         {/* 家具层 */}
         <FurnitureLayer
