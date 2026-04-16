@@ -17,6 +17,7 @@ import type {
 import { getGridSize } from '../data/areaLevels'
 import { tileKey, getEffectiveSize, isInBounds } from '../utils/grid'
 import { getBrushInteraction } from '../data/fixtures'
+import { getEdgesForTileFootprint } from '../utils/edgeRasterize'
 
 // ======== 旋转辅助 ========
 
@@ -85,6 +86,7 @@ export function checkCanPlace(
   gridWidth: number,
   gridDepth: number,
   excludeItemId?: string,
+  edgeSet?: Set<string>,
 ): boolean {
   // 边界检查
   if (!isInBounds(x, y, width, depth, gridWidth, gridDepth)) return false
@@ -94,6 +96,13 @@ export function checkCanPlace(
       const key = tileKey(x + dx, y + dy)
       const occupant = occupancyGrid.get(key)
       if (occupant && occupant !== excludeItemId) return false
+    }
+  }
+  // 围栏碰撞：脚印边界上的边若被占据则阻止
+  if (edgeSet) {
+    const borderEdges = getEdgesForTileFootprint(x, y, width, depth)
+    for (const ek of borderEdges) {
+      if (edgeSet.has(ek)) return false
     }
   }
   return true
