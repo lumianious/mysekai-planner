@@ -11,6 +11,7 @@ import {
   startStrokeBatch,
   endStrokeBatch,
   buildOccupancyGrid,
+  buildFenceCollisionGrid,
   checkCanPlace,
 } from '../../stores/editorStore'
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction'
@@ -299,7 +300,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
 
       const state = useEditorStore.getState()
       const edgeSet = buildEdgeOccupancySet(state.placedEdges)
-      const furnitureOcc = buildOccupancyGrid(state.placedItems, fixtureMap, 'furniture')
+      const furnitureOcc = buildFenceCollisionGrid(state.placedItems, fixtureMap)
       const newEdges = rasterizeEdgeLine(last, projected, axis, fixture.id)
       const gw = state.gridSize.width
       const gd = state.gridSize.depth

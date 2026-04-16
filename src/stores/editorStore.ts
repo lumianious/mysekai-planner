@@ -16,7 +16,7 @@ import type {
 } from '../types/editor'
 import { getGridSize } from '../data/areaLevels'
 import { tileKey, getEffectiveSize, isInBounds } from '../utils/grid'
-import { getBrushInteraction } from '../data/fixtures'
+import { getBrushInteraction, getGroundSubtype } from '../data/fixtures'
 import { getEdgesForTileFootprint } from '../utils/edgeRasterize'
 
 // ======== 旋转辅助 ========
@@ -67,6 +67,32 @@ export function buildOccupancyGrid(
     if (item.layer !== layer) continue
     const fixture = fixtureMap.get(item.fixtureId)
     if (!fixture) continue
+    const [w, d] = getEffectiveSize(fixture.gridSize, item.rotation)
+    for (let dx = 0; dx < w; dx++) {
+      for (let dy = 0; dy < d; dy++) {
+        grid.set(tileKey(item.x + dx, item.y + dy), item.id)
+      }
+    }
+  }
+  return grid
+}
+
+/**
+ * 围栏碰撞专用占用网格：包含所有占据物理空间的物品，
+ * 排除道路、颜色瓷砖、地毯（这些与围栏共存）
+ */
+export function buildFenceCollisionGrid(
+  items: Record<string, PlacedItem>,
+  fixtureMap: Map<number, Fixture>,
+): OccupancyGrid {
+  const grid: OccupancyGrid = new Map()
+  for (const item of Object.values(items)) {
+    const fixture = fixtureMap.get(item.fixtureId)
+    if (!fixture) continue
+    const sub = getGroundSubtype(fixture)
+    if (sub === 'road' || sub === 'color-tile' || sub === 'rug') continue
+    // fence 本身不占格子空间（它们在边缘上），也跳过
+    if (sub === 'fence') continue
     const [w, d] = getEffectiveSize(fixture.gridSize, item.rotation)
     for (let dx = 0; dx < w; dx++) {
       for (let dy = 0; dy < d; dy++) {
