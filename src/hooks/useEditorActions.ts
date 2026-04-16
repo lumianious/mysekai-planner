@@ -5,6 +5,7 @@
 
 import { useCallback } from 'react'
 import { useEditorStore, buildOccupancyGrid, checkCanPlace } from '../stores/editorStore'
+import { buildEdgeOccupancySet } from '../utils/edgeRasterize'
 import { getEffectiveSize, tileKey } from '../utils/grid'
 import { getItemLayer } from '../data/fixtures'
 import type { Fixture, PlacedItem } from '../types/editor'
@@ -71,6 +72,7 @@ export function useEditorActions(fixtureMap: Map<number, Fixture>) {
         // previewRotation 从 store.getState() 中读取，避免闭包过期
         const [w, d] = getEffectiveSize(fixture.gridSize, previewRotation)
         const occupancy = buildOccupancyGrid(state.placedItems, fixtureMap, layer)
+        const edgeSet = buildEdgeOccupancySet(state.placedEdges)
 
         if (overwriteEnabled) {
           // 覆盖模式：先移除占位物品
@@ -81,11 +83,11 @@ export function useEditorActions(fixtureMap: Map<number, Fixture>) {
             fixtureMap,
             layer,
           )
-          if (!checkCanPlace(freshOccupancy, gridX, gridY, w, d, state.gridSize.width, state.gridSize.depth)) {
-            return // 系统物品无法被覆盖
+          if (!checkCanPlace(freshOccupancy, gridX, gridY, w, d, state.gridSize.width, state.gridSize.depth, undefined, edgeSet)) {
+            return // 系统物品无法被覆盖，或被围栏阻挡
           }
         } else {
-          if (!checkCanPlace(occupancy, gridX, gridY, w, d, state.gridSize.width, state.gridSize.depth)) {
+          if (!checkCanPlace(occupancy, gridX, gridY, w, d, state.gridSize.width, state.gridSize.depth, undefined, edgeSet)) {
             return // 被阻挡 — 鬼影为红色
           }
         }
@@ -125,8 +127,9 @@ export function useEditorActions(fixtureMap: Map<number, Fixture>) {
       if (!fixture) return
       const [w, d] = getEffectiveSize(fixture.gridSize, item.rotation)
       const occupancy = buildOccupancyGrid(state.placedItems, fixtureMap, item.layer)
+      const edgeSet = buildEdgeOccupancySet(state.placedEdges)
       if (
-        checkCanPlace(occupancy, newX, newY, w, d, state.gridSize.width, state.gridSize.depth, itemId)
+        checkCanPlace(occupancy, newX, newY, w, d, state.gridSize.width, state.gridSize.depth, itemId, edgeSet)
       ) {
         state.moveItem(itemId, newX, newY)
       }

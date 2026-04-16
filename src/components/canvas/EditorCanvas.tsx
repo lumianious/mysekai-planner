@@ -299,11 +299,12 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
 
       const state = useEditorStore.getState()
       const edgeSet = buildEdgeOccupancySet(state.placedEdges)
+      const furnitureOcc = buildOccupancyGrid(state.placedItems, fixtureMap, 'furniture')
       const newEdges = rasterizeEdgeLine(last, projected, axis, fixture.id)
       const gw = state.gridSize.width
       const gd = state.gridSize.depth
       for (const edge of newEdges) {
-        if (checkCanPlaceEdge(edgeSet, edge.x, edge.y, edge.orientation, gw, gd)) {
+        if (checkCanPlaceEdge(edgeSet, edge.x, edge.y, edge.orientation, gw, gd, furnitureOcc)) {
           state.placeEdge(edge)
           edgeSet.add(edgeKey(edge.x, edge.y, edge.orientation))
         }
@@ -311,7 +312,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
       }
       lastEdgePointRef.current = projected
     },
-    [],
+    [fixtureMap],
   )
 
   // ======== 瓦片画刷推进（提取出 handleMouseMove 以遵守 50 行函数限制） ========
