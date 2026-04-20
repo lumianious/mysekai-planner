@@ -71,22 +71,25 @@ export function buildEdgeOccupancySet(
 }
 
 /**
- * 返回矩形脚印 (x,y,w,d) 所有相邻边的 edgeKey
+ * 返回矩形脚印 (x,y,w,d) 内部及边界上所有边的 edgeKey
+ * 包含内部网格线上的边，不仅仅是外围一圈
  * 用于家具放置时检查是否与已有围栏碰撞
  */
 export function getEdgesForTileFootprint(
   x: number, y: number, w: number, d: number,
 ): string[] {
   const keys: string[] = []
-  // 上边 + 下边（水平）
+  // 水平边：x∈[x..x+w-1], y∈[y..y+d]（含上下边界）
   for (let col = x; col < x + w; col++) {
-    keys.push(edgeKey(col, y, 'h'))
-    keys.push(edgeKey(col, y + d, 'h'))
+    for (let row = y; row <= y + d; row++) {
+      keys.push(edgeKey(col, row, 'h'))
+    }
   }
-  // 左边 + 右边（垂直）
-  for (let row = y; row < y + d; row++) {
-    keys.push(edgeKey(x, row, 'v'))
-    keys.push(edgeKey(x + w, row, 'v'))
+  // 垂直边：x∈[x..x+w], y∈[y..y+d-1]（含左右边界）
+  for (let col = x; col <= x + w; col++) {
+    for (let row = y; row < y + d; row++) {
+      keys.push(edgeKey(col, row, 'v'))
+    }
   }
   return keys
 }
