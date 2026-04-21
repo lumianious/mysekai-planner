@@ -43,21 +43,42 @@ describe('encodeBlueprint / decodeBlueprint roundtrip (PERS-05)', () => {
   }
   const areaLevel: AreaLevel = 2
 
-  it('roundtrips all PlacedItem fields exactly', () => {
+  // ID 策略说明：编码器不序列化 UUID（见 encodeBlueprint.ts）。
+  // 解码时合成新 UUID，record 键改变；字段级内容（fixtureId/x/y/rotation/layer/isSystem/orientation）完整保留。
+  // applyBlueprint 会清空 temporal 历史，因此 id 连续性本就在导入边界被打断。
+
+  it('roundtrips all PlacedItem fields (except id, which is regenerated)', () => {
     const encoded = encodeBlueprint({ placedItems: items, placedEdges: edges, areaLevel })
     const decoded = decodeBlueprint(encoded)
     expect(decoded).not.toBeNull()
-    const decodedItems = decoded!.placedItems
-    expect(Object.keys(decodedItems).sort()).toEqual(['item1', 'item2'])
-    expect(decodedItems.item1).toEqual(items.item1)
-    expect(decodedItems.item2).toEqual(items.item2)
+    const decodedItems = Object.values(decoded!.placedItems)
+    expect(decodedItems).toHaveLength(2)
+    // 字段级匹配：剥离 id 后其余字段必须精确相等
+    const stripId = (it: PlacedItem) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _id, ...rest } = it
+      return rest
+    }
+    const expected = Object.values(items).map(stripId).sort((a, b) => a.fixtureId - b.fixtureId)
+    const actual = decodedItems.map(stripId).sort((a, b) => a.fixtureId - b.fixtureId)
+    expect(actual).toEqual(expected)
+    // 每个合成 id 都是合法非空字符串
+    expect(decodedItems.every((d) => typeof d.id === 'string' && d.id.length > 0)).toBe(true)
   })
 
   it('roundtrips PlacedEdge with orientation v', () => {
     const encoded = encodeBlueprint({ placedItems: items, placedEdges: edges, areaLevel })
     const decoded = decodeBlueprint(encoded)
     expect(decoded).not.toBeNull()
-    expect(decoded!.placedEdges.edge1).toEqual(edges.edge1)
+    const decodedEdges = Object.values(decoded!.placedEdges)
+    expect(decodedEdges).toHaveLength(1)
+    const e0 = decodedEdges[0]
+    expect(e0.fixtureId).toBe(777)
+    expect(e0.x).toBe(10)
+    expect(e0.y).toBe(2)
+    expect(e0.orientation).toBe('v')
+    expect(typeof e0.id).toBe('string')
+    expect(e0.id.length).toBeGreaterThan(0)
   })
 
   it('roundtrips areaLevel', () => {
@@ -71,11 +92,14 @@ describe('encodeBlueprint / decodeBlueprint roundtrip (PERS-05)', () => {
     expect(encoded.startsWith('v1.')).toBe(true)
   })
 
-  it('encoded string contains only URL-safe characters', () => {
+  it('encoded string contains only URL-safe characters (lz-string alphabet)', () => {
     const encoded = encodeBlueprint({ placedItems: items, placedEdges: edges, areaLevel })
-    // compressToEncodedURIComponent 使用的字母表: A-Z a-z 0-9 + - 和 $ *
-    // 断言没有 +、/、=、#、?、&、空白等需转义字符
-    expect(encoded).not.toMatch(/[+/=#?&\s]/)
+    // compressToEncodedURIComponent 的 URI 安全字母表: A-Z a-z 0-9 $ - + *
+    // 加上前缀 "v1." 的点号
+    // 断言不含 / = # ? & 空白等需要额外转义的字符
+    expect(encoded).not.toMatch(/[/=#?&\s]/)
+    // 整体只包含 lz-string 安全字母表 + 前缀字符
+    expect(encoded).toMatch(/^v\d+\.[A-Za-z0-9$\-+*]+$/)
   })
 
   it('roundtrips empty slices', () => {
@@ -105,8 +129,11 @@ describe('encodeBlueprint / decodeBlueprint roundtrip (PERS-05)', () => {
     const encoded = encodeBlueprint({ placedItems: slice, placedEdges: {}, areaLevel: 3 })
     const decoded = decodeBlueprint(encoded)
     expect(decoded).not.toBeNull()
+    // 用 fixtureId 作为稳定身份检索（id 已被重新合成）
+    const decodedByFixture = new Map<number, PlacedItem>()
+    for (const it of Object.values(decoded!.placedItems)) decodedByFixture.set(it.fixtureId, it)
     rots.forEach((r, i) => {
-      expect(decoded!.placedItems[`r${i}`].rotation).toBe(r)
+      expect(decodedByFixture.get(100 + i)?.rotation).toBe(r)
     })
   })
 })
