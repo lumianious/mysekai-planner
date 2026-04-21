@@ -97,7 +97,11 @@ Plans:
   2. User can load a previously saved design from localStorage
   3. User can generate a shareable URL and send it to another user who can import the design
   4. URL encoding uses compact binary format with version byte, keeping URLs within platform sharing limits
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Blueprint encode/decode pure module + Wave 0 tests (PERS-05)
+- [ ] 03-02-PLAN.md — Persist middleware composed outside temporal; auto-save + auto-load (PERS-01, PERS-02)
+- [ ] 03-03-PLAN.md — Share button + import URL flow + confirm dialog + toast (PERS-03, PERS-04)
 
 ### Phase 4: Cost Calculator & Inventory
 **Goal**: Users can see material costs for their blueprint and track what they still need to gather
@@ -141,7 +145,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Foundation & Core Editor | 0/6 | Planning complete | - |
 | 2. Roads, Fences & Ground Layer | 0/5 | Complete    | 2026-04-10 |
-| 3. Persistence & Sharing | 0/TBD | Not started | - |
+| 3. Persistence & Sharing | 0/3 | Planning complete | - |
 | 4. Cost Calculator & Inventory | 0/TBD | Not started | - |
 | 5. Sprite Pipeline | 0/TBD | Not started | - |
 | 6. Internationalization | 0/TBD | Not started | - |
