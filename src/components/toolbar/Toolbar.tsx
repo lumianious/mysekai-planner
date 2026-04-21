@@ -19,6 +19,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useEditorStore, undoWithFlash, redoWithFlash } from '../../stores/editorStore'
 import { AREA_LEVELS } from '../../data/areaLevels'
 import { ToolButton } from './ToolButton'
+import { ShareButton } from './ShareButton'
 import type { AreaLevel, ToolMode } from '../../types/editor'
 
 // ======== temporal 状态订阅 Hook ========
@@ -122,6 +123,11 @@ export function Toolbar() {
           activeClassName="bg-accent/20 text-accent ring-1 ring-accent/40"
           onClick={toggleOverwrite}
         />
+
+        <div className="w-px h-6 bg-default mx-1" />
+
+        {/* 分享 */}
+        <ShareButton />
 
         <div className="w-px h-6 bg-default mx-1" />
 

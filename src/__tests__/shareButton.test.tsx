@@ -7,6 +7,15 @@ import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/react'
 import type { PlacedItem } from '../types/editor'
 
+// ======== ToolButton 测试替身 —— 绕开 Radix Tooltip Portal 以免阻塞 jsdom 渲染 ========
+vi.mock('../components/toolbar/ToolButton', () => ({
+  ToolButton: (props: { label: string; onClick: () => void; disabled?: boolean }) => (
+    <button aria-label={props.label} onClick={props.onClick} disabled={props.disabled}>
+      {props.label}
+    </button>
+  ),
+}))
+
 // ======== sonner mock —— 捕获 toast.success / toast.error 调用 ========
 const toastSuccess = vi.fn()
 const toastError = vi.fn()
@@ -16,11 +25,6 @@ vi.mock('sonner', () => ({
     error: (...args: unknown[]) => toastError(...args),
   },
   Toaster: () => null,
-}))
-
-// ======== lucide-react 图标轻量 mock（避免 jsdom 渲染 SVG 噪声） ========
-vi.mock('lucide-react', () => new Proxy({}, {
-  get: () => () => null,
 }))
 
 import { ShareButton } from '../components/toolbar/ShareButton'
