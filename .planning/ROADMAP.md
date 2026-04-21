@@ -99,7 +99,7 @@ Plans:
   4. URL encoding uses compact binary format with version byte, keeping URLs within platform sharing limits
 **Plans:** 3 plans
 Plans:
-- [ ] 03-01-PLAN.md — Blueprint encode/decode pure module + Wave 0 tests (PERS-05)
+- [x] 03-01-PLAN.md — Blueprint encode/decode pure module + Wave 0 tests (PERS-05)
 - [ ] 03-02-PLAN.md — Persist middleware composed outside temporal; auto-save + auto-load (PERS-01, PERS-02)
 - [ ] 03-03-PLAN.md — Share button + import URL flow + confirm dialog + toast (PERS-03, PERS-04)
 

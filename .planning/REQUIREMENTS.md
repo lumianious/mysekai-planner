@@ -50,7 +50,7 @@
 - [ ] **PERS-02**: User can load a previously saved design from localStorage
 - [ ] **PERS-03**: User can generate a shareable URL that encodes the current blueprint
 - [ ] **PERS-04**: User can import a design from a shared URL
-- [ ] **PERS-05**: URL encoding uses compact binary format with version byte (lz-string compressed)
+- [x] **PERS-05**: URL encoding uses compact binary format with version byte (lz-string compressed)
 
 ### Roads & Fences
 
@@ -132,7 +132,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERS-02 | Phase 3 | Pending |
 | PERS-03 | Phase 3 | Pending |
 | PERS-04 | Phase 3 | Pending |
-| PERS-05 | Phase 3 | Pending |
+| PERS-05 | Phase 3 | Complete |
 | ROAD-01 | Phase 2 | Complete |
 | ROAD-02 | Phase 2 | Complete |
 | ROAD-03 | Phase 2 | Complete |
