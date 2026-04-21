@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-21T09:31:26.201Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-21T09:40:29.883Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 19
-  completed_plans: 17
+  completed_plans: 18
   percent: 94
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 03 (persistence-sharing) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-21
 
@@ -64,6 +64,7 @@ Progress: [█████████░] 94%
 | Phase 02.1 P03 | 15min | 2 tasks | 2 files |
 | Phase 02.1 P04 | 12min | 3 tasks | 2 files |
 | Phase 03-persistence-sharing P01 | 8min | 2 tasks | 8 files |
+| Phase 03-persistence-sharing P02 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,10 @@ Recent decisions affecting current work:
 - [Phase 03-persistence-sharing]: Tuple encoding [f,x,y,packed] over object {f,x,y,r,l,s} eliminates JSON field-name overhead; bit-pack rotation|layer|isSystem into one 4-bit int
 - [Phase 03-persistence-sharing]: URL payload drops UUID ids and regenerates on decode (UUIDs incompressible: 28KB vs 3.6KB budget); applyBlueprint clears temporal history so id continuity was already broken at import boundary
 - [Phase 03-persistence-sharing]: Plaintext v1. prefix satisfies PERS-05 version byte — lets decoder dispatch before decompression; human-inspectable
+- [Phase 03-persistence-sharing]: persist middleware composed OUTSIDE temporal (no wrapTemporal); partialize whitelists placedItems+placedEdges+areaLevel+gridSize+isEditorReady
+- [Phase 03-persistence-sharing]: onRehydrateStorage hook enforces isEditorReady=true when design exists (defense-in-depth alongside partialize, covers hand-edited payloads)
+- [Phase 03-persistence-sharing]: Debounce skipped — Phase 02.1 stroke-batch already collapses drag events to one write per stroke; localStorage sync writes are trivial at ≤50/min
+- [Phase 03-persistence-sharing]: MemoryStorage polyfill in vitest.setup.ts bypasses Node 22+ broken built-in localStorage that shadows jsdom's Storage
 
 ### Pending Todos
 
@@ -124,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-21T09:31:26.199Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-21T09:40:15.819Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None

@@ -100,7 +100,7 @@ Plans:
 **Plans:** 3 plans
 Plans:
 - [x] 03-01-PLAN.md — Blueprint encode/decode pure module + Wave 0 tests (PERS-05)
-- [ ] 03-02-PLAN.md — Persist middleware composed outside temporal; auto-save + auto-load (PERS-01, PERS-02)
+- [x] 03-02-PLAN.md — Persist middleware composed outside temporal; auto-save + auto-load (PERS-01, PERS-02)
 - [ ] 03-03-PLAN.md — Share button + import URL flow + confirm dialog + toast (PERS-03, PERS-04)
 
 ### Phase 4: Cost Calculator & Inventory
