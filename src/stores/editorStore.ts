@@ -1,9 +1,15 @@
 // ======== 编辑器 Zustand Store ========
 // 单一状态源：所有编辑器操作（放置、移动、旋转、删除、撤销/重做）均通过此 store 流转
 // previewRotation 存储在 store 中，使 GhostPreview、useEditorActions、useKeyboard 均可访问
+//
+// 中间件组合：persist(temporal(creator)) —— 外层 persist 写 localStorage，内层 temporal 管 undo
+// 持久化字段（partialize）：placedItems / placedEdges / areaLevel / gridSize / isEditorReady
+// 不持久化：undo 历史、工具模式、选中项、预览旋转、热栏、stageScale、flashItemIds、activeFixtureId、overwriteEnabled
 
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { temporal } from 'zundo'
+import { DESIGN_STORAGE_KEY } from '../persistence/storageKey'
 import type {
   EditorState,
   PlacedItem,
@@ -137,7 +143,8 @@ export function checkCanPlace(
 // ======== Store 实现 ========
 
 export const useEditorStore = create<EditorState>()(
-  temporal(
+  persist(
+    temporal(
     (set, get) => ({
       // -- 核心状态 --
       areaLevel: 1 as AreaLevel,
@@ -337,6 +344,41 @@ export const useEditorStore = create<EditorState>()(
       equality: (pastState, currentState) =>
         pastState.placedItems === currentState.placedItems &&
         pastState.placedEdges === currentState.placedEdges,
+    },
+  ),
+    {
+      name: DESIGN_STORAGE_KEY,
+      version: 1,
+      storage: createJSONStorage(() => localStorage),
+      // 只持久化用户设计数据 —— 不含 undo 历史、UI 临时状态
+      // D-03: placedItems + placedEdges + areaLevel
+      // 附加 gridSize（Pitfall 7：避免 rehydrate 后 gridSize 与 areaLevel 失配）
+      // 附加 isEditorReady（Pitfall 2：有已保存内容时跳过 WelcomeScreen）
+      partialize: (state) => ({
+        placedItems: state.placedItems,
+        placedEdges: state.placedEdges,
+        areaLevel: state.areaLevel,
+        gridSize: state.gridSize,
+        isEditorReady:
+          Object.keys(state.placedItems).length > 0 ||
+          Object.keys(state.placedEdges).length > 0
+            ? true
+            : state.isEditorReady,
+      }),
+      // Pitfall 2：rehydrate 后若有设计数据，强制 isEditorReady=true
+      // 保护对面：即使旧 payload 里 isEditorReady=false（例如用户首次写入前手动编辑了 localStorage）
+      // 也能正确跳过 WelcomeScreen
+      onRehydrateStorage: () => (rehydrated) => {
+        if (!rehydrated) return
+        const hasDesign =
+          Object.keys(rehydrated.placedItems ?? {}).length > 0 ||
+          Object.keys(rehydrated.placedEdges ?? {}).length > 0
+        if (hasDesign && !rehydrated.isEditorReady) {
+          rehydrated.isEditorReady = true
+        }
+      },
+      // 预留 migrate 钩子 —— 未来 version=2 时填充
+      // migrate: (persistedState, version) => { ... },
     },
   ),
 )
