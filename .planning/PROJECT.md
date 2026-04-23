@@ -17,6 +17,8 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 - [x] Furniture catalog with search/filter sourced from sekai.best data (Phase 1)
 - [x] CDN isometric thumbnails from storage.sekai.best for catalog browsing (Phase 1)
 - [x] Road and fence placement tools (Phase 2)
+- [x] Auto-save / auto-load designs to localStorage (Phase 3)
+- [x] Blueprint sharing via code-based export/import (Phase 3 — pivoted from URL hash to code paste for simpler UX)
 
 ### Active
 
@@ -24,7 +26,6 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 - [ ] Material cost calculator — shows total crafting costs for current blueprint
 - [ ] Inventory input — users enter owned materials/furniture, see remaining costs
 - [ ] Inventory persistence via localStorage
-- [ ] Blueprint sharing via URL hash encoding (paste link to share/import designs)
 - [ ] Bilingual UI (Chinese + Japanese), item names in Japanese
 
 ### Out of Scope
@@ -54,8 +55,8 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Static site on GitHub Pages | No backend needed; sister project pjsk uses same hosting model | — Pending |
-| localStorage for inventory | Only viable persistence for static hosting; no accounts to manage | — Pending |
-| URL hash for blueprint sharing | Proven pattern (Happy Island Designer); no server needed | — Pending |
+| localStorage for inventory | Only viable persistence for static hosting; no accounts to manage | ✓ Phase 3 (design persistence) |
+| Code-based export/import for blueprint sharing | Pivoted from URL-hash mid-Phase-3 — simpler UX (no tab-replace ambiguity), same `v1.<lz-string>` payload | ✓ Phase 3 |
 | sekai.best as primary data source | Already validated in pjsk project; richest ProSeka data available | — Pending |
 | sssekai + Blender for sprite generation | No top-down sprites exist on CDN; 3D models must be rendered offline | — Pending |
 | CDN thumbnails for catalog only | Isometric perspective doesn't work on top-down grid; use for browsing | — Pending |
@@ -79,4 +80,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 after Phase 2 completion*
+*Last updated: 2026-04-23 after Phase 3 completion*
