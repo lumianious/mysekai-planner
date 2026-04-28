@@ -68,7 +68,9 @@ def _try_download(
 ) -> dict:
     """运行 sssekai abcache，仅下载与 bundle_name 完全匹配的资源。
     --download-filter 接收正则；点号转义。"""
-    pattern = "^" + bundle_name.replace(".", r"\.") + "$"
+    # 实际 abcache 路径是 mysekai/fixture/<assetbundleName>；正则匹配该完整路径。
+    full_path = f"mysekai/fixture/{bundle_name}"
+    pattern = "^" + full_path.replace(".", r"\.") + "$"
     sssekai_bin = (
         shutil.which("sssekai")
         or str(Path(sys.executable).parent / "sssekai")
