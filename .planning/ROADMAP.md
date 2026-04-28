@@ -139,7 +139,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+Phases execute in: 1 -> 2 -> 3 -> 5 -> 4 -> 6 (Phase 5 pulled forward to de-risk the offline sprite toolchain — the highest-uncertainty work — before tackling cost calculator, which is well-understood territory)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|

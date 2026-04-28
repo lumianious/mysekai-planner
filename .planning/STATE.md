@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** Users can visually plan their MySekai outdoor layout and know exactly what materials they need to build it.
-**Current focus:** Phase 03 — persistence-sharing
+**Current focus:** Phase 5 — sprite-pipeline (pulled forward ahead of Phase 4 to de-risk in-game asset extraction first)
 
 ## Current Position
 
-Phase: 4
+Phase: 5
 Plan: Not started
-Status: Phase complete — ready for verification
+Status: Awaiting discuss-phase / plan-phase
 Last activity: 2026-04-23
 
 Progress: [█████████░] 94%
