@@ -126,7 +126,7 @@ Plans:
   4. Placed items in the grid editor render with top-down sprites instead of colored rectangles
 **Plans:** 4 plans
 Plans:
-- [ ] 05-01-PLAN.md — Wave 0: tooling, tests, getGroundSubtype Python parity, frontend manifest loader + failing PlacedItem sprite/fallback tests
+- [x] 05-01-PLAN.md — Wave 0: tooling, tests, getGroundSubtype Python parity, frontend manifest loader + failing PlacedItem sprite/fallback tests
 - [ ] 05-02-PLAN.md — Wave 1: 2D extraction + Blender render + 3-fixture pilot + PILOT-FINDINGS checkpoint
 - [ ] 05-03-PLAN.md — Wave 2: download.py + run-all + assemble_manifest + size guard + Vite build verify
 - [ ] 05-04-PLAN.md — Wave 3: PlacedItem.tsx sprite branch + boot manifest fetch + visual sign-off

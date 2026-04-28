@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Awaiting discuss-phase / plan-phase
-stopped_at: Phase 5 context gathered
-last_updated: "2026-04-28T06:11:27.805Z"
+status: In Progress
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-28T09:00:13.446Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 19
-  completed_plans: 19
+  total_plans: 23
+  completed_plans: 20
   percent: 94
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 5
-Plan: Not started
-Status: Awaiting discuss-phase / plan-phase
-Last activity: 2026-04-23
+Plan: 1 of 4 complete (next: 05-02)
+Status: In Progress
+Last activity: 2026-04-28
 
-Progress: [█████████░] 94%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [█████████░] 94%
 | Phase 03-persistence-sharing P01 | 8min | 2 tasks | 8 files |
 | Phase 03-persistence-sharing P02 | 5min | 2 tasks | 5 files |
 | Phase 03-persistence-sharing P03 | 30min | 3 tasks | 11 files |
+| Phase 05 P01 | 10min | 3 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,9 @@ Recent decisions affecting current work:
 - [Phase 03-persistence-sharing]: scope change: URL-hash sharing replaced with code-based export/import dialogs mid-checkpoint (user preference — simpler UX, inspectable artifact, consistent always-on confirm); PERS-03/04 intent preserved, transport changed
 - [Phase 03-persistence-sharing]: ImportConfirmDialog always shows (even on empty store) — consistency over path-optimization
 - [Phase 03-persistence-sharing]: malformed import code shows inline role=alert error, paste dialog stays open with pasted content preserved (no toast, no close)
+- [Phase 05]: Python sprite-pipeline scaffolded with pytest + L2 DocOps; get_ground_subtype Python port matches JS classifier across 1255 fixtures
+- [Phase 05]: use-image ^1.1.1 (resolved 1.1.4) added as production dep for Wave 4 sprite rendering
+- [Phase 05]: PlacedItem fallback test guards manifest-miss contract directly (jsdom + Konva Stage incompatible)
 
 ### Pending Todos
 
@@ -133,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T06:11:27.797Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-sprite-pipeline/05-CONTEXT.md
+Last session: 2026-04-28T09:00:02.816Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
