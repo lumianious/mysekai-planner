@@ -27,6 +27,7 @@
     "react-konva": "^19.2.3",
     "sonner": "^2.0.7",
     "tailwindcss": "^4.2.2",
+    "use-image": "^1.1.1",
     "zundo": "^2.3.0",
     "zustand": "^5.0.12"
   },

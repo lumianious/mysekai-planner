@@ -1,0 +1,5 @@
+sssekai==0.8.0
+Pillow>=10.4
+pyyaml>=6.0
+tqdm>=4.66
+pytest>=8.0

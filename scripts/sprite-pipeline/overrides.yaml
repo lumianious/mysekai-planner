@@ -1,0 +1,4 @@
+# ======== D-09 分类覆盖列表 ========
+# 默认空。在此列出 assetbundleName -> "2d" | "3d" 强制覆盖路由。
+# 例：mysekai_fixture_999: 2d
+overrides: {}

@@ -27,3 +27,10 @@ coverage/
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# Phase 5 sprite pipeline
+scripts/sprite-pipeline/assets-cache/
+scripts/sprite-pipeline/.venv/
+scripts/sprite-pipeline/__pycache__/
+scripts/sprite-pipeline/**/__pycache__/
+scripts/sprite-pipeline/.pytest_cache/
