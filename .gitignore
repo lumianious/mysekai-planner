@@ -34,3 +34,5 @@ scripts/sprite-pipeline/.venv/
 scripts/sprite-pipeline/__pycache__/
 scripts/sprite-pipeline/**/__pycache__/
 scripts/sprite-pipeline/.pytest_cache/
+# Pipeline-cached master DB (fetched at runtime in app; cached locally for Python tooling)
+src/data/mysekaiFixtures.json
