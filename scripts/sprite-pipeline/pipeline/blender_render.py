@@ -93,13 +93,13 @@ def _setup_camera_and_light(tile_w: int, tile_d: int):
     mins, maxs = _scene_aabb()
     center = (mins + maxs) * 0.5
     size_xy = max(maxs.x - mins.x, maxs.y - mins.y)
-    grid_size = max(tile_w, tile_d)
-    # D-04 决策：grid 为主，AABB 取 max 防止 1×1 项被裁切；统一 30% margin 留透明边
-    # （Pitfall 5 / Q3 由 Wave 2 pilot + Wave 3 重审决定 grid-only 还是 AABB-only）
-    ortho_scale = max(grid_size, size_xy) * 1.3
+    # PILOT-FINDINGS Q3 → Wave 3 fix: Unity 模型坐标（米级）与 fixture.gridSize（格）
+    # 不可直接比较；渲 ortho_scale 必须只用 AABB。grid_w / grid_d 决定输出像素分辨率，
+    # 不影响相机缩放。1×1 微件取下界 0.4m 以避免极端裁切。
+    ortho_scale = max(size_xy, 0.4) * 1.15
 
     bpy.ops.object.camera_add(
-        location=(center.x, center.y, maxs.z + grid_size + 5),
+        location=(center.x, center.y, maxs.z + max(size_xy, 0.5) + 5),
         rotation=(0, 0, 0),
     )
     cam = bpy.context.object
@@ -109,7 +109,7 @@ def _setup_camera_and_light(tile_w: int, tile_d: int):
 
     bpy.ops.object.light_add(
         type="SUN",
-        location=(center.x, center.y, maxs.z + grid_size + 10),
+        location=(center.x, center.y, maxs.z + max(size_xy, 0.5) + 10),
     )
     sun = bpy.context.object
     sun.data.energy = 3.0

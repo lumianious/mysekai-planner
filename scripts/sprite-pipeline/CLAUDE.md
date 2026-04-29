@@ -26,16 +26,18 @@ Pipeline runs **LOCAL ONLY** (D-03). `assets-cache/` is gitignored.
 | `pipeline/__init__.py` | Wave 0 | Package marker |
 | `pipeline/config.py` | Wave 0 | Constants: paths, TILE_PX, size budget |
 | `pipeline/routing.py` | Wave 0 | Python port of `getGroundSubtype` (D-08, D-19 parity gate) |
+| `pipeline/__main__.py` | Wave 3 | Subcommand router: download / extract-2d / render-3d / assemble-manifest / run-all |
 | `pipeline/cdn_probe.py` | Wave 2 | CDN reachability probe (gates pilot) |
-| `pipeline/download.py` | later wave | sssekai abcache wrapper |
-| `pipeline/extract_2d.py` | Wave 2 | UnityPy → diffuse PNG (Material._MainTex with Texture2D fallback) |
+| `pipeline/download.py` | Wave 3 | sssekai abcache wrapper + .extracted-with stamp (D-12, D-14) |
+| `pipeline/extract_2d.py` | Wave 2/3 | UnityPy → diffuse PNG (incl. extract_to_tiled_png + batch run + thumbnail extraction) |
 | `data/apphash.json` | Wave 2 | Pinned JP production app credentials (refreshed from current xapk) |
-| `pipeline/render_3d.py` | later wave | Spawn Blender headless per fixture |
+| `pipeline/render_3d.py` | Wave 3 | Batch 3D dispatcher (UnityPy → GLB → Blender per fixture) |
 | `pipeline/blender_render.py` | Wave 2 | bpy script: ortho top-down render, EEVEE→CYCLES fallback |
-| `pipeline/glb_writer.py` | Wave 2 (stub) | Unity→GLB fallback path (NotImplementedError until Wave 3 needs it) |
+| `pipeline/glb_writer.py` | Wave 3 | UnityPy Mesh + Texture2D → minimal PBR-baseColor GLB via pygltflib |
+| `pipeline/run_all.py` | Wave 3 | Drives extract-2d → render-3d → assemble-manifest |
 | `pipeline/pilot.py` | Wave 2 | 3-fixture pilot: download → route → render/extract → manifest |
-| `pipeline/assemble_manifest.py` | later wave | Write `public/sprites/manifest.json` |
-| `pipeline/check_size.py` | later wave | Aggregate-size guard (D-02 ≤150MB) |
+| `pipeline/assemble_manifest.py` | Wave 3 | Writes `public/sprites/manifest.json` (incl. thumbnails[]) |
+| `pipeline/check_size.py` | Wave 3 | Aggregate-size guard (D-02 ≤150MB) |
 | `tests/__init__.py` | Wave 0 | Package marker |
 | `tests/conftest.py` | Wave 0 | Shared pytest fixtures |
 | `tests/test_routing.py` | Wave 0 | Parity test vs JS `getGroundSubtype` snapshot |
@@ -47,8 +49,9 @@ Pipeline runs **LOCAL ONLY** (D-03). `assets-cache/` is gitignored.
 | `tests/test_render_3d.py` | Wave 2 | Khronos Box.glb → 128×128 RGBA (`@pytest.mark.slow`) |
 | `tests/fixtures/sample_3d.glb` | Wave 2 | Khronos Box.glb (1664 B, public domain) |
 | `tests/test_output_dimensions.py` | Wave 2 | TILE_PX = 128 + grid-size canvas math |
-| `tests/test_manifest_completeness.py` | later wave | Manifest entry ↔ PNG existence |
-| `tests/test_download_dryrun.py` | later wave | Assert sssekai command string |
+| `tests/test_manifest_completeness.py` | Wave 3 | Manifest entry ↔ PNG existence + schema check |
+| `tests/test_download_dryrun.py` | Wave 3 | Assert sssekai command string + subcommand --help completeness |
+| `tests/test_routing_outdoor_count.py` | Wave 3 | Outdoor fixture count + 2D/3D split sanity |
 | `assets-cache/` | runtime, gitignored | Bundle cache + `.extracted-with` stamp |
 
 ## Conventions

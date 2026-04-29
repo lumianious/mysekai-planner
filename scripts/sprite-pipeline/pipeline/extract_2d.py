@@ -125,10 +125,40 @@ def extract_to_tiled_png(
     return canvas.size
 
 
-# ======== 子命令：extract-2d（批量 2D 分支抽取）========
+# ======== 子命令：extract-2d（批量 2D 分支抽取 + 全部户外缩略图）========
 def add_args(p):  # type: ignore[no-untyped-def]
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--limit", type=int, default=None)
+    p.add_argument(
+        "--skip-thumbnails", action="store_true",
+        help="只跑 2D 主纹理（rug/road/floor），不抓缩略图",
+    )
+
+
+def _variant_count(fx: dict) -> int:
+    colors = fx.get("mysekaiFixtureAnotherColors") or []
+    return 1 + len(colors)
+
+
+def _extract_thumbnails_for(fx: dict, bundles_dir, thumbnails_dir) -> tuple[int, int]:
+    """返回 (ok, errored)。缺失的 bundle 静默跳过（部分变体未必存在）。"""
+    name = fx["assetbundleName"]
+    ok = 0
+    err = 0
+    for v in range(1, _variant_count(fx) + 1):
+        bundle = bundles_dir / "mysekai" / "thumbnail" / "fixture" / f"{name}_{v}"
+        if not bundle.exists():
+            continue
+        out = thumbnails_dir / f"{name}_{v}.png"
+        if out.exists() and out.stat().st_size > 0:
+            ok += 1
+            continue
+        try:
+            extract_to_png(bundle, out)
+            ok += 1
+        except Exception:
+            err += 1
+    return ok, err
 
 
 def run(args) -> int:  # type: ignore[no-untyped-def]
@@ -154,6 +184,10 @@ def run(args) -> int:  # type: ignore[no-untyped-def]
         return 0
 
     SPRITES_OUT_DIR.mkdir(parents=True, exist_ok=True)
+    thumbnails_dir = SPRITES_OUT_DIR / "thumbnails"
+    thumbnails_dir.mkdir(parents=True, exist_ok=True)
+
+    # ======== Phase 1：2D 分支主纹理 ========
     failures = 0
     skipped = 0
     for fx in tqdm(targets, desc="extract 2D"):
@@ -175,5 +209,20 @@ def run(args) -> int:  # type: ignore[no-untyped-def]
             print(f"[ERR] {name}: {e}", file=sys.stderr)
     ok = len(targets) - failures - skipped
     print(f"extract-2d done: {ok}/{len(targets)} OK ({skipped} skipped, {failures} errored)")
+
+    # ======== Phase 2：所有户外 fixture 的目录缩略图 ========
+    # PILOT-FINDINGS 把 thumbnails 加进 schema：每个户外项 1 + len(otherColors) 个变体
+    if not getattr(args, "skip_thumbnails", False):
+        outdoor = [f for f in all_fx if is_outdoor(f)]
+        if args.limit:
+            outdoor = outdoor[: args.limit]
+        thumb_ok = 0
+        thumb_err = 0
+        for fx in tqdm(outdoor, desc="extract thumbs"):
+            ok_v, err_v = _extract_thumbnails_for(fx, BUNDLES_DIR, thumbnails_dir)
+            thumb_ok += ok_v
+            thumb_err += err_v
+        print(f"thumbnails done: {thumb_ok} extracted, {thumb_err} errored")
+
     # 把高失败率视为退出码非 0；纯 skipped（缺 bundle）不算硬错。
     return 1 if failures and failures > len(targets) // 2 else 0
