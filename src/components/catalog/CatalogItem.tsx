@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import type { Fixture } from '../../types/editor'
 import { getThumbnailUrl } from '../../data/fixtures'
+import { getSpriteEntrySync } from '../../data/spriteManifest'
 import { getFixtureColor } from '../../utils/color'
 import { useEditorStore, setHoveredFixtureId } from '../../stores/editorStore'
 
@@ -29,6 +30,13 @@ export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
     fixture.colorCode,
   )
 
+  // Phase 5：优先用本地清单缩略图（cyan 已去背），未命中再回退到 CDN webp
+  const manifestEntry = getSpriteEntrySync(fixture.assetbundleName)
+  const localThumb = manifestEntry?.thumbnails?.[0]
+  const thumbnailSrc = localThumb
+    ? `${import.meta.env.BASE_URL}${localThumb}`
+    : getThumbnailUrl(fixture.assetbundleName)
+
   return (
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
@@ -48,7 +56,7 @@ export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
           {/* CDN 缩略图 / 备用颜色块 */}
           {!imgError ? (
             <img
-              src={getThumbnailUrl(fixture.assetbundleName)}
+              src={thumbnailSrc}
               alt={fixture.name}
               loading="lazy"
               className="w-full h-full object-contain bg-surface"
