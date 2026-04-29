@@ -90,10 +90,90 @@ def extract_to_png(
     out_path: Path,
     target_size: Optional[Tuple[int, int]] = None,
 ) -> Tuple[int, int]:
-    """抽取主纹理并写 PNG。target_size 给定时按 LANCZOS 重采样。返回最终像素尺寸。"""
+    """抽取主纹理并写 PNG。target_size 给定时按 LANCZOS 重采样。返回最终像素尺寸。
+    用于缩略图（缩放）；对地毯/路面等 tileable 纹理请改用 extract_to_tiled_png。"""
     img = extract_main_texture(bundle_path)
     if target_size is not None:
         img = img.resize(target_size, Image.LANCZOS)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     img.save(out_path, format="PNG", optimize=True)
     return img.size
+
+
+# ======== Tiled 输出（PILOT-FINDINGS Q2）========
+def extract_to_tiled_png(
+    bundle_path: Path,
+    out_path: Path,
+    grid_w: int,
+    grid_d: int,
+    tile_px: int,
+) -> Tuple[int, int]:
+    """把源纹理当作 1×1 格的 seam-tile，平铺到 (grid_w * tile_px) × (grid_d * tile_px) 画布。
+    Pilot 发现 rug/road 纹理是 tileable 单瓦片，整毯/整路需要在 pipeline 端铺好，
+    避免给 Konva 引入运行时 fillPattern 复杂度。"""
+    src = extract_main_texture(bundle_path)
+    # 把单 tile 缩到 tile_px 见方
+    tile = src.resize((tile_px, tile_px), Image.LANCZOS)
+    canvas_w = grid_w * tile_px
+    canvas_d = grid_d * tile_px
+    canvas = Image.new("RGBA", (canvas_w, canvas_d), (0, 0, 0, 0))
+    for gy in range(grid_d):
+        for gx in range(grid_w):
+            canvas.paste(tile, (gx * tile_px, gy * tile_px), tile)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    canvas.save(out_path, format="PNG", optimize=True)
+    return canvas.size
+
+
+# ======== 子命令：extract-2d（批量 2D 分支抽取）========
+def add_args(p):  # type: ignore[no-untyped-def]
+    p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--limit", type=int, default=None)
+
+
+def run(args) -> int:  # type: ignore[no-untyped-def]
+    import json
+    import sys
+
+    from tqdm import tqdm
+
+    from pipeline.config import (
+        BUNDLES_DIR,
+        FIXTURES_JSON_PATH,
+        SPRITES_OUT_DIR,
+        TILE_PX,
+    )
+    from pipeline.routing import is_2d_branch, is_outdoor
+
+    all_fx = json.loads(FIXTURES_JSON_PATH.read_text())
+    targets = [f for f in all_fx if is_outdoor(f) and is_2d_branch(f)]
+    if args.limit:
+        targets = targets[: args.limit]
+    if args.dry_run:
+        print(f"extract-2d dry-run: {len(targets)} fixtures")
+        return 0
+
+    SPRITES_OUT_DIR.mkdir(parents=True, exist_ok=True)
+    failures = 0
+    skipped = 0
+    for fx in tqdm(targets, desc="extract 2D"):
+        name = fx["assetbundleName"]
+        bundle = BUNDLES_DIR / "mysekai" / "fixture" / name
+        out = SPRITES_OUT_DIR / f"{name}.png"
+        if not bundle.exists():
+            skipped += 1
+            continue
+        try:
+            extract_to_tiled_png(
+                bundle, out,
+                grid_w=fx["gridSize"]["width"],
+                grid_d=fx["gridSize"]["depth"],
+                tile_px=TILE_PX,
+            )
+        except Exception as e:
+            failures += 1
+            print(f"[ERR] {name}: {e}", file=sys.stderr)
+    ok = len(targets) - failures - skipped
+    print(f"extract-2d done: {ok}/{len(targets)} OK ({skipped} skipped, {failures} errored)")
+    # 把高失败率视为退出码非 0；纯 skipped（缺 bundle）不算硬错。
+    return 1 if failures and failures > len(targets) // 2 else 0
