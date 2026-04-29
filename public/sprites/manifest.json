@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "extracted_at": "2026-04-29T03:02:40Z",
+  "fixtures": {
+    "mdl_mis0001_rug_rug1": {
+      "mode": "2d",
+      "sprite": "sprites/mdl_mis0001_rug_rug1.png",
+      "size_px": [
+        768,
+        768
+      ],
+      "thumbnails": [
+        "sprites/thumbnails/mdl_mis0001_rug_rug1_1.png"
+      ]
+    }
+  }
+}

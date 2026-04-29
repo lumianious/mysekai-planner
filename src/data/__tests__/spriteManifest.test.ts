@@ -31,6 +31,7 @@ describe('spriteManifest', () => {
           mode: '3d',
           sprite: 'sprites/mysekai_fixture_001.png',
           size_px: [128, 128],
+          thumbnails: [],
         },
       },
     }

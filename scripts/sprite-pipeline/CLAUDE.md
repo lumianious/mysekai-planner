@@ -33,6 +33,7 @@ Pipeline runs **LOCAL ONLY** (D-03). `assets-cache/` is gitignored.
 | `pipeline/render_3d.py` | later wave | Spawn Blender headless per fixture |
 | `pipeline/blender_render.py` | Wave 2 | bpy script: ortho top-down render, EEVEE→CYCLES fallback |
 | `pipeline/glb_writer.py` | Wave 2 (stub) | Unity→GLB fallback path (NotImplementedError until Wave 3 needs it) |
+| `pipeline/pilot.py` | Wave 2 | 3-fixture pilot: download → route → render/extract → manifest |
 | `pipeline/assemble_manifest.py` | later wave | Write `public/sprites/manifest.json` |
 | `pipeline/check_size.py` | later wave | Aggregate-size guard (D-02 ≤150MB) |
 | `tests/__init__.py` | Wave 0 | Package marker |
