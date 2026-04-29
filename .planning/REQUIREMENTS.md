@@ -26,8 +26,8 @@
 - [x] **SPRT-02**: Pipeline extracts 2D textures directly for flat items (roads, fences, floor surfaces)
 - [ ] **SPRT-03**: Pipeline renders orthographic top-down view of 3D furniture models via Blender headless scripting
 - [ ] **SPRT-04**: Pipeline outputs transparent PNG sprites at consistent resolution per grid unit
-- [ ] **SPRT-05**: Pipeline is batch-automated for all ~1,126 outdoor-placeable fixtures (excluding 113 indoor-only items) with no manual intervention
-- [ ] **SPRT-06**: Generated sprites are served as static assets alongside the web app on GitHub Pages
+- [x] **SPRT-05**: Pipeline is batch-automated for all ~1,126 outdoor-placeable fixtures (excluding 113 indoor-only items) with no manual intervention
+- [x] **SPRT-06**: Generated sprites are served as static assets alongside the web app on GitHub Pages
 - [x] **SPRT-07**: Grid editor renders generated top-down sprites for placed items (replacing colored rectangles)
 
 ### Furniture Catalog
@@ -117,8 +117,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPRT-02 | Phase 5 | Complete |
 | SPRT-03 | Phase 5 | Pending |
 | SPRT-04 | Phase 5 | Pending |
-| SPRT-05 | Phase 5 | Pending |
-| SPRT-06 | Phase 5 | Pending |
+| SPRT-05 | Phase 5 | Complete |
+| SPRT-06 | Phase 5 | Complete |
 | SPRT-07 | Phase 5 | Complete |
 | CATL-01 | Phase 1 | Complete |
 | CATL-02 | Phase 1 | Complete |

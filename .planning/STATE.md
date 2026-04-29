@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: In Progress
-stopped_at: Completed 05-02-PLAN.md (partial pilot sign-off; Wave 3 inherits 2 gaps)
-last_updated: "2026-04-29T03:35:00.000Z"
+status: executing
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-04-29T05:20:30.552Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 23
-  completed_plans: 21
-  percent: 91
+  completed_plans: 22
+  percent: 87
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 5
-Plan: 2 of 4 complete (next: 05-03)
-Status: In Progress
+Plan: 3 of 4 complete (next: 05-03)
+Status: Ready to execute
 Last activity: 2026-04-29
 
 Progress: [█████████░] 87%
@@ -67,6 +67,7 @@ Progress: [█████████░] 87%
 | Phase 03-persistence-sharing P02 | 5min | 2 tasks | 5 files |
 | Phase 03-persistence-sharing P03 | 30min | 3 tasks | 11 files |
 | Phase 05 P01 | 10min | 3 tasks | 22 files |
+| Phase 05 P03 | 22m | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -126,6 +127,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Python sprite-pipeline scaffolded with pytest + L2 DocOps; get_ground_subtype Python port matches JS classifier across 1255 fixtures
 - [Phase 05]: use-image ^1.1.1 (resolved 1.1.4) added as production dep for Wave 4 sprite rendering
 - [Phase 05]: PlacedItem fallback test guards manifest-miss contract directly (jsdom + Konva Stage incompatible)
+- [Phase 05]: Camera ortho_scale uses AABB only (max(AABB_xy, 0.4)*1.15); Unity meters and grid cells are incompatible units. Resolves PILOT-FINDINGS Q3.
+- [Phase 05]: glb_writer Path B confirmed in production (USE_GLB_FALLBACK=True): UnityPy Mesh.export() OBJ + first usable Texture2D into one-primitive pygltflib GLB.
+- [Phase 05]: Thumbnail extraction folded into extract-2d run handler instead of new subcommand; one CLI surface, runs after 2D-branch loop.
 
 ### Pending Todos
 
@@ -137,6 +141,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T09:00:02.816Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-04-29T05:20:23.975Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
