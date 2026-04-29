@@ -4,12 +4,15 @@
 // POS: src/components/canvas/PlacedItem.tsx — 单个放置物品的画布渲染
 
 import React, { useCallback, useEffect, useRef } from 'react'
-import { Group, Rect, Text } from 'react-konva'
+import { Group, Rect, Text, Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
+import useImage from 'use-image'
 import type { KonvaEventObject } from 'konva/lib/Node'
 import { TILE_SIZE } from '../../utils/grid'
 import { getEffectiveSize } from '../../utils/grid'
 import { getFixtureColor } from '../../utils/color'
+import { getGroundSubtype } from '../../data/fixtures'
+import { getSpriteEntrySync, resolveSpriteUrl } from '../../data/spriteManifest'
 import { useEditorStore } from '../../stores/editorStore'
 import type { PlacedItem as PlacedItemType, Fixture, ToolMode } from '../../types/editor'
 
@@ -123,6 +126,38 @@ export const PlacedItem = React.memo(function PlacedItem({
 
   const fillColor = getFixtureColor(fixture.mysekaiFixtureMainGenreId, fixture.colorCode)
 
+  // ======== Phase 5：sprite / 纯色矩形分支 ========
+  // 决策（user feedback）：
+  //   - 地面项（rug/road/color-tile/floor_appearance）-> 纯色 Rect 用 manifest dominantColor，
+  //     这样相邻可连接、无 thumbnail 边缘伪影
+  //   - 3D 家具 -> iso thumbnail（HID 风格）
+  //   - manifest 未命中 -> getFixtureColor 旧路径（D-17 回退）
+  const isGroundItem =
+    getGroundSubtype(fixture) !== null ||
+    fixture.mysekaiSettableLayoutType === 'floor_appearance'
+  const manifestEntry = getSpriteEntrySync(fixture.assetbundleName)
+  const groundColor =
+    isGroundItem && manifestEntry?.dominantColor
+      ? `rgb(${manifestEntry.dominantColor.join(',')})`
+      : null
+  // 地面项：solid Rect 保证可连接 + thumbnail 叠加在上层提供质感
+  // 非地面（家具）：直接用 thumbnail（HID 风格）
+  const thumbnailUrl = manifestEntry?.thumbnails?.[0]
+    ? `${import.meta.env.BASE_URL}${manifestEntry.thumbnails[0]}`
+    : ''
+  const furnitureUrl = !isGroundItem
+    ? (resolveSpriteUrl(fixture, import.meta.env.BASE_URL)?.url ?? '')
+    : ''
+  const [groundImg, groundStatus] = useImage(
+    isGroundItem ? thumbnailUrl : '',
+    'anonymous',
+  )
+  const [spriteImg, spriteStatus] = useImage(furnitureUrl, 'anonymous')
+  const renderGroundTexture =
+    isGroundItem && groundImg !== undefined && groundStatus === 'loaded'
+  const renderSprite =
+    !isGroundItem && spriteImg !== undefined && spriteStatus === 'loaded'
+
   return (
     <Group
       x={item.x * TILE_SIZE}
@@ -133,29 +168,52 @@ export const PlacedItem = React.memo(function PlacedItem({
       onTap={handleClick}
       onDragEnd={handleDragEnd}
     >
-      {/* 彩色矩形 */}
-      <Rect
-        width={pixelWidth}
-        height={pixelHeight}
-        fill={fillColor}
-        stroke="rgba(255, 255, 255, 0.3)"
-        strokeWidth={1}
-        cornerRadius={2}
-      />
+      {/* 主体：地面 = solid color + thumbnail 叠加；家具 = sprite；fallback = 彩色矩形 */}
+      {groundColor ? (
+        <>
+          <Rect width={pixelWidth} height={pixelHeight} fill={groundColor} />
+          {renderGroundTexture && (
+            <KonvaImage
+              image={groundImg}
+              width={pixelWidth}
+              height={pixelHeight}
+              listening={false}
+            />
+          )}
+        </>
+      ) : renderSprite ? (
+        <KonvaImage
+          image={spriteImg}
+          width={pixelWidth}
+          height={pixelHeight}
+          listening={false}
+        />
+      ) : (
+        <Rect
+          width={pixelWidth}
+          height={pixelHeight}
+          fill={fillColor}
+          stroke="rgba(255, 255, 255, 0.3)"
+          strokeWidth={1}
+          cornerRadius={2}
+        />
+      )}
 
-      {/* 名称标签 */}
-      <Text
-        text={fixture.name}
-        width={pixelWidth}
-        height={pixelHeight}
-        fontSize={12}
-        fill="white"
-        align="center"
-        verticalAlign="middle"
-        wrap="none"
-        ellipsis={true}
-        listening={false}
-      />
+      {/* 名称标签：仅在 fallback rect 路径上展示（地面纯色/sprite 都不需要标签） */}
+      {!renderSprite && !groundColor && (
+        <Text
+          text={fixture.name}
+          width={pixelWidth}
+          height={pixelHeight}
+          fontSize={12}
+          fill="white"
+          align="center"
+          verticalAlign="middle"
+          wrap="none"
+          ellipsis={true}
+          listening={false}
+        />
+      )}
 
       {/* 选中指示器 */}
       {isSelected && (

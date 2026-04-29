@@ -1,12 +1,13 @@
 // ======== 家具数据 Hook ========
-// INPUT: fetchFixtures, filterOutdoorFixtures, fetchMainGenres
+// INPUT: fetchFixtures, filterOutdoorFixtures, fetchMainGenres, loadSpriteManifest
 // OUTPUT: fixtures, mainGenres, fixtureMap, loading, error
-// POS: src/hooks/useFixtureData.ts — 获取并缓存家具 + 分类数据
+// POS: src/hooks/useFixtureData.ts — 获取并缓存家具 + 分类 + 精灵清单数据
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import type { Fixture, FixtureMainGenre } from '../types/editor'
 import { fetchFixtures, filterOutdoorFixtures } from '../data/fixtures'
 import { fetchMainGenres } from '../data/genres'
+import { loadSpriteManifest } from '../data/spriteManifest'
 
 export function useFixtureData() {
   const [fixtures, setFixtures] = useState<Fixture[]>([])
@@ -27,10 +28,12 @@ export function useFixtureData() {
 
     async function loadData() {
       try {
-        // 并行加载家具数据和主分类
+        // 并行加载家具数据 + 主分类 + 精灵清单
+        // 精灵清单失败不阻塞主流程（loadSpriteManifest 内部 D-17 回退到空 Map）
         const [allFixtures, genres] = await Promise.all([
           fetchFixtures(),
           fetchMainGenres(),
+          loadSpriteManifest(),
         ])
 
         if (controller.signal.aborted) return

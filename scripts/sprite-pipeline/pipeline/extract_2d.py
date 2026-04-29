@@ -140,8 +140,50 @@ def _variant_count(fx: dict) -> int:
     return 1 + len(colors)
 
 
+# 缩略图卡片背景色（实际游戏内目录 UI 的 cyan 卡片，烘进缩略图纹理里）
+THUMBNAIL_BG_KEY = (143, 233, 233)
+THUMBNAIL_BG_TOLERANCE = 8
+
+
+def _strip_cyan_card(out_path) -> None:
+    """缩略图烘焙了 cyan 卡片背景 + 一层深 teal 描边外框；
+    两步去除：
+      1) 色度键扫掉 cyan 主背景
+      2) 从透明边缘 4-连通向内蚕食蓝色主导（B>R）的像素，剥掉描边外框 ~3-4 px。
+    走完留下纯净物体内容，方便相邻 tile（如道路）连贴时无缝。"""
+    import numpy as np
+
+    img = Image.open(out_path).convert("RGBA")
+    arr = np.array(img)
+
+    # 1) cyan 主背景
+    key = np.array(THUMBNAIL_BG_KEY, dtype=np.int16)
+    diff = np.abs(arr[:, :, :3].astype(np.int16) - key).max(axis=2)
+    arr[diff <= THUMBNAIL_BG_TOLERANCE, 3] = 0
+
+    # 2) 边缘蓝主导描边蚕食（最多 4 圈，自然收敛）
+    for _ in range(4):
+        transparent = arr[:, :, 3] == 0
+        rgb = arr[:, :, :3].astype(np.int16)
+        blue_dominant = (rgb[:, :, 2] > rgb[:, :, 0] + 20) & (
+            rgb[:, :, 2] > rgb[:, :, 1] - 20
+        )
+        neighbor_transparent = np.zeros_like(transparent)
+        neighbor_transparent[1:, :] |= transparent[:-1, :]
+        neighbor_transparent[:-1, :] |= transparent[1:, :]
+        neighbor_transparent[:, 1:] |= transparent[:, :-1]
+        neighbor_transparent[:, :-1] |= transparent[:, 1:]
+        strip = blue_dominant & neighbor_transparent & (~transparent)
+        if not strip.any():
+            break
+        arr[strip, 3] = 0
+
+    Image.fromarray(arr, "RGBA").save(out_path, format="PNG", optimize=True)
+
+
 def _extract_thumbnails_for(fx: dict, bundles_dir, thumbnails_dir) -> tuple[int, int]:
-    """返回 (ok, errored)。缺失的 bundle 静默跳过（部分变体未必存在）。"""
+    """返回 (ok, errored)。缺失的 bundle 静默跳过（部分变体未必存在）。
+    输出写入后立即去 cyan 背景。"""
     name = fx["assetbundleName"]
     ok = 0
     err = 0
@@ -155,10 +197,25 @@ def _extract_thumbnails_for(fx: dict, bundles_dir, thumbnails_dir) -> tuple[int,
             continue
         try:
             extract_to_png(bundle, out)
+            _strip_cyan_card(out)
             ok += 1
         except Exception:
             err += 1
     return ok, err
+
+
+def _restrip_existing_thumbnails(thumbnails_dir) -> int:
+    """对已经存在的缩略图重做 cyan 去背。便于现有产物增量修复。"""
+    if not thumbnails_dir.exists():
+        return 0
+    n = 0
+    for p in thumbnails_dir.glob("*.png"):
+        try:
+            _strip_cyan_card(p)
+            n += 1
+        except Exception:
+            pass
+    return n
 
 
 def run(args) -> int:  # type: ignore[no-untyped-def]

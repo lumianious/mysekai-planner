@@ -11,6 +11,9 @@ export interface SpriteManifestEntry {
   // Index aligns with mysekaiFixtureAnotherColors ordering (variant 1 first).
   // Empty array if no thumbnails were extracted (e.g. Wave 2 pilot only ran for some fixtures).
   thumbnails: string[]
+  // RGB sampled from the first variant's thumbnail (mean of opaque pixels).
+  // Used by ground items + fences as solid-fill so adjacent placements connect cleanly.
+  dominantColor?: [number, number, number]
 }
 
 export interface SpriteManifest {
