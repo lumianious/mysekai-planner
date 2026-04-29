@@ -31,7 +31,8 @@ Pipeline runs **LOCAL ONLY** (D-03). `assets-cache/` is gitignored.
 | `pipeline/extract_2d.py` | Wave 2 | UnityPy → diffuse PNG (Material._MainTex with Texture2D fallback) |
 | `data/apphash.json` | Wave 2 | Pinned JP production app credentials (refreshed from current xapk) |
 | `pipeline/render_3d.py` | later wave | Spawn Blender headless per fixture |
-| `pipeline/blender_render.py` | later wave | bpy script (invoked via `blender -b -P`) |
+| `pipeline/blender_render.py` | Wave 2 | bpy script: ortho top-down render, EEVEE→CYCLES fallback |
+| `pipeline/glb_writer.py` | Wave 2 (stub) | Unity→GLB fallback path (NotImplementedError until Wave 3 needs it) |
 | `pipeline/assemble_manifest.py` | later wave | Write `public/sprites/manifest.json` |
 | `pipeline/check_size.py` | later wave | Aggregate-size guard (D-02 ≤150MB) |
 | `tests/__init__.py` | Wave 0 | Package marker |
@@ -42,7 +43,8 @@ Pipeline runs **LOCAL ONLY** (D-03). `assets-cache/` is gitignored.
 | `tests/fixtures/` | Wave 0 | Sample bundles + GLBs for unit tests (currently `.gitkeep` only) |
 | `tests/test_extract_2d.py` | Wave 2 | Sample bundle → PNG (RGBA, dimensions, resample) |
 | `tests/fixtures/sample_2d_bundle.unity3d` | Wave 2 | Real `mdl_non2001_road_soil1` bundle for offline tests |
-| `tests/test_render_3d.py` | later wave | Sample GLB → PNG (`@pytest.mark.slow`) |
+| `tests/test_render_3d.py` | Wave 2 | Khronos Box.glb → 128×128 RGBA (`@pytest.mark.slow`) |
+| `tests/fixtures/sample_3d.glb` | Wave 2 | Khronos Box.glb (1664 B, public domain) |
 | `tests/test_output_dimensions.py` | Wave 2 | TILE_PX = 128 + grid-size canvas math |
 | `tests/test_manifest_completeness.py` | later wave | Manifest entry ↔ PNG existence |
 | `tests/test_download_dryrun.py` | later wave | Assert sssekai command string |
