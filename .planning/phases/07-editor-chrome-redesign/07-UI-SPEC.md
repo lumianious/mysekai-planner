@@ -24,8 +24,8 @@ canonical_source: scripts/sprite-pipeline/.planning/handoffs/editor-chrome/
 | Styling engine | Tailwind CSS 4 with CSS-based `@theme` block in `src/index.css` |
 | Icon library | Lucide React (already in repo via `lucide-react`) |
 | Font (UI) | `'Nunito', 'M PLUS Rounded 1c', system-ui, sans-serif` |
-| Font (Japanese headers, numerics, kbd) | `'M PLUS Rounded 1c'` (weights 800 / 900) |
-| Font loading strategy | **Decision: self-host via `@fontsource/nunito` + `@fontsource/m-plus-rounded-1c`** (avoids GH-Pages → Google Fonts CORS/perf hop, matches static-hosting constraint). Imported once in `src/main.tsx`. |
+| Font (Japanese headers, numerics, kbd) | `'M PLUS Rounded 1c'` (weight 800 only) |
+| Font loading strategy | **Decision: self-host via `@fontsource/nunito` (700 axis only) + `@fontsource/m-plus-rounded-1c` (800 axis only)** (avoids GH-Pages → Google Fonts CORS/perf hop, matches static-hosting constraint). Imported once in `src/main.tsx`. The 900 axis is **not** loaded. |
 
 ### Theme migration note (load-bearing)
 
@@ -54,22 +54,26 @@ Top rail children, left → right: project title pill, spacer, cost pill (`#cost
 
 ## Spacing Scale
 
-Declared values (strict 4-multiples, used for all padding / gap / layout offsets):
+Declared values (strict — only values from the standard 4-multiple set {4, 8, 16, 24, 32, 48, 64} are permitted; intermediate values such as 12 / 20 / 28 are deliberately excluded):
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps inside pills, kbd-chip vertical padding, intra-segment gaps |
-| sm | 8px | Compact element spacing, intra-pill gaps, tile padding, material-row vertical padding, cat-rail vertical padding, kbd-chip horizontal padding |
-| md | 12px | Catalog body padding, cost panel body padding, pill internal padding, button h-padding, tile internal padding |
-| lg | 16px | **Outer canvas padding** (frames every chrome region from viewport edge), section gaps |
-| xl | 24px | Top-rail to panel vertical offset, large panel inner padding |
-| xxl | 32px | (reserved — not used by chrome) |
+| sm | 8px | Compact element spacing, intra-pill gaps, tile inner padding, material-row vertical padding, cat-rail vertical padding, kbd-chip horizontal padding, hotbar pill internal padding, zoom-dock internal gaps |
+| md | 16px | Catalog body padding, cost panel body padding, pill internal h-padding (autosave / cost / area-level), floatbar segment h-padding, button h-padding, **outer canvas padding** (frames every chrome region from viewport edge), section gaps |
+| lg | 24px | Top-rail to panel vertical offset, large panel inner padding |
+| xl | 32px | (reserved — page-level breathing room when needed) |
+
+**Remap note (12 → 8 or 16):** The hifi prototype originally specified 12px / 14px values for several internal paddings and gaps. Per the GSD spacing contract these have been resolved to either 8 (tighter density) or 16 (looser density) depending on the closest hifi visual:
+- Pill internal h-padding (autosave, cost, area-level, project title, floatbar tool segments): **16px** (was 14px hifi → previously 12px; 16px is the nearest standard value and reads correctly at h44 pill size)
+- Tile internal padding, hotbar pill internal padding, kbd chip h-padding, intra-pill icon-to-text gap: **8px**
+- Catalog body padding, cost panel body padding: **16px**
 
 Touch-target ergonomic exceptions (handoff-mandated, recorded explicitly — these are component sizes, not spacing units): floatbar segments are 36×36 hit area inside a 44px-tall pill; drag-handle is 22×36; category buttons are 60×52 (non-square); hotbar slots are 72×72; zoom buttons are 36×36 inside a 44px pill.
 
 ### Border Radii (separate from spacing — radii are exempt from the 4-multiple rule)
 
-Pills, panels, and tiles use a distinct radii scale tuned for game-feel softness; these values are NOT shared with the spacing scale and are declared independently.
+Pills, panels, and tiles use a distinct radii scale tuned for game-feel softness; these values are NOT shared with the spacing scale and are declared independently. The values 12 / 14 / 18 / 22 appear ONLY in this radii table and are never used as spacing/padding/gap tokens elsewhere in the contract.
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -89,11 +93,17 @@ Declared sizes (exactly 4 tiers — no intermediate values; tier names are the c
 | Tier | Size | Weight | Line Height | Font | Usage |
 |------|------|--------|-------------|------|-------|
 | Display | 16px | 800 | 1.2 | M PLUS Rounded 1c | Panel headers (`家具目録`, `材料コスト` h3) |
-| Body | 13px | 700 | 1.4 | Nunito | Buttons, material-row name, tile labels, project title |
-| Label | 12px | 800 | 1.3 | M PLUS Rounded 1c | Numeric counts, captions, kbd chips, badges (`133 件`, `Lv.3`, `1,655`) |
+| Body | 13px | 700 | 1.4 | Nunito | Buttons, material-row name, tile labels, project title pill, search input |
+| Label | 11px | 800 | 1.3 | M PLUS Rounded 1c | Numeric counts, captions, kbd chips, badges (`133 件`, `Lv.3`, `1,655`) |
 | Micro | 10px | 800 | 1.1 | M PLUS Rounded 1c | Cat-rail category labels, hotbar slot labels |
 
-**Three weights declared (not two):** 700 (Nunito body) / 800 (M PLUS Rounded 1c — display, labels, micro, Japanese headers) / 900 (M PLUS Rounded 1c — reserved for the project title pill only, where extra weight reads as a "title" against surrounding 800 labels). The 900 weight is single-use and intentional; if it cannot be loaded it falls back to 800 without contract violation.
+**Exactly 2 weights declared:**
+- **700** — Nunito (all body text: buttons, material rows, tile labels, search input, project title pill)
+- **800** — M PLUS Rounded 1c (all display + label + micro: panel headers, numeric counts, kbd chips, category labels, hotbar slot labels, project title)
+
+The project title pill — previously called out as a candidate for an extra weight — remains visually distinct via its **white pill chrome + `--shadow-md` halo + sky-gradient accent options** when focused/active, NOT via an additional font weight. The contract is strictly two weights; any future temptation to introduce a 900 axis is rejected by this clause.
+
+**Label tier dropped from 12px → 11px** to widen the visual gap from the 13px Body tier (was 1px, now 2px). This keeps the contract at exactly 4 sizes (16 / 13 / 11 / 10) while improving tier separation.
 
 ---
 
@@ -158,7 +168,7 @@ Accent is **never** used for: hover states (cream `#f1efe5`), inactive tool segm
 | `StatusBar.tsx` | **Removed** from layout. Its data (item count, scale, area) is shown via top-rail pills + zoom dock. File can be deleted. |
 | `EditorLayout.tsx` | Rewritten. No more flex column with toolbar/hotbar/status; instead canvas fills viewport and chrome regions are absolutely positioned over it. |
 | `ImportButton.tsx`, `ExportButton.tsx` | **Decision: relocate to a kebab "︙" overflow menu pinned to the right end of the top rail (between autosave and area-level pills).** Rationale: the handoff lists "kebab in top rail OR settings drawer" and explicitly notes screen real estate priority; a kebab keeps these one click away without consuming a permanent pill slot, and avoids inventing a settings drawer that has no other contents in v1. |
-| `CatalogSidebar.tsx` | Inner body re-skinned (header sky-gradient, search bar light-blue, 3-col tile grid with size + qty badges, 12px radius tiles, white→pale-blue tile gradient). Outer rail is replaced by `CatalogRail.tsx`. |
+| `CatalogSidebar.tsx` | Inner body re-skinned (header sky-gradient, search bar light-blue, 3-col tile grid with size + qty badges, 12px-radius tiles, white→pale-blue tile gradient). Outer rail is replaced by `CatalogRail.tsx`. |
 | `CostPanel.tsx` | Wrapped by `CostPanelPopover.tsx` — keeps internal layout but gets header restyled (cream gradient, "材料コスト" h3, close X button) and is mounted only when `costPanelOpen=true` (with scale/opacity transition). |
 
 ### Category icons (cat-rail, 8 buttons)
@@ -331,7 +341,7 @@ No third-party shadcn registry blocks are declared for this phase. All new compo
 |---|---------|------------|-----------|
 | 1 | Where do `ImportButton` / `ExportButton` go? | Kebab "︙" overflow menu in top rail (between autosave and area-level pills). | Handoff offered "kebab OR settings drawer" — a settings drawer has no other v1 contents, so kebab is simpler. Keeps actions one click away without permanent screen real estate. |
 | 2 | Tailwind 4 token integration: new theme file vs extend `index.css` `@theme`? | Rewrite the existing `@theme` block in `src/index.css` wholesale. No new file. | Tailwind 4's `@theme` is the canonical config surface (no `tailwind.config.*` exists). Single source of truth aligns with the simplicity rule. |
-| 3 | Font loading strategy (Google Fonts vs self-host)? | Self-host via `@fontsource/nunito` and `@fontsource/m-plus-rounded-1c`, imported in `src/main.tsx`. | GitHub Pages static-hosting constraint favors zero-CDN-hop; pinned npm deps survive CDN churn; FOIT avoided via fontsource's preload optimization. |
+| 3 | Font loading strategy (Google Fonts vs self-host)? | Self-host via `@fontsource/nunito` (700 only) and `@fontsource/m-plus-rounded-1c` (800 only), imported in `src/main.tsx`. 900 axis is not loaded. | GitHub Pages static-hosting constraint favors zero-CDN-hop; pinned npm deps survive CDN churn; FOIT avoided via fontsource's preload optimization. Limiting to 2 weights matches the Typography contract. |
 | 4 | `catalogCollapsed` / `costPanelOpen` / `floatbarPosition` / `activeCategory` — extend `useEditorStore` or new `useChromeStore`? | Extend `useEditorStore`. Add to persist `partialize`, exclude from temporal `partialize`. | Chrome state and editor state are interdependent (cost pill reads `placedItems`, area dropdown writes `areaLevel`). Splitting forces cross-store reads. Phase 03's persist-outside-temporal pattern accommodates new fields directly. |
 | 5 | Lucide icon mapping for the 8 cat-rail categories? | See Component Inventory → "Category icons" table above (`Grid3x3`, `Image`, `Palette`, `Square`, `Route`, `LibraryBig`, `TreePine`, `Box`). | Production-style icons replace the prototype's emoji per the "use Lucide" directive in handoff §Assets. Mapping was chosen for semantic clarity within Lucide's vocabulary. |
 
