@@ -1,6 +1,6 @@
 // ======== 浮动工具栏（Slot D） ========
-// INPUT: useEditorStore（toolMode, overwriteEnabled, floatbarPosition）+ temporal pastStates/futureStates
-// OUTPUT: 底部居中工具药丸；可拖拽快照到 left/center/right
+// INPUT: useEditorStore（toolMode, overwriteEnabled, floatbarX）+ temporal pastStates/futureStates
+// OUTPUT: 底部工具药丸；通过拖拽柄在视口横向自由移动（无离散吸附）
 // POS: src/components/chrome/FloatbarToolPill.tsx — Phase 7 浮动工具栏
 
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -199,56 +199,53 @@ function Separator() {
   )
 }
 
+// 视口边距：药丸中心不能贴到视口边
+const VIEWPORT_MARGIN = 16
+
 // ======== 主组件 ========
 export function FloatbarToolPill() {
   const toolMode = useEditorStore((s) => s.toolMode)
   const setToolMode = useEditorStore((s) => s.setToolMode)
   const overwriteEnabled = useEditorStore((s) => s.overwriteEnabled)
   const toggleOverwrite = useEditorStore((s) => s.toggleOverwrite)
-  const floatbarPosition = useEditorStore((s) => s.floatbarPosition)
-  const setFloatbarPosition = useEditorStore((s) => s.setFloatbarPosition)
+  const floatbarX = useEditorStore((s) => s.floatbarX)
+  const setFloatbarX = useEditorStore((s) => s.setFloatbarX)
 
   const { canUndo, canRedo } = useTemporalState()
 
   const pillRef = useRef<HTMLDivElement | null>(null)
-  const draggingRef = useRef(false)
+  const dragStartXRef = useRef(0)
+  const dragStartFractionRef = useRef(0)
 
-  // ======== 拖拽中：直接修改 inline transform，避免 React re-render ========
+  // ======== 拖拽中：直接 setState 让 left 跟随；过渡禁用避免抖动 ========
   const handleDragMove = useCallback((deltaX: number) => {
     const el = pillRef.current
     if (!el) return
-    if (!draggingRef.current) {
-      // 暂停 left 过渡，让 transform 跟随光标
-      draggingRef.current = true
-      el.style.transition = 'none'
-    }
-    // 在原 floatbarPosition 计算出的 left 基础上叠加 translateX(deltaX)
-    // 注意：base translate 已经包含在 style.transform 中（由 React 根据 floatbarPosition 计算），
-    // 这里需要重写完整 transform 以叠加 deltaX
-    const base = computeBaseTransform(floatbarPosition)
-    el.style.transform = `${base} translateX(${deltaX}px)`
-  }, [floatbarPosition])
+    el.style.transition = 'none'
+    const w = window.innerWidth
+    const pillW = el.offsetWidth
+    // 把 deltaX 像素转回归一化分数；clamp 保证药丸完全在视口内（含边距）
+    const halfPill = pillW / 2
+    const minCenterPx = halfPill + VIEWPORT_MARGIN
+    const maxCenterPx = w - halfPill - VIEWPORT_MARGIN
+    const targetCenterPx =
+      dragStartFractionRef.current * w + deltaX
+    const clamped = Math.max(minCenterPx, Math.min(maxCenterPx, targetCenterPx))
+    const fraction = clamped / w
+    setFloatbarX(fraction)
+  }, [setFloatbarX])
 
-  // ======== 拖拽结束：根据视口三分位选择 snap ========
+  const handleDragStart = useCallback(() => {
+    dragStartXRef.current = floatbarX * window.innerWidth
+    dragStartFractionRef.current = floatbarX
+  }, [floatbarX])
+
   const handleDragEnd = useCallback(() => {
     const el = pillRef.current
     if (!el) return
-    draggingRef.current = false
-    const rect = el.getBoundingClientRect()
-    const center = rect.left + rect.width / 2
-    const w = window.innerWidth
-    let snap: 'left' | 'center' | 'right' = 'center'
-    if (center < w / 3) snap = 'left'
-    else if (center > (2 * w) / 3) snap = 'right'
-    else snap = 'center'
-    // 恢复过渡，由 React 重新计算 left/transform（floatbarPosition 触发）
-    el.style.transition = 'left .22s cubic-bezier(.5,1.4,.4,1), transform .22s cubic-bezier(.5,1.4,.4,1)'
-    el.style.transform = computeBaseTransform(snap)
-    setFloatbarPosition(snap)
-  }, [setFloatbarPosition])
-
-  // ======== 计算定位 ========
-  const { left, transform } = computePosition(floatbarPosition)
+    // 拖拽结束恢复过渡，下次外部驱动的位置变化会平滑
+    el.style.transition = 'left .22s cubic-bezier(.5,1.4,.4,1)'
+  }, [])
 
   return (
     <Tooltip.Provider delayDuration={300}>
@@ -258,8 +255,8 @@ export function FloatbarToolPill() {
         style={{
           position: 'absolute',
           bottom: 0,
-          left,
-          transform,
+          left: `${floatbarX * 100}%`,
+          transform: 'translateX(-50%)',
           height: 52,
           display: 'flex',
           alignItems: 'center',
@@ -269,13 +266,17 @@ export function FloatbarToolPill() {
           borderRadius: 'var(--radius-panel, 22px)',
           boxShadow: 'var(--shadow-md)',
           border: '1px solid var(--color-panel-edge, rgba(60,80,140,.14))',
-          transition: 'left .22s cubic-bezier(.5,1.4,.4,1), transform .22s cubic-bezier(.5,1.4,.4,1)',
+          transition: 'left .22s cubic-bezier(.5,1.4,.4,1)',
           pointerEvents: 'auto',
           whiteSpace: 'nowrap',
         }}
       >
         {/* 拖拽柄 */}
-        <FloatbarDragHandle onDragMove={handleDragMove} onDragEnd={handleDragEnd} />
+        <FloatbarDragHandle
+          onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
+          onDragEnd={handleDragEnd}
+        />
 
         {/* 工具段 */}
         {TOOL_SEGMENTS.map((spec) => (
@@ -316,20 +317,3 @@ export function FloatbarToolPill() {
   )
 }
 
-// ======== 定位计算 ========
-// left/center/right -> { left, transform } 双值
-function computePosition(pos: 'left' | 'center' | 'right') {
-  switch (pos) {
-    case 'left':
-      return { left: '0%', transform: 'translateX(24px)' }
-    case 'right':
-      return { left: '100%', transform: 'translateX(calc(-100% - 24px))' }
-    case 'center':
-    default:
-      return { left: '50%', transform: 'translateX(-50%)' }
-  }
-}
-
-function computeBaseTransform(pos: 'left' | 'center' | 'right') {
-  return computePosition(pos).transform
-}

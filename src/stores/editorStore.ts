@@ -165,8 +165,9 @@ export const useEditorStore = create<EditorState>()(
 
       // Phase 7 chrome state（UI-only，进入 persist，不进入 temporal）
       catalogCollapsed: false,
+      catalogTop: 76,
       costPanelOpen: false,
-      floatbarPosition: 'center' as const,
+      floatbarX: 0.5,
       activeCategory: 'all',
       // Phase 7 plan 02: 自动保存时间戳（运行时态，由 persist storage 包装器写入；不进入 partialize）
       lastSaveAt: null as number | null,
@@ -358,9 +359,10 @@ export const useEditorStore = create<EditorState>()(
       setCatalogCollapsed: (collapsed) => set({ catalogCollapsed: collapsed }),
       toggleCatalogCollapsed: () =>
         set((s) => ({ catalogCollapsed: !s.catalogCollapsed })),
+      setCatalogTop: (top) => set({ catalogTop: top }),
       setCostPanelOpen: (open) => set({ costPanelOpen: open }),
       toggleCostPanel: () => set((s) => ({ costPanelOpen: !s.costPanelOpen })),
-      setFloatbarPosition: (pos) => set({ floatbarPosition: pos }),
+      setFloatbarX: (x) => set({ floatbarX: Math.max(0, Math.min(1, x)) }),
       setActiveCategory: (category) => set({ activeCategory: category }),
     }),
     {
@@ -380,7 +382,7 @@ export const useEditorStore = create<EditorState>()(
   ),
     {
       name: DESIGN_STORAGE_KEY,
-      version: 2,
+      version: 3,
       // Phase 7 plan 02: 包装 localStorage 以在每次 setItem 后捕获 lastSaveAt
       // 注意：不能让 lastSaveAt 进入 partialize（否则形成 setState→setItem→setState 死循环）
       storage: createJSONStorage(() => ({
@@ -396,18 +398,34 @@ export const useEditorStore = create<EditorState>()(
         },
         removeItem: (name: string) => localStorage.removeItem(name),
       })),
-      // Phase 7: 老 payload (version<2) 缺少 chrome 字段时填默认值
+      // Phase 7: 老 payload (version<2) 缺少 chrome 字段时填默认值；
+      // version<3 把离散的 floatbarPosition 'left'|'center'|'right' 转换为连续 floatbarX (0..1)，
+      // 并补齐 catalogTop 默认值
       migrate: (persistedState: any, fromVersion: number) => {
+        let migrated = persistedState ?? {}
         if (fromVersion < 2) {
-          return {
-            ...persistedState,
-            catalogCollapsed: persistedState?.catalogCollapsed ?? false,
-            costPanelOpen: persistedState?.costPanelOpen ?? false,
-            floatbarPosition: persistedState?.floatbarPosition ?? 'center',
-            activeCategory: persistedState?.activeCategory ?? 'all',
+          migrated = {
+            ...migrated,
+            catalogCollapsed: migrated.catalogCollapsed ?? false,
+            costPanelOpen: migrated.costPanelOpen ?? false,
+            floatbarPosition: migrated.floatbarPosition ?? 'center',
+            activeCategory: migrated.activeCategory ?? 'all',
           }
         }
-        return persistedState
+        if (fromVersion < 3) {
+          const oldPos = migrated.floatbarPosition
+          const fraction =
+            oldPos === 'left' ? 0.1 : oldPos === 'right' ? 0.9 : 0.5
+          // 删除旧字段，写入新字段
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { floatbarPosition: _legacy, ...rest } = migrated
+          migrated = {
+            ...rest,
+            floatbarX: typeof migrated.floatbarX === 'number' ? migrated.floatbarX : fraction,
+            catalogTop: typeof migrated.catalogTop === 'number' ? migrated.catalogTop : 76,
+          }
+        }
+        return migrated
       },
       // 只持久化用户设计数据 —— 不含 undo 历史、UI 临时状态
       // D-03: placedItems + placedEdges + areaLevel
@@ -425,10 +443,11 @@ export const useEditorStore = create<EditorState>()(
           Object.keys(state.placedEdges).length > 0
             ? true
             : state.isEditorReady,
-        // Phase 7 chrome state（UI-only，version=2 起）
+        // Phase 7 chrome state（UI-only）
         catalogCollapsed: state.catalogCollapsed,
+        catalogTop: state.catalogTop,
         costPanelOpen: state.costPanelOpen,
-        floatbarPosition: state.floatbarPosition,
+        floatbarX: state.floatbarX,
         activeCategory: state.activeCategory,
       }),
       // Pitfall 2：rehydrate 后若有设计数据，强制 isEditorReady=true

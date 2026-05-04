@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { GripVertical } from 'lucide-react'
 
 interface FloatbarDragHandleProps {
+  onDragStart?: () => void
   onDragMove: (deltaX: number) => void
   onDragEnd: () => void
 }
@@ -32,6 +33,7 @@ function ensureKeyframes() {
 }
 
 export function FloatbarDragHandle({
+  onDragStart,
   onDragMove,
   onDragEnd,
 }: FloatbarDragHandleProps) {
@@ -60,6 +62,7 @@ export function FloatbarDragHandle({
     e.currentTarget.setPointerCapture(e.pointerId)
     startXRef.current = e.clientX
     setDragging(true)
+    onDragStart?.()
   }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {

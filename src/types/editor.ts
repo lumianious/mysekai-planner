@@ -131,8 +131,9 @@ export interface EditorState {
 
   // Phase 7 chrome state（UI-only，进入 persist 但不进入 temporal）
   catalogCollapsed: boolean
+  catalogTop: number          // px from viewport top — drag-controlled vertical position
   costPanelOpen: boolean
-  floatbarPosition: 'left' | 'center' | 'right'
+  floatbarX: number           // 0..1 normalized horizontal position of the floatbar pill center
   activeCategory: string
   // Phase 7 plan 02: 自动保存时间戳（仅运行时态，由 persist storage 包装器写入；不进入 partialize）
   lastSaveAt: number | null
@@ -165,8 +166,9 @@ export interface EditorState {
   // Phase 7 chrome setters
   setCatalogCollapsed: (collapsed: boolean) => void
   toggleCatalogCollapsed: () => void
+  setCatalogTop: (top: number) => void
   setCostPanelOpen: (open: boolean) => void
   toggleCostPanel: () => void
-  setFloatbarPosition: (pos: 'left' | 'center' | 'right') => void
+  setFloatbarX: (x: number) => void
   setActiveCategory: (category: string) => void
 }

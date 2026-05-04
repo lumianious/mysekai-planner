@@ -1,8 +1,10 @@
 // ======== 目录外壳（Slot B） ========
-// INPUT: useEditorStore（catalogCollapsed, activeCategory）, fixtures, mainGenres, fixtureMap
-// OUTPUT: 72px 总是可见的分类轨 + 可折叠 248px 主体（搜索 + 网格）
+// INPUT: useEditorStore（catalogCollapsed, catalogTop, activeCategory）, fixtures, mainGenres, fixtureMap
+// OUTPUT: 72px 分类轨 + 可折叠 248px 主体；顶部 grip 可竖直拖拽（仅 Y 轴）；
+//          空分类（filterByPhase7Category 返回 0 个家具）自动隐藏
 // POS: src/components/chrome/CatalogRail.tsx — Phase 7 目录壳
 
+import { useCallback, useMemo, useRef } from 'react'
 import {
   Menu,
   Grid3x3,
@@ -13,11 +15,12 @@ import {
   LibraryBig,
   TreePine,
   Box,
+  GripHorizontal,
 } from 'lucide-react'
 import type React from 'react'
 import { useEditorStore } from '../../stores/editorStore'
 import { CatalogSidebar } from '../catalog/CatalogSidebar'
-import type { Phase7Category } from '../../data/fixtures'
+import { filterByPhase7Category, type Phase7Category } from '../../data/fixtures'
 import type { Fixture, FixtureMainGenre } from '../../types/editor'
 
 const CATEGORIES: Array<{
@@ -41,6 +44,10 @@ interface CatalogRailProps {
   fixtureMap: Map<number, Fixture>
 }
 
+// 视口顶/底安全区
+const TOP_MARGIN = 16
+const BOTTOM_MARGIN = 96 // 不要遮挡底部 floatbar/hotbar
+
 export function CatalogRail({
   fixtures,
   mainGenres,
@@ -53,6 +60,59 @@ export function CatalogRail({
   ) as Phase7Category
   const setActiveCategory = useEditorStore((s) => s.setActiveCategory)
   const setCollapsed = useEditorStore((s) => s.setCatalogCollapsed)
+  const setCatalogTop = useEditorStore((s) => s.setCatalogTop)
+
+  // ======== 仅保留有家具的分类，'all' 永远显示 ========
+  const visibleCategories = useMemo(() => {
+    return CATEGORIES.filter((cat) => {
+      if (cat.key === 'all') return true
+      return filterByPhase7Category(fixtures, cat.key).length > 0
+    })
+  }, [fixtures])
+
+  // ======== 竖直拖拽：grip 按下后跟随光标 Y 移动 ========
+  const dragStartYRef = useRef(0)
+  const dragStartTopRef = useRef(0)
+
+  const handleGripPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      e.preventDefault()
+      e.stopPropagation()
+      e.currentTarget.setPointerCapture(e.pointerId)
+      dragStartYRef.current = e.clientY
+      dragStartTopRef.current = useEditorStore.getState().catalogTop
+    },
+    [],
+  )
+
+  const handleGripPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (!e.currentTarget.hasPointerCapture(e.pointerId)) return
+      const deltaY = e.clientY - dragStartYRef.current
+      const railHeight = 740
+      const maxTop = Math.max(
+        TOP_MARGIN,
+        window.innerHeight - railHeight - BOTTOM_MARGIN,
+      )
+      const next = Math.max(
+        TOP_MARGIN,
+        Math.min(maxTop, dragStartTopRef.current + deltaY),
+      )
+      setCatalogTop(next)
+    },
+    [setCatalogTop],
+  )
+
+  const handleGripPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      } catch {
+        /* already released */
+      }
+    },
+    [],
+  )
 
   return (
     <div
@@ -83,6 +143,32 @@ export function CatalogRail({
           gap: 4,
         }}
       >
+        {/* 竖直拖拽柄（仅 Y 轴） */}
+        <button
+          type="button"
+          aria-label="ドラッグで上下に移動"
+          onPointerDown={handleGripPointerDown}
+          onPointerMove={handleGripPointerMove}
+          onPointerUp={handleGripPointerUp}
+          onPointerCancel={handleGripPointerUp}
+          style={{
+            width: 36,
+            height: 22,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: 8,
+            cursor: 'ns-resize',
+            color: 'rgba(60,80,140,.5)',
+            padding: 0,
+            marginBottom: 2,
+          }}
+        >
+          <GripHorizontal size={16} />
+        </button>
+
         {/* 汉堡菜单按钮 */}
         <button
           type="button"
@@ -102,7 +188,7 @@ export function CatalogRail({
           <Menu size={18} color="#1f3556" />
         </button>
 
-        {CATEGORIES.map(({ key, label, Icon }) => {
+        {visibleCategories.map(({ key, label, Icon }) => {
           const active = activeCategory === key
           return (
             <button

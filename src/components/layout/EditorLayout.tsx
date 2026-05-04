@@ -12,10 +12,12 @@ import { TopRail } from '../chrome/TopRail'
 import { FloatbarToolPill } from '../chrome/FloatbarToolPill'
 import { ZoomDock } from '../chrome/ZoomDock'
 import { useFixtureData } from '../../hooks/useFixtureData'
+import { useEditorStore } from '../../stores/editorStore'
 
 export function EditorLayout() {
   const { fixtures, mainGenres, fixtureMap, costIndex, loading, error } =
     useFixtureData()
+  const catalogTop = useEditorStore((s) => s.catalogTop)
 
   return (
     <Tooltip.Provider delayDuration={300}>
@@ -40,12 +42,13 @@ export function EditorLayout() {
         )}
       </div>
 
-      {/* Slot B — Catalog (top:76, left:16, h:740) — CatalogRail owns its own width animation */}
+      {/* Slot B — Catalog (top: catalogTop, left:16, h:740)
+          catalogTop 来自 store，由 CatalogRail 顶部的 grip 拖拽更新 */}
       {!loading && !error && (
         <div
           data-chrome-slot="catalog"
           className="absolute z-10"
-          style={{ top: 76, left: 16, height: 740 }}
+          style={{ top: catalogTop, left: 16, height: 740 }}
         >
           <CatalogRail
             fixtures={fixtures}
