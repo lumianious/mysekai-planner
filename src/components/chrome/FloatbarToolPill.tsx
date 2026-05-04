@@ -96,8 +96,8 @@ function Segment({ spec, active, disabled = false, onClick }: SegmentProps) {
     ? 'inset 0 -2px 0 rgba(46,168,238,.4)'
     : 'none'
 
-  // 激活态下 kbd chip 切换为白色半透明
-  const chipBg = active ? 'rgba(255,255,255,.32)' : 'rgba(31,53,86,.08)'
+  // 激活态下 kbd chip 切换为不透明白底 + 深色文字（避免 white-on-light 不可读）
+  const chipBg = active ? '#ffffff' : 'rgba(31,53,86,.08)'
 
   return (
     <Tooltip.Root>
@@ -110,8 +110,8 @@ function Segment({ spec, active, disabled = false, onClick }: SegmentProps) {
           onClick={disabled ? undefined : onClick}
           style={{
             position: 'relative',
-            width: 36,
-            height: 36,
+            width: 44,
+            height: 44,
             borderRadius: 'var(--radius-pill-inner, 14px)',
             padding: 0,
             display: 'flex',
@@ -135,19 +135,19 @@ function Segment({ spec, active, disabled = false, onClick }: SegmentProps) {
             e.currentTarget.style.background = 'transparent'
           }}
         >
-          <Icon size={22} strokeWidth={active ? 2.4 : 2} />
+          <Icon size={24} strokeWidth={active ? 2.4 : 2} />
           <span
             aria-hidden="true"
             style={{
               position: 'absolute',
-              top: -4,
-              right: -4,
-              minWidth: 16,
-              height: 14,
-              padding: '0 4px',
+              top: -2,
+              right: -2,
+              minWidth: 18,
+              height: 16,
+              padding: '0 5px',
               borderRadius: 'var(--radius-chip, 10px)',
               background: chipBg,
-              color: active ? '#ffffff' : 'var(--color-ink, #1f3556)',
+              color: 'var(--color-ink, #1f3556)',
               fontFamily: "'M PLUS Rounded 1c', system-ui, sans-serif",
               fontWeight: 800,
               fontSize: 11,
@@ -155,6 +155,7 @@ function Segment({ spec, active, disabled = false, onClick }: SegmentProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxShadow: active ? '0 0 0 1px rgba(31,53,86,.08)' : 'none',
             }}
           >
             {spec.kbd}
@@ -189,9 +190,9 @@ function Separator() {
       aria-hidden="true"
       style={{
         width: 1,
-        height: 24,
+        height: 28,
         background: 'rgba(60,80,140,.14)',
-        margin: '0 4px',
+        margin: '0 6px',
         flexShrink: 0,
       }}
     />
@@ -259,11 +260,11 @@ export function FloatbarToolPill() {
           bottom: 0,
           left,
           transform,
-          height: 44,
+          height: 52,
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
-          padding: '0 8px',
+          gap: 6,
+          padding: '0 14px',
           background: 'linear-gradient(180deg, #ffffff, #fbf6ea)',
           borderRadius: 'var(--radius-panel, 22px)',
           boxShadow: 'var(--shadow-md)',
