@@ -4,7 +4,6 @@
 // POS: src/components/layout/EditorLayout.tsx — 编辑器页面骨架（chrome shell）
 
 import * as Tooltip from '@radix-ui/react-tooltip'
-import grassTextureSrc from '../../assets/grass-texture.png'
 import { Hotbar } from '../hotbar/Hotbar'
 import { CatalogRail } from '../chrome/CatalogRail'
 import { EditorCanvas } from '../canvas/EditorCanvas'
@@ -20,14 +19,10 @@ export function EditorLayout() {
 
   return (
     <Tooltip.Provider delayDuration={300}>
-    {/* 使用与画布相同的草地纹理作为页面底色 —— 网格外部不再露出明显的奶油色"地板"，
-        chrome 真正悬浮在世界上而不是落在另一块面板里 */}
+    {/* 暗绿色作为画布纹理加载前的过渡底色 —— 草地由 GridLayer 在 Stage 内绘制并向外延展 */}
     <div
       className="relative w-screen h-screen overflow-hidden"
-      style={{
-        background: `#2d5a1e url(${grassTextureSrc}) repeat`,
-        backgroundSize: '64px 64px',
-      }}
+      style={{ background: '#2d5a1e' }}
     >
       {/* Canvas fills entire viewport — chrome floats over it */}
       <div className="absolute inset-0">
