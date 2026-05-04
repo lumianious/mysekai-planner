@@ -125,7 +125,7 @@ export interface EditorState {
   hotbar: HotbarSlot[]
   isEditorReady: boolean     // false = 显示欢迎界面
   flashItemIds: string[]     // undo/redo 闪烁动画目标项
-  stageScale: number         // 画布缩放比例（供 StatusBar 读取）
+  stageScale: number         // 画布缩放比例（Phase 7: 供 ZoomDock 读取）
   // Phase 4: 库存（materialId -> 拥有数量），通过 persist 跨 session 保留
   inventory: Record<number, number>
 

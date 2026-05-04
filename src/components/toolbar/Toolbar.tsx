@@ -44,7 +44,13 @@ function useTemporalState() {
   return { canUndo, canRedo }
 }
 
-export function Toolbar() {
+interface ToolbarProps {
+  // Phase 7 plan 02: 紧凑模式 —— 隐藏迁移到顶栏的 area-level 下拉、Import/Export 按钮
+  // 仅保留工具按钮、覆盖切换、撤销/重做（待 plan 04 替换为 Floatbar）
+  compact?: boolean
+}
+
+export function Toolbar({ compact = false }: ToolbarProps = {}) {
   const toolMode = useEditorStore((s) => s.toolMode)
   const setToolMode = useEditorStore((s) => s.setToolMode)
   const overwriteEnabled = useEditorStore((s) => s.overwriteEnabled)
@@ -127,11 +133,14 @@ export function Toolbar() {
 
         <div className="w-px h-6 bg-default mx-1" />
 
-        {/* 导出 / 导入 代码 */}
-        <ExportButton />
-        <ImportButton />
-
-        <div className="w-px h-6 bg-default mx-1" />
+        {/* 导出 / 导入 代码（compact 模式隐藏 —— 已迁移到顶栏 kebab） */}
+        {!compact && (
+          <>
+            <ExportButton />
+            <ImportButton />
+            <div className="w-px h-6 bg-default mx-1" />
+          </>
+        )}
 
         {/* 撤销/重做 */}
         <ToolButton
@@ -151,7 +160,8 @@ export function Toolbar() {
           disabled={!canRedo}
         />
 
-        {/* 右侧 — 区域等级 */}
+        {/* 右侧 — 区域等级（compact 模式隐藏 —— 已迁移到顶栏 AreaLevelDropdown） */}
+        {!compact && (
         <div className="ml-auto">
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
@@ -196,6 +206,7 @@ export function Toolbar() {
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
         </div>
+        )}
       </div>
     </Tooltip.Provider>
   )

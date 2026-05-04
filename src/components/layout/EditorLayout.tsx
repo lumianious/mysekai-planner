@@ -5,10 +5,10 @@
 
 import { Toolbar } from '../toolbar/Toolbar'
 import { Hotbar } from '../hotbar/Hotbar'
-import { StatusBar } from '../status/StatusBar'
 import { CatalogSidebar } from '../catalog/CatalogSidebar'
 import { EditorCanvas } from '../canvas/EditorCanvas'
 import { CostPanel } from '../costs/CostPanel'
+import { TopRail } from '../chrome/TopRail'
 import { useFixtureData } from '../../hooks/useFixtureData'
 import { useEditorStore } from '../../stores/editorStore'
 
@@ -34,8 +34,20 @@ export function EditorLayout() {
         className="absolute z-20"
         style={{ top: 16, left: 16, right: 16, height: 44 }}
       >
-        {/* Plan 02 mounts TopRail here. Until then keep legacy Toolbar visible to preserve features. */}
-        <Toolbar />
+        {!loading && !error && (
+          <TopRail fixtureMap={fixtureMap} costIndex={costIndex} />
+        )}
+      </div>
+
+      {/* Transitional Slot — legacy Toolbar (compact) for tool/overwrite/undo/redo
+          until plan 04 replaces it with the Floatbar. Positioned just right of
+          the catalog rail (left:360 = 16 + 320 + 24 sm-gap snapped to 32). */}
+      <div
+        data-chrome-slot="legacy-tools"
+        className="absolute z-20"
+        style={{ top: 76, left: 360 }}
+      >
+        <Toolbar compact />
       </div>
 
       {/* Slot B — Catalog (top:76, left:16, h:740, w: 320|72) */}
@@ -95,15 +107,6 @@ export function EditorLayout() {
         style={{ bottom: 16, right: 16, height: 44 }}
       >
         {/* Plan 05 mounts ZoomDock here */}
-      </div>
-
-      {/* Legacy status bar — temporary, removed by Plan 02 once top-rail pills cover its data */}
-      <div
-        data-chrome-slot="legacy-status"
-        className="absolute z-0"
-        style={{ bottom: 0, left: 0, right: 0 }}
-      >
-        <StatusBar />
       </div>
 
       {/* Loading / error states keep their existing position over the catalog slot */}

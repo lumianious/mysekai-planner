@@ -638,5 +638,5 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
   )
 }
 
-// 导出 stageScale 供 StatusBar 使用
+// 导出类型给 EditorLayout（stageScale 供 Phase 7 ZoomDock 读取）
 export type { EditorCanvasProps }
