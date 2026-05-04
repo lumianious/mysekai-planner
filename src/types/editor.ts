@@ -126,6 +126,14 @@ export interface EditorState {
   isEditorReady: boolean     // false = 显示欢迎界面
   flashItemIds: string[]     // undo/redo 闪烁动画目标项
   stageScale: number         // 画布缩放比例（供 StatusBar 读取）
+  // Phase 4: 库存（materialId -> 拥有数量），通过 persist 跨 session 保留
+  inventory: Record<number, number>
+
+  // Phase 7 chrome state（UI-only，进入 persist 但不进入 temporal）
+  catalogCollapsed: boolean
+  costPanelOpen: boolean
+  floatbarPosition: 'left' | 'center' | 'right'
+  activeCategory: string
 
   // -- 动作 --
   placeItem: (item: Omit<PlacedItem, 'id'>) => void
@@ -149,4 +157,14 @@ export interface EditorState {
   startEditor: (level: AreaLevel) => void
   triggerFlash: (ids: string[]) => void
   setStageScale: (scale: number) => void
+  // Phase 4
+  setInventoryQuantity: (materialId: number, quantity: number) => void
+  clearInventory: () => void
+  // Phase 7 chrome setters
+  setCatalogCollapsed: (collapsed: boolean) => void
+  toggleCatalogCollapsed: () => void
+  setCostPanelOpen: (open: boolean) => void
+  toggleCostPanel: () => void
+  setFloatbarPosition: (pos: 'left' | 'center' | 'right') => void
+  setActiveCategory: (category: string) => void
 }

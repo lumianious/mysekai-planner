@@ -16,6 +16,12 @@ const ALLOWED_PERSISTED_KEYS = [
   'areaLevel',
   'gridSize',
   'isEditorReady',
+  'inventory', // Phase 4
+  // Phase 7 chrome state（UI-only，进入 persist 但不进入 temporal）
+  'catalogCollapsed',
+  'costPanelOpen',
+  'floatbarPosition',
+  'activeCategory',
 ]
 
 /**

@@ -161,6 +161,13 @@ export const useEditorStore = create<EditorState>()(
       isEditorReady: false,
       flashItemIds: [],
       stageScale: 1,
+      inventory: {} as Record<number, number>,
+
+      // Phase 7 chrome state（UI-only，进入 persist，不进入 temporal）
+      catalogCollapsed: false,
+      costPanelOpen: false,
+      floatbarPosition: 'center' as const,
+      activeCategory: 'all',
 
       // -- 动作 --
 
@@ -330,6 +337,29 @@ export const useEditorStore = create<EditorState>()(
       },
 
       setStageScale: (scale: number) => set({ stageScale: scale }),
+
+      // Phase 4：库存条目（quantity<=0 -> 删除该 key 保持对象稀疏）
+      setInventoryQuantity: (materialId: number, quantity: number) =>
+        set((state) => {
+          const next = { ...state.inventory }
+          if (!Number.isFinite(quantity) || quantity <= 0) {
+            delete next[materialId]
+          } else {
+            next[materialId] = Math.floor(quantity)
+          }
+          return { inventory: next }
+        }),
+
+      clearInventory: () => set({ inventory: {} }),
+
+      // Phase 7 chrome setters
+      setCatalogCollapsed: (collapsed) => set({ catalogCollapsed: collapsed }),
+      toggleCatalogCollapsed: () =>
+        set((s) => ({ catalogCollapsed: !s.catalogCollapsed })),
+      setCostPanelOpen: (open) => set({ costPanelOpen: open }),
+      toggleCostPanel: () => set((s) => ({ costPanelOpen: !s.costPanelOpen })),
+      setFloatbarPosition: (pos) => set({ floatbarPosition: pos }),
+      setActiveCategory: (category) => set({ activeCategory: category }),
     }),
     {
       limit: 50, // 超过 GRID-09 最低 20 步要求
@@ -348,8 +378,21 @@ export const useEditorStore = create<EditorState>()(
   ),
     {
       name: DESIGN_STORAGE_KEY,
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => localStorage),
+      // Phase 7: 老 payload (version<2) 缺少 chrome 字段时填默认值
+      migrate: (persistedState: any, fromVersion: number) => {
+        if (fromVersion < 2) {
+          return {
+            ...persistedState,
+            catalogCollapsed: persistedState?.catalogCollapsed ?? false,
+            costPanelOpen: persistedState?.costPanelOpen ?? false,
+            floatbarPosition: persistedState?.floatbarPosition ?? 'center',
+            activeCategory: persistedState?.activeCategory ?? 'all',
+          }
+        }
+        return persistedState
+      },
       // 只持久化用户设计数据 —— 不含 undo 历史、UI 临时状态
       // D-03: placedItems + placedEdges + areaLevel
       // 附加 gridSize（Pitfall 7：避免 rehydrate 后 gridSize 与 areaLevel 失配）
@@ -359,11 +402,18 @@ export const useEditorStore = create<EditorState>()(
         placedEdges: state.placedEdges,
         areaLevel: state.areaLevel,
         gridSize: state.gridSize,
+        // Phase 4: 库存独立于设计数据持久化（用户的真实背包）
+        inventory: state.inventory,
         isEditorReady:
           Object.keys(state.placedItems).length > 0 ||
           Object.keys(state.placedEdges).length > 0
             ? true
             : state.isEditorReady,
+        // Phase 7 chrome state（UI-only，version=2 起）
+        catalogCollapsed: state.catalogCollapsed,
+        costPanelOpen: state.costPanelOpen,
+        floatbarPosition: state.floatbarPosition,
+        activeCategory: state.activeCategory,
       }),
       // Pitfall 2：rehydrate 后若有设计数据，强制 isEditorReady=true
       // 保护对面：即使旧 payload 里 isEditorReady=false（例如用户首次写入前手动编辑了 localStorage）
