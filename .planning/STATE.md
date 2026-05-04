@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-04-PLAN.md (Phase 5 closed; HID-style canvas rendering)
-last_updated: "2026-04-29T08:50:00.000Z"
-last_activity: 2026-04-29
+stopped_at: Completed 07-01-foundation-PLAN.md
+last_updated: "2026-05-04T15:32:55.281Z"
+last_activity: 2026-05-04
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 5
-  total_plans: 23
-  completed_plans: 23
-  percent: 100
+  total_plans: 29
+  completed_plans: 24
+  percent: 87
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** Users can visually plan their MySekai outdoor layout and know exactly what materials they need to build it.
-**Current focus:** Phase 5 — sprite-pipeline (pulled forward ahead of Phase 4 to de-risk in-game asset extraction first)
+**Current focus:** Phase 07 — editor-chrome-redesign
 
 ## Current Position
 
-Phase: 5
-Plan: 3 of 4 complete (next: 05-03)
+Phase: 07 (editor-chrome-redesign) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-04-29
+Last activity: 2026-05-04
 
 Progress: [█████████░] 87%
 
@@ -68,6 +68,7 @@ Progress: [█████████░] 87%
 | Phase 03-persistence-sharing P03 | 30min | 3 tasks | 11 files |
 | Phase 05 P01 | 10min | 3 tasks | 22 files |
 | Phase 05 P03 | 22m | 3 tasks | 13 files |
+| Phase 07 P01 | 5min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,11 @@ Recent decisions affecting current work:
 - [Phase 05]: Camera ortho_scale uses AABB only (max(AABB_xy, 0.4)*1.15); Unity meters and grid cells are incompatible units. Resolves PILOT-FINDINGS Q3.
 - [Phase 05]: glb_writer Path B confirmed in production (USE_GLB_FALLBACK=True): UnityPy Mesh.export() OBJ + first usable Texture2D into one-primitive pygltflib GLB.
 - [Phase 05]: Thumbnail extraction folded into extract-2d run handler instead of new subcommand; one CLI surface, runs after 2D-branch loop.
+- [Phase 07]: Self-host fonts via @fontsource (Nunito 700 + M PLUS Rounded 1c 800 only) — avoids Google Fonts CORS hop on GitHub Pages
+- [Phase 07]: Tailwind @theme block rewritten wholesale (dark→light); legacy semantic tokens remap to new palette so existing classnames keep rendering
+- [Phase 07]: Chrome state added to useEditorStore persist partialize but excluded from temporal partialize (no undo entries for catalog collapse / cost panel toggle)
+- [Phase 07]: Persist version 1→2 with migrate hook defaulting absent chrome fields; preserves Phase-3 placedItems data on rehydrate
+- [Phase 07]: EditorLayout rewritten flex-column → absolute slots; canvas absolute inset-0, six numbered chrome slots + transitional legacy-status slot
 
 ### Pending Todos
 
@@ -141,6 +147,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T05:20:23.975Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-05-04T15:32:55.279Z
+Stopped at: Completed 07-01-foundation-PLAN.md
 Resume file: None

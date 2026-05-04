@@ -146,7 +146,7 @@ Plans:
   7. Visual treatment matches handoff hifi.html: design tokens, typography (Nunito + M PLUS Rounded 1c), shadows, transitions
 **Plans:** 6 plans
 Plans:
-- [ ] 07-01-foundation-PLAN.md — Self-host fonts, rewrite Tailwind @theme, add chrome state to store, refactor EditorLayout into absolute-positioned shell
+- [x] 07-01-foundation-PLAN.md — Self-host fonts, rewrite Tailwind @theme, add chrome state to store, refactor EditorLayout into absolute-positioned shell
 - [ ] 07-02-top-rail-PLAN.md — Top rail (project title, cost pill, autosave indicator, area-level dropdown, kebab); remove StatusBar; add lastSaveAt to persist
 - [ ] 07-03-catalog-rail-PLAN.md — Always-visible 72px cat-rail with 8 category buttons + collapsible 248px body; persist activeCategory + catalogCollapsed
 - [ ] 07-04-floatbar-PLAN.md — Bottom-centered drag-snap floatbar (tools/overwrite/undo/redo); add O keybinding; delete legacy Toolbar
