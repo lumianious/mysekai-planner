@@ -151,7 +151,7 @@ Plans:
 - [x] 07-03-catalog-rail-PLAN.md — Always-visible 72px cat-rail with 8 category buttons + collapsible 248px body; persist activeCategory + catalogCollapsed
 - [x] 07-04-floatbar-PLAN.md — Bottom-centered drag-snap floatbar (tools/overwrite/undo/redo); add O keybinding; delete legacy Toolbar
 - [x] 07-05-hotbar-zoom-PLAN.md — Re-skin hotbar to 72×72 content-width pill; new ZoomDock wiring setStageScale at bottom-right
-- [ ] 07-06-cost-popover-PLAN.md — CostPanel as popover toggled by cost pill; sky→green progress meter; persist costPanelOpen
+- [x] 07-06-cost-popover-PLAN.md — CostPanel as popover toggled by cost pill; sky→green progress meter; persist costPanelOpen
 **UI hint**: yes
 **Design contract**: `.planning/phases/07-editor-chrome-redesign/07-UI-SPEC.md` (canonical UI design contract)
 
