@@ -3,6 +3,7 @@
 // OUTPUT: 画布全屏 + 六个绝对定位 chrome 槽位（A–F），槽内容由后续 plan 02–06 填充
 // POS: src/components/layout/EditorLayout.tsx — 编辑器页面骨架（chrome shell）
 
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { Hotbar } from '../hotbar/Hotbar'
 import { CatalogRail } from '../chrome/CatalogRail'
 import { EditorCanvas } from '../canvas/EditorCanvas'
@@ -17,6 +18,7 @@ export function EditorLayout() {
     useFixtureData()
 
   return (
+    <Tooltip.Provider delayDuration={300}>
     <div
       className="relative w-screen h-screen overflow-hidden bg-cream"
       style={{ background: '#fff8e7' }}
@@ -120,5 +122,6 @@ export function EditorLayout() {
         </div>
       )}
     </div>
+    </Tooltip.Provider>
   )
 }

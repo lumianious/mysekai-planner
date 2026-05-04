@@ -8,7 +8,6 @@ Phase 7 chrome shell components. Each file declares INPUT/OUTPUT/POS in its L3 h
 | CostPill.tsx | 顶栏成本药丸（点击切换 cost popover） |
 | AutosavePill.tsx | 自动保存指示器 |
 | AreaLevelDropdown.tsx | 区域等级下拉 |
-| TopRailKebab.tsx | Import/Export 溢出菜单 |
 | CatalogRail.tsx | Slot B（plan 03） |
 | CostPanelPopover.tsx | Slot C（plan 06） |
 | FloatbarToolPill.tsx | Slot D（plan 04） |
