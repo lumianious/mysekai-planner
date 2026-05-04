@@ -105,10 +105,10 @@ export const GridLayer = React.memo(function GridLayer({
   const totalDepth = gridDepth * TILE_SIZE
 
   return (
-    {/* 草地纹理背景 —— 远超 90×90 范围向四周延展，让世界看起来无限延续；
-        Konva 自动裁剪到 Stage 视口，性能不受影响。
-        网格线仍只画在 90×90 内，作为唯一的"可放置"边界提示。 */}
     <Layer listening={false}>
+      {/* 草地纹理背景 —— 远超 90×90 范围向四周延展，让世界看起来无限延续；
+          Konva 自动裁剪到 Stage 视口，性能不受影响。
+          网格线仍只画在 90×90 内，作为唯一的"可放置"边界提示。 */}
       <Rect
         x={-totalWidth * 5}
         y={-totalDepth * 5}
