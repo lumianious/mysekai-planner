@@ -113,11 +113,10 @@ function Segment({ spec, active, disabled = false, onClick }: SegmentProps) {
             width: 36,
             height: 36,
             borderRadius: 'var(--radius-pill-inner, 14px)',
-            padding: '0 16px',
+            padding: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 4,
             background: bg,
             color,
             boxShadow: insetShadow,
@@ -136,7 +135,7 @@ function Segment({ spec, active, disabled = false, onClick }: SegmentProps) {
             e.currentTarget.style.background = 'transparent'
           }}
         >
-          <Icon size={18} strokeWidth={active ? 2.4 : 2} />
+          <Icon size={22} strokeWidth={active ? 2.4 : 2} />
           <span
             aria-hidden="true"
             style={{
