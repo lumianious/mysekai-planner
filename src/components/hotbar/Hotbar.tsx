@@ -3,12 +3,58 @@
 // OUTPUT: 内容宽度居中白色药丸；9 个 72×72 槽位
 // POS: src/components/hotbar/Hotbar.tsx — Phase 7 重构后的热栏
 
+import { useState } from 'react'
 import { useEditorStore } from '../../stores/editorStore'
 import { getThumbnailUrl } from '../../data/fixtures'
+import { getSpriteEntrySync } from '../../data/spriteManifest'
+import { getFixtureColor } from '../../utils/color'
 import type { Fixture } from '../../types/editor'
 
 interface HotbarProps {
   fixtureMap: Map<number, Fixture>
+}
+
+// ======== 槽位缩略图 ========
+// 与 CatalogItem 相同的三段式策略：本地清单 → CDN webp → 颜色块占位
+function HotbarThumbnail({ fixture }: { fixture: Fixture }) {
+  const [imgError, setImgError] = useState(false)
+  const manifestEntry = getSpriteEntrySync(fixture.assetbundleName)
+  const localThumb = manifestEntry?.thumbnails?.[0]
+  const src = localThumb
+    ? `${import.meta.env.BASE_URL}${localThumb}`
+    : getThumbnailUrl(fixture.assetbundleName)
+
+  if (imgError) {
+    return (
+      <div
+        className="w-full h-full flex items-center justify-center"
+        style={{
+          backgroundColor: getFixtureColor(
+            fixture.mysekaiFixtureMainGenreId,
+            fixture.colorCode,
+          ),
+          borderRadius: 'var(--radius-tile)',
+        }}
+      >
+        <span
+          className="text-[8px] text-white/80 text-center leading-tight px-0.5 line-clamp-2"
+        >
+          {fixture.name}
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={src}
+      alt={fixture.name}
+      className="w-full h-full object-contain"
+      style={{ borderRadius: 'var(--radius-tile)', background: '#ffffff' }}
+      loading="lazy"
+      onError={() => setImgError(true)}
+    />
+  )
 }
 
 export function Hotbar({ fixtureMap }: HotbarProps) {
@@ -60,15 +106,7 @@ export function Hotbar({ fixtureMap }: HotbarProps) {
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)' }}
             aria-label={isEmpty ? '空きスロット' : (fixture?.name ?? `スロット ${slotNumber}`)}
           >
-            {!isEmpty && fixture && (
-              <img
-                src={getThumbnailUrl(fixture.assetbundleName)}
-                alt={fixture.name}
-                className="w-full h-full object-cover"
-                style={{ borderRadius: 'var(--radius-tile)' }}
-                loading="lazy"
-              />
-            )}
+            {!isEmpty && fixture && <HotbarThumbnail fixture={fixture} />}
             {/* Slot number badge — top-left */}
             <span
               style={{
