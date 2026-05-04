@@ -6,17 +6,15 @@
 import { Hotbar } from '../hotbar/Hotbar'
 import { CatalogRail } from '../chrome/CatalogRail'
 import { EditorCanvas } from '../canvas/EditorCanvas'
-import { CostPanel } from '../costs/CostPanel'
+import { CostPanelPopover } from '../chrome/CostPanelPopover'
 import { TopRail } from '../chrome/TopRail'
 import { FloatbarToolPill } from '../chrome/FloatbarToolPill'
 import { ZoomDock } from '../chrome/ZoomDock'
 import { useFixtureData } from '../../hooks/useFixtureData'
-import { useEditorStore } from '../../stores/editorStore'
 
 export function EditorLayout() {
   const { fixtures, mainGenres, fixtureMap, costIndex, loading, error } =
     useFixtureData()
-  const costPanelOpen = useEditorStore((s) => s.costPanelOpen)
 
   return (
     <div
@@ -54,14 +52,14 @@ export function EditorLayout() {
         </div>
       )}
 
-      {/* Slot C — Cost panel (top:76, right:16, w:320, h:580) — only when open */}
-      {!loading && !error && costPanelOpen && (
+      {/* Slot C — Cost panel popover (top:76, right:16) — popover handles its own mount/unmount lifecycle */}
+      {!loading && !error && (
         <div
           data-chrome-slot="cost-panel"
           className="absolute z-10"
-          style={{ top: 76, right: 16, width: 320, height: 580 }}
+          style={{ top: 76, right: 16 }}
         >
-          <CostPanel fixtureMap={fixtureMap} costIndex={costIndex} />
+          <CostPanelPopover fixtureMap={fixtureMap} costIndex={costIndex} />
         </div>
       )}
 
