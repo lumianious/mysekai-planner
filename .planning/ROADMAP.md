@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Cost Calculator & Inventory** - Material cost breakdown, inventory input, and remaining-cost calculation
 - [ ] **Phase 5: Sprite Pipeline** - Offline Python/Blender pipeline to extract and render top-down sprites, integrate into grid editor
 - [ ] **Phase 6: Internationalization** - Bilingual UI in Chinese and Japanese
+- [ ] **Phase 7: Editor Chrome Redesign** - Floatbar + collapsible catalog + cost popover + zoom dock per claude-design handoff
 
 ## Phase Details
 
@@ -131,6 +132,29 @@ Plans:
 - [x] 05-03-PLAN.md — Wave 2: download.py + run-all + assemble_manifest + size guard + Vite build verify
 - [ ] 05-04-PLAN.md — Wave 3: PlacedItem.tsx sprite branch + boot manifest fetch + visual sign-off
 
+### Phase 7: Editor Chrome Redesign
+**Goal**: The editor's surrounding UI (toolbar, catalog, hotbar, cost panel, zoom) is restructured per the claude-design handoff: high-frequency tools consolidated into a centered draggable floatbar at the bottom, catalog rail always-visible with collapsible body, cost panel demoted to popover, and a slim top rail with title/cost-pill/autosave/area-level
+**Depends on**: Phase 4 (cost data shape stable), Phase 5 (real sprites for catalog/hotbar tiles)
+**Requirements**: see `.planning/handoffs/editor-chrome/README.md` (canonical spec)
+**Success Criteria** (what must be TRUE):
+  1. New floatbar replaces the wide top toolbar; tool/overwrite/undo/redo controls reachable with shorter mouse travel
+  2. Catalog supports rail-only collapsed state (72px) and full state (320px), category-rail always visible
+  3. Cost panel hidden by default, opened/closed from a top-rail cost pill, persists state to localStorage
+  4. Top rail shows project title pill, cost pill (with progress meter), autosave indicator, and area-level dropdown
+  5. Hotbar drops the meta block and is content-width centered; new bottom-right zoom dock wires to stage scale
+  6. Keyboard shortcuts (V/B/P/X/O/⌘Z/⌘⇧Z) preserved; tool-mode and overwrite still mutually independent
+  7. Visual treatment matches handoff hifi.html: design tokens, typography (Nunito + M PLUS Rounded 1c), shadows, transitions
+**Plans:** 6 plans
+Plans:
+- [ ] 07-01-foundation-PLAN.md — Self-host fonts, rewrite Tailwind @theme, add chrome state to store, refactor EditorLayout into absolute-positioned shell
+- [ ] 07-02-top-rail-PLAN.md — Top rail (project title, cost pill, autosave indicator, area-level dropdown, kebab); remove StatusBar; add lastSaveAt to persist
+- [ ] 07-03-catalog-rail-PLAN.md — Always-visible 72px cat-rail with 8 category buttons + collapsible 248px body; persist activeCategory + catalogCollapsed
+- [ ] 07-04-floatbar-PLAN.md — Bottom-centered drag-snap floatbar (tools/overwrite/undo/redo); add O keybinding; delete legacy Toolbar
+- [ ] 07-05-hotbar-zoom-PLAN.md — Re-skin hotbar to 72×72 content-width pill; new ZoomDock wiring setStageScale at bottom-right
+- [ ] 07-06-cost-popover-PLAN.md — CostPanel as popover toggled by cost pill; sky→green progress meter; persist costPanelOpen
+**UI hint**: yes
+**Design contract**: `.planning/phases/07-editor-chrome-redesign/07-UI-SPEC.md` (canonical UI design contract)
+
 ### Phase 6: Internationalization
 **Goal**: Users can use the application in Chinese or Japanese
 **Depends on**: Phase 1
@@ -154,3 +178,4 @@ Phases execute in: 1 -> 2 -> 3 -> 5 -> 4 -> 6 (Phase 5 pulled forward to de-risk
 | 4. Cost Calculator & Inventory | 0/TBD | Not started | - |
 | 5. Sprite Pipeline | 0/TBD | Not started | - |
 | 6. Internationalization | 0/TBD | Not started | - |
+| 7. Editor Chrome Redesign | 0/TBD | Not started | - |
