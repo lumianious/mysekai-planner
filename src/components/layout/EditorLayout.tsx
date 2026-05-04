@@ -9,6 +9,7 @@ import { EditorCanvas } from '../canvas/EditorCanvas'
 import { CostPanel } from '../costs/CostPanel'
 import { TopRail } from '../chrome/TopRail'
 import { FloatbarToolPill } from '../chrome/FloatbarToolPill'
+import { ZoomDock } from '../chrome/ZoomDock'
 import { useFixtureData } from '../../hooks/useFixtureData'
 import { useEditorStore } from '../../stores/editorStore'
 
@@ -90,7 +91,7 @@ export function EditorLayout() {
         className="absolute z-20"
         style={{ bottom: 16, right: 16, height: 44 }}
       >
-        {/* Plan 05 mounts ZoomDock here */}
+        <ZoomDock />
       </div>
 
       {/* Loading / error states keep their existing position over the catalog slot */}
