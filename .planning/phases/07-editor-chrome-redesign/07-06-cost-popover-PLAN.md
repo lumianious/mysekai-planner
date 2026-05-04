@@ -2,14 +2,14 @@
 phase: 07-editor-chrome-redesign
 plan: 06
 type: execute
-wave: 2
-depends_on: [07-01]
+wave: 6
+depends_on: [07-01, 07-05]
 files_modified:
   - src/components/chrome/CostPanelPopover.tsx
   - src/components/costs/CostPanel.tsx
   - src/components/layout/EditorLayout.tsx
 autonomous: true
-requirements: [SC-3, SC-7]
+requirements: [SC-3, SC-4, SC-7]
 must_haves:
   truths:
     - "Cost panel is hidden by default; clicking the cost pill in the top rail toggles it"
@@ -206,7 +206,7 @@ The existing component currently does its own outer chrome (`w-72 bg-surface-rai
                   padding: '4px 0',
                 }}
               >
-                库存清零
+                在庫をクリア
               </button>
             </div>
 
@@ -218,7 +218,7 @@ The existing component currently does its own outer chrome (`w-72 bg-surface-rai
                   fontFamily: 'Nunito, system-ui, sans-serif', fontWeight: 700, fontSize: 13,
                   color: 'var(--color-muted)',
                 }}>
-                  画布上无家具
+                  家具がありません
                 </p>
               ) : (
                 <ul>

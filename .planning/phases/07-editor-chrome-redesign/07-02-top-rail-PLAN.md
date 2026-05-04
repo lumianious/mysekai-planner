@@ -20,7 +20,7 @@ must_haves:
   truths:
     - "Top rail shows a project title pill, cost pill, autosave indicator, area-level dropdown, and a kebab overflow menu"
     - "Clicking the cost pill toggles costPanelOpen and the chevron rotates 180°"
-    - "Area-level dropdown uses Radix DropdownMenu and writes setAreaLevel"
+    - "User can change area level from a top-rail dropdown and the canvas grid resizes to match the selected level"
     - "Autosave indicator reflects the persist middleware's last-write timestamp via a relative-time string"
     - "Legacy StatusBar is removed from EditorLayout"
     - "Import + Export buttons relocate into the kebab menu"
@@ -94,7 +94,7 @@ From src/stores/editorStore.ts (after plan 01):
 
 <tasks>
 
-<task type="auto" tdd="true">
+<task type="auto">
   <name>Task 1: Add lastSaveAt to persist middleware + create top-rail pill components</name>
   <read_first>
     - src/stores/editorStore.ts (persist config — extend with lastSaveAt)
@@ -104,12 +104,6 @@ From src/stores/editorStore.ts (after plan 01):
     - src/data/areaLevels.ts
     - src/data/cost.ts (computeMaterialTotals — for cost pill numerics)
   </read_first>
-  <behavior>
-    - CostPill renders `1,655 / 18,000` (current/max) with a chevron that rotates 180° when costPanelOpen=true; clicking calls toggleCostPanel.
-    - AutosavePill renders `自動保存 · {N}s` (or `保存中…` / `保存エラー — 再試行`) with a pulsing green dot; reads `lastSaveAt` from store.
-    - AreaLevelDropdown renders `Lv.{N}` pill + grid size in muted; clicking opens a Radix DropdownMenu listing all 5 levels; selecting calls setAreaLevel.
-    - TopRailKebab renders a `︙` icon button that opens a Radix DropdownMenu containing the existing ImportButton + ExportButton actions.
-  </behavior>
   <files>
     - src/stores/editorStore.ts
     - src/components/chrome/CLAUDE.md

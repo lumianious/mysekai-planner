@@ -2,8 +2,8 @@
 phase: 07-editor-chrome-redesign
 plan: 05
 type: execute
-wave: 2
-depends_on: [07-01]
+wave: 5
+depends_on: [07-01, 07-04]
 files_modified:
   - src/components/hotbar/Hotbar.tsx
   - src/components/chrome/ZoomDock.tsx

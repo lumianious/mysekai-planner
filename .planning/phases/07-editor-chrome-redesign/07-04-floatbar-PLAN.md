@@ -2,8 +2,8 @@
 phase: 07-editor-chrome-redesign
 plan: 04
 type: execute
-wave: 2
-depends_on: [07-01]
+wave: 4
+depends_on: [07-01, 07-03]
 files_modified:
   - src/components/chrome/FloatbarToolPill.tsx
   - src/components/chrome/FloatbarDragHandle.tsx
@@ -184,7 +184,7 @@ From useKeyboard.ts (existing): handles V/B/P/X/Z/Y/R/Delete/Backspace/Arrows/Ta
         // ======== Phase 7 SC-6: V/B/P/X/O/⌘Z/⌘⇧Z ========
   </action>
   <verify>
-    <automated>pnpm build 2>&1 | tail -10 && grep -E "case 'o':" src/hooks/useKeyboard.ts && grep -l "FloatbarDragHandle" src/components/chrome/FloatbarToolPill.tsx && grep -l "setFloatbarPosition" src/components/chrome/FloatbarToolPill.tsx</automated>
+    <automated>pnpm build 2>&1 | tail -10 && grep -E "case 'o':" src/hooks/useKeyboard.ts && grep -E "case 'v':" src/hooks/useKeyboard.ts && grep -E "case 'b':" src/hooks/useKeyboard.ts && grep -E "case 'p':" src/hooks/useKeyboard.ts && grep -E "case 'x':" src/hooks/useKeyboard.ts && grep -E "case 'z':|metaKey.*z|ctrlKey.*z" src/hooks/useKeyboard.ts && grep -l "FloatbarDragHandle" src/components/chrome/FloatbarToolPill.tsx && grep -l "setFloatbarPosition" src/components/chrome/FloatbarToolPill.tsx</automated>
   </verify>
   <done>
     - `FloatbarToolPill.tsx` and `FloatbarDragHandle.tsx` exist with full UI-SPEC styling.

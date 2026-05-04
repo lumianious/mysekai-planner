@@ -2,8 +2,8 @@
 phase: 07-editor-chrome-redesign
 plan: 03
 type: execute
-wave: 2
-depends_on: [07-01]
+wave: 3
+depends_on: [07-01, 07-02]
 files_modified:
   - src/components/chrome/CatalogRail.tsx
   - src/components/catalog/CatalogSidebar.tsx
@@ -361,14 +361,15 @@ For Phase 7 we add a NEW filter: `filterByPhase7Category(fixtures, category)` �
          NEW: `<CatalogRail fixtures={fixtures} mainGenres={mainGenres} fixtureMap={fixtureMap} />`
       c) Remove the slot's inline `width:` / `transition: 'width 0.22s ease'` style — the CatalogRail now owns its own width animation. Slot B becomes simply `style={{ top: 76, left: 16, height: 740 }}`.
 
+      d) **Do NOT modify or remove the `data-chrome-slot="legacy-tools"` block** (the transitional `<Toolbar compact />` mount added by Plan 02). Plan 04 owns its deletion. Touch only slot B in this plan.
+
     Step 4 — Update L3 header in `CatalogSidebar.tsx` to reflect new responsibilities:
       - INPUT: fixtures, mainGenres, fixtureMap; activeCategory from store
       - OUTPUT: header + 搜索 + 缩略图网格（不含分类轨）
       - POS: src/components/catalog/CatalogSidebar.tsx — 目录主体（Phase 7 拆分后只负责搜索+网格）
   </action>
   <verify>
-    <automated>pnpm build 2>&1 | tail -10 && grep -c "filterByPhase7Category" src/components/catalog/CatalogSidebar.tsx && grep "<CatalogRail" src/components/layout/EditorLayout.tsx && grep "家具目録" src/components/catalog/CatalogSidebar.tsx && grep "家具を検索" src/components/catalog/CatalogSearch.tsx</antomated>
-    <automated>pnpm build 2>&1 | tail -10 && grep -c "filterByPhase7Category" src/components/catalog/CatalogSidebar.tsx && grep "<CatalogRail" src/components/layout/EditorLayout.tsx</automated>
+    <automated>pnpm build 2>&1 | tail -10 && grep -c "filterByPhase7Category" src/components/catalog/CatalogSidebar.tsx && grep "<CatalogRail" src/components/layout/EditorLayout.tsx && grep "家具目録" src/components/catalog/CatalogSidebar.tsx && grep "家具を検索" src/components/catalog/CatalogSearch.tsx</automated>
   </verify>
   <done>
     - `CatalogSidebar.tsx` no longer renders CategoryFilter or its own collapse button.
