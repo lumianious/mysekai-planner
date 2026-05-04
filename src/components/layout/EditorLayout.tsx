@@ -19,10 +19,10 @@ export function EditorLayout() {
 
   return (
     <Tooltip.Provider delayDuration={300}>
-    {/* 暗绿色作为画布纹理加载前的过渡底色 —— 草地由 GridLayer 在 Stage 内绘制并向外延展 */}
+    {/* 画布容器铺满整个视口；底色是白色（同 bg-surface），网格外即可见为白色"边界" */}
     <div
       className="relative w-screen h-screen overflow-hidden"
-      style={{ background: '#2d5a1e' }}
+      style={{ background: '#ffffff' }}
     >
       {/* Canvas fills entire viewport — chrome floats over it */}
       <div className="absolute inset-0">

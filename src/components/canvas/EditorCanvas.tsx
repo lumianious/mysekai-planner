@@ -571,7 +571,7 @@ export function EditorCanvas({ fixtureMap }: EditorCanvasProps) {
   return (
     <div
       ref={containerRef}
-      className="relative flex-1 bg-surface overflow-hidden"
+      className="relative w-full h-full bg-surface overflow-hidden"
       style={{ cursor: getCursor(toolMode) }}
     >
       <Stage

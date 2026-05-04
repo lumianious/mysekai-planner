@@ -106,14 +106,13 @@ export const GridLayer = React.memo(function GridLayer({
 
   return (
     <Layer listening={false}>
-      {/* 草地纹理背景 —— 远超网格边界向四周延展，让 Konva 自动裁剪到 Stage 视口，
-          用户在任何缩放/平移下都不会看到草地"地板"的尽头，世界感觉是连续的。
-          Konva 不会绘制视口外的像素，所以放大尺寸不带来性能负担。 */}
+      {/* 草地纹理背景 —— 仅在 90×90 可放置范围内绘制；范围外露出 Stage 容器的白色，
+          作为可见边界提示用户已到达地图边缘 */}
       <Rect
-        x={-totalWidth * 5}
-        y={-totalDepth * 5}
-        width={totalWidth * 11}
-        height={totalDepth * 11}
+        x={0}
+        y={0}
+        width={totalWidth}
+        height={totalDepth}
         fill={grassImage ? undefined : '#2d5a1e'}
         fillPatternImage={grassImage ?? undefined}
         fillPatternRepeat="repeat"
