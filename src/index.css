@@ -1,37 +1,89 @@
 @import "tailwindcss";
 
 @theme {
-  /* 背景层级 */
-  --color-surface: #1a1a2e;
-  --color-surface-raised: #242440;
-  --color-surface-hover: #2e2e50;
-  --color-surface-active: #383860;
+  /* ----- Fonts (Phase 7) ----- */
+  --font-sans: 'Nunito', 'M PLUS Rounded 1c', system-ui, sans-serif;
+  --font-display: 'M PLUS Rounded 1c', 'Nunito', system-ui, sans-serif;
 
-  /* 强调色 — Project Sekai 蓝绿 */
-  --color-accent: #39c5bb;
-  --color-accent-dim: #39c5bb26;
-  --color-destructive: #ef4444;
-  --color-valid: #22c55e;
-  --color-selection: #3b82f6;
+  /* ----- Color: dominant 60% (panels) ----- */
+  --color-panel: #ffffff;
+  --color-panel-2: #fbf6ea;
 
-  /* 文本 */
-  --color-primary: #e8e8f0;
-  --color-muted: #9090a8;
+  /* ----- Color: secondary 30% (cream + tan) ----- */
+  --color-cream: #fff8e7;
+  --color-cream-hover: #f1efe5;
+  --color-tan-1: #ecdfb8;
+  --color-tan-2: #e0cf9a;
 
-  /* 边框 */
-  --color-default: #3a3a56;
+  /* ----- Color: accent 10% (sky) ----- */
+  --color-sky: #69c8ff;
+  --color-sky-deep: #2ea8ee;
+  --color-sky-soft: #9bdcff;
+
+  /* ----- Status / destructive ----- */
+  --color-danger: #ff7a8a;
+  --color-danger-hot: #ff6f6f;
+  --color-danger-warm: #ff8c8c;
+  --color-shortfall: #d33;
+  --color-green: #8fdf6c;
+  --color-green-deep: #5db232;
+  --color-surplus: #2c8a3a;
+
+  /* ----- Text ----- */
+  --color-ink: #1f3556;
+  --color-ink-2: #4f6a8e;
+  --color-muted: #8aa0bd;
+  --color-ink-on-sky: #0e3955;
+
+  /* ----- Borders ----- */
+  --color-panel-edge: rgba(60,80,140,.14);
+  --color-tan-edge: rgba(120,90,30,.18);
+
+  /* ----- Legacy semantic remap (so existing classnames like bg-surface still resolve) ----- */
+  --color-surface: #ffffff;
+  --color-surface-raised: #fbf6ea;
+  --color-surface-hover: #f1efe5;
+  --color-surface-active: #ecdfb8;
+  --color-accent: #69c8ff;
+  --color-accent-dim: rgba(105,200,255,.4);
+  --color-destructive: #ff7a8a;
+  --color-valid: #8fdf6c;
+  --color-selection: #2ea8ee;
+  --color-primary: #1f3556;
+  --color-default: rgba(60,80,140,.14);
+
+  /* ----- Spacing (4-multiple ONLY: 4/8/16/24/32/48/64) ----- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* ----- Border radii (independent scale; values 12/14/18/22 are radii-only) ----- */
+  --radius-panel: 22px;
+  --radius-search: 18px;
+  --radius-pill-inner: 14px;
+  --radius-tile: 12px;
+  --radius-chip: 10px;
+  --radius-badge: 6px;
+
+  /* ----- Shadows ----- */
+  --shadow-lg: 0 16px 36px -14px rgba(60,90,160,.30), 0 4px 12px -6px rgba(60,90,160,.18);
+  --shadow-md: 0 6px 16px -8px rgba(60,90,160,.28), 0 2px 4px -2px rgba(60,90,160,.16);
+  --shadow-sm: 0 2px 6px -2px rgba(60,90,160,.18);
 }
 
-/* 全局滚动条 */
+/* Scrollbar (light theme) */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #3a3a56; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #4a4a66; }
+::-webkit-scrollbar-thumb { background: rgba(60,80,140,.18); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(60,80,140,.32); }
 
 body {
   margin: 0;
-  background: #1a1a2e;
-  color: #e8e8f0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+  background: #fff8e7; /* cream — see UI-SPEC §Color secondary */
+  color: #1f3556;       /* --color-ink */
+  font-family: 'Nunito', 'M PLUS Rounded 1c', system-ui, sans-serif;
+  font-weight: 700;
   -webkit-font-smoothing: antialiased;
 }
