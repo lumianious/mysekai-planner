@@ -3,12 +3,12 @@
 // OUTPUT: 画布全屏 + 六个绝对定位 chrome 槽位（A–F），槽内容由后续 plan 02–06 填充
 // POS: src/components/layout/EditorLayout.tsx — 编辑器页面骨架（chrome shell）
 
-import { Toolbar } from '../toolbar/Toolbar'
 import { Hotbar } from '../hotbar/Hotbar'
 import { CatalogRail } from '../chrome/CatalogRail'
 import { EditorCanvas } from '../canvas/EditorCanvas'
 import { CostPanel } from '../costs/CostPanel'
 import { TopRail } from '../chrome/TopRail'
+import { FloatbarToolPill } from '../chrome/FloatbarToolPill'
 import { useFixtureData } from '../../hooks/useFixtureData'
 import { useEditorStore } from '../../stores/editorStore'
 
@@ -38,17 +38,6 @@ export function EditorLayout() {
         )}
       </div>
 
-      {/* Transitional Slot — legacy Toolbar (compact) for tool/overwrite/undo/redo
-          until plan 04 replaces it with the Floatbar. Positioned just right of
-          the catalog rail (left:360 = 16 + 320 + 24 sm-gap snapped to 32). */}
-      <div
-        data-chrome-slot="legacy-tools"
-        className="absolute z-20"
-        style={{ top: 76, left: 360 }}
-      >
-        <Toolbar compact />
-      </div>
-
       {/* Slot B — Catalog (top:76, left:16, h:740) — CatalogRail owns its own width animation */}
       {!loading && !error && (
         <div
@@ -75,13 +64,15 @@ export function EditorLayout() {
         </div>
       )}
 
-      {/* Slot D — Floatbar (bottom:120, centered) */}
+      {/* Slot D — Floatbar (bottom:120, drag-snap left/center/right)
+          Slot is full-width with pointer-events:none so the empty area passes
+          clicks through; the FloatbarToolPill itself sets pointerEvents:'auto'. */}
       <div
         data-chrome-slot="floatbar"
         className="absolute z-20"
-        style={{ bottom: 120, left: '50%', transform: 'translateX(-50%)' }}
+        style={{ bottom: 120, left: 0, right: 0, pointerEvents: 'none' }}
       >
-        {/* Plan 04 mounts FloatbarToolPill here */}
+        <FloatbarToolPill />
       </div>
 
       {/* Slot E — Hotbar (bottom:16, centered) */}
