@@ -134,6 +134,8 @@ export interface EditorState {
   costPanelOpen: boolean
   floatbarPosition: 'left' | 'center' | 'right'
   activeCategory: string
+  // Phase 7 plan 02: 自动保存时间戳（仅运行时态，由 persist storage 包装器写入；不进入 partialize）
+  lastSaveAt: number | null
 
   // -- 动作 --
   placeItem: (item: Omit<PlacedItem, 'id'>) => void

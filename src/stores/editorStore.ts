@@ -168,6 +168,8 @@ export const useEditorStore = create<EditorState>()(
       costPanelOpen: false,
       floatbarPosition: 'center' as const,
       activeCategory: 'all',
+      // Phase 7 plan 02: 自动保存时间戳（运行时态，由 persist storage 包装器写入；不进入 partialize）
+      lastSaveAt: null as number | null,
 
       // -- 动作 --
 
@@ -379,7 +381,21 @@ export const useEditorStore = create<EditorState>()(
     {
       name: DESIGN_STORAGE_KEY,
       version: 2,
-      storage: createJSONStorage(() => localStorage),
+      // Phase 7 plan 02: 包装 localStorage 以在每次 setItem 后捕获 lastSaveAt
+      // 注意：不能让 lastSaveAt 进入 partialize（否则形成 setState→setItem→setState 死循环）
+      storage: createJSONStorage(() => ({
+        getItem: (name: string) => localStorage.getItem(name),
+        setItem: (name: string, value: string) => {
+          localStorage.setItem(name, value)
+          // 顶栏 AutosavePill 通过 store 订阅读取该字段
+          try {
+            useEditorStore.setState({ lastSaveAt: Date.now() })
+          } catch {
+            /* during init: store 未就绪，跳过 */
+          }
+        },
+        removeItem: (name: string) => localStorage.removeItem(name),
+      })),
       // Phase 7: 老 payload (version<2) 缺少 chrome 字段时填默认值
       migrate: (persistedState: any, fromVersion: number) => {
         if (fromVersion < 2) {
