@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-04-floatbar-PLAN.md
-last_updated: "2026-05-04T16:08:58.127Z"
+stopped_at: Completed 07-05-hotbar-zoom-PLAN.md
+last_updated: "2026-05-04T16:13:17.851Z"
 last_activity: 2026-05-04
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 29
-  completed_plans: 27
+  completed_plans: 28
   percent: 87
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 07 (editor-chrome-redesign) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-05-04
 
@@ -72,6 +72,7 @@ Progress: [█████████░] 87%
 | Phase 07 P02 | 5min | 2 tasks | 12 files |
 | Phase 07 P03 | 2min | 2 tasks | 5 files |
 | Phase 07-editor-chrome-redesign P04 | 19min | 2 tasks | 5 files |
+| Phase 07-editor-chrome-redesign P05 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -148,6 +149,8 @@ Recent decisions affecting current work:
 - [Phase 07-editor-chrome-redesign]: Drag flow: imperative style.transform during pointermove (bypass React render), snap calc on pointerup against viewport thirds, then setFloatbarPosition fires final transitioned glide
 - [Phase 07-editor-chrome-redesign]: O keybinding has no modifier gating and never calls setToolMode — preserves SC-6 mutual-independence axiom (overwrite ⊥ toolMode)
 - [Phase 07-editor-chrome-redesign]: ToolButton.tsx kept — ImportButton/ExportButton still consume it via sibling-relative import; only Toolbar.tsx is deleted in plan 04
+- [Phase 07-editor-chrome-redesign]: ZoomDock clamps (MIN 0.15 / MAX 3.0) copied from useCanvasInteraction; sync-comment on both files marks them as paired constants
+- [Phase 07-editor-chrome-redesign]: Hotbar drag-from-catalog deferred — plan 05 preserves click-only behavior; assignHotbar action exists but no UI invokes it yet
 
 ### Pending Todos
 
@@ -159,6 +162,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-04T16:08:43.975Z
-Stopped at: Completed 07-04-floatbar-PLAN.md
+Last session: 2026-05-04T16:13:17.849Z
+Stopped at: Completed 07-05-hotbar-zoom-PLAN.md
 Resume file: None
