@@ -27,6 +27,7 @@ export function useKeyboard({
       const state = useEditorStore.getState()
       const { undo, redo } = useEditorStore.temporal.getState()
 
+      // ======== Phase 7 SC-6: V/B/P/X/O/⌘Z/⌘⇧Z ========
       // 全局快捷键
       switch (e.key.toLowerCase()) {
         case 'v':
@@ -40,6 +41,10 @@ export function useKeyboard({
           return
         case 'x':
           state.setToolMode('remove')
+          return
+        case 'o':
+          // SC-6: 覆盖切换独立于工具模式
+          state.toggleOverwrite()
           return
         case 'escape':
           state.setSelectedItem(null)
