@@ -1,91 +1,118 @@
-// ======== 目录侧边栏 ========
-// INPUT: fixtures, mainGenres, fixtureMap (由 EditorLayout 通过 useFixtureData 传入)
-// OUTPUT: 可折叠侧边栏，包含搜索、分类芯片、缩略图网格
-// POS: src/components/catalog/CatalogSidebar.tsx — 家具目录容器
+// ======== 目录主体（Phase 7 拆分后只负责搜索+网格） ========
+// INPUT: fixtures, mainGenres, fixtureMap; activeCategory from store
+// OUTPUT: 头部条 + 搜索 + 缩略图网格（不含分类轨）
+// POS: src/components/catalog/CatalogSidebar.tsx — 目录主体（Phase 7 拆分后只负责搜索+网格）
 
 import { useState } from 'react'
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'
 import type { Fixture, FixtureMainGenre } from '../../types/editor'
-import { searchFixtures, filterByGenre } from '../../data/fixtures'
+import {
+  searchFixtures,
+  filterByPhase7Category,
+  type Phase7Category,
+} from '../../data/fixtures'
 import { CatalogSearch } from './CatalogSearch'
-import { CategoryFilter } from './CategoryFilter'
 import { CatalogGrid } from './CatalogGrid'
 import { useEditorStore } from '../../stores/editorStore'
 
 interface CatalogSidebarProps {
   fixtures: Fixture[]
+  // mainGenres / fixtureMap 保留接口（兼容外层 CatalogRail 调用），暂未使用
   mainGenres: FixtureMainGenre[]
   fixtureMap: Map<number, Fixture>
 }
 
-export function CatalogSidebar({
-  fixtures,
-  mainGenres,
-}: CatalogSidebarProps) {
+export function CatalogSidebar({ fixtures }: CatalogSidebarProps) {
   const activeFixtureId = useEditorStore((s) => s.activeFixtureId)
+  const activeCategory = useEditorStore(
+    (s) => s.activeCategory,
+  ) as Phase7Category
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeGenreId, setActiveGenreId] = useState<number | null>(null)
-  const [collapsed, setCollapsed] = useState(false)
 
-  const filteredFixtures = filterByGenre(
+  const filteredFixtures = filterByPhase7Category(
     searchFixtures(fixtures, searchQuery),
-    activeGenreId,
-    null,
+    activeCategory,
   )
 
-  if (collapsed) {
-    return (
-      <div className="w-10 bg-surface-raised border-r border-default flex-shrink-0 flex flex-col items-center pt-2">
-        <button
-          type="button"
-          onClick={() => setCollapsed(false)}
-          className="p-1.5 text-muted hover:text-accent hover:bg-surface-hover rounded-lg transition-colors"
-          title="展开目录"
-        >
-          <ChevronsRight size={18} />
-        </button>
-      </div>
-    )
-  }
-
   return (
-    <div className="w-72 bg-surface-raised border-r border-default flex-shrink-0 flex flex-col">
-      {/* 标题行 */}
-      <div className="flex items-center justify-between px-3 h-9 border-b border-default">
-        <span className="text-xs font-semibold text-muted uppercase tracking-wider">家具目录</span>
-        <button
-          type="button"
-          onClick={() => setCollapsed(true)}
-          className="p-1 text-muted hover:text-accent hover:bg-surface-hover rounded-md transition-colors"
-          title="折叠目录"
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* 头部条 — sky 渐变 */}
+      <div
+        className="flex items-center justify-between"
+        style={{
+          padding: '8px 16px',
+          height: 40,
+          background: 'linear-gradient(180deg, #9bdcff, #69c8ff)',
+          color: 'var(--color-ink-on-sky, #1f3556)',
+          borderTopRightRadius: 'var(--radius-panel)',
+          flexShrink: 0,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
+            fontWeight: 800,
+            fontSize: 16,
+            lineHeight: 1.2,
+          }}
         >
-          <ChevronsLeft size={16} />
-        </button>
+          家具目録
+        </span>
+        <span
+          style={{
+            padding: '4px 8px',
+            background: 'rgba(255,255,255,.4)',
+            borderRadius: 'var(--radius-badge, 6px)',
+            fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
+            fontWeight: 800,
+            fontSize: 11,
+            lineHeight: 1,
+          }}
+        >
+          {filteredFixtures.length} 件
+        </span>
       </div>
 
       {/* 搜索框 */}
-      <div className="px-2 pt-2">
+      <div style={{ padding: 16, flexShrink: 0 }}>
         <CatalogSearch value={searchQuery} onChange={setSearchQuery} />
       </div>
 
-      {/* 分类芯片 */}
-      <div className="px-1">
-        <CategoryFilter
-          genres={mainGenres}
-          activeGenreId={activeGenreId}
-          onSelect={setActiveGenreId}
-        />
-      </div>
-
-      {/* 分隔线 */}
-      <div className="mx-2 border-t border-default" />
-
-      {/* 虚拟化缩略图网格 */}
+      {/* 网格主体 */}
       <div className="flex-1 overflow-hidden">
-        <CatalogGrid
-          fixtures={filteredFixtures}
-          activeFixtureId={activeFixtureId}
-        />
+        {filteredFixtures.length === 0 ? (
+          <div
+            className="h-full flex flex-col items-center justify-center text-center"
+            style={{ padding: 16 }}
+          >
+            <p
+              style={{
+                fontFamily:
+                  '"M PLUS Rounded 1c", system-ui, sans-serif',
+                fontWeight: 800,
+                fontSize: 13,
+                color: '#1f3556',
+                marginBottom: 4,
+              }}
+            >
+              該当する家具はありません
+            </p>
+            <p
+              style={{
+                fontFamily: 'Nunito, system-ui, sans-serif',
+                fontWeight: 700,
+                fontSize: 11,
+                color: '#4f6a8e',
+              }}
+            >
+              検索語またはカテゴリを変更してみてください
+            </p>
+          </div>
+        ) : (
+          <CatalogGrid
+            fixtures={filteredFixtures}
+            activeFixtureId={activeFixtureId}
+          />
+        )}
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 // ======== 目录搜索输入框 ========
 // INPUT: value, onChange 回调
-// OUTPUT: 带图标的搜索输入框
+// OUTPUT: 带图标的搜索输入框（Phase 7: 18px 圆角 + 浅蓝底 + Nunito 700 13px）
 // POS: src/components/catalog/CatalogSearch.tsx — 家具名搜索
 
 import { Search, X } from 'lucide-react'
@@ -15,23 +15,49 @@ export function CatalogSearch({ value, onChange }: CatalogSearchProps) {
     <div className="relative">
       <Search
         size={14}
-        className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+        className="absolute pointer-events-none"
+        style={{
+          left: 12,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#4f6a8e',
+        }}
       />
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="搜索家具..."
-        className="w-full h-8 bg-surface border border-default rounded-lg pl-8 pr-8
-          text-xs text-primary placeholder:text-muted/50
-          focus:border-accent focus:ring-1 focus:ring-accent/30 outline-none
-          transition-colors"
+        placeholder="家具を検索…"
+        className="w-full outline-none"
+        style={{
+          height: 36,
+          background: '#eaf6ff',
+          border: '1px solid rgba(60,80,140,.14)',
+          borderRadius: 'var(--radius-search, 18px)',
+          padding: '0 32px 0 32px',
+          fontFamily: 'Nunito, system-ui, sans-serif',
+          fontWeight: 700,
+          fontSize: 13,
+          color: '#1f3556',
+        }}
       />
       {value.length > 0 && (
         <button
           type="button"
           onClick={() => onChange('')}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
+          className="absolute"
+          style={{
+            right: 10,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#4f6a8e',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            display: 'flex',
+          }}
+          aria-label="検索をクリア"
         >
           <X size={14} />
         </button>

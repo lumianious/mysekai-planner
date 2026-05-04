@@ -5,7 +5,7 @@
 
 import { Toolbar } from '../toolbar/Toolbar'
 import { Hotbar } from '../hotbar/Hotbar'
-import { CatalogSidebar } from '../catalog/CatalogSidebar'
+import { CatalogRail } from '../chrome/CatalogRail'
 import { EditorCanvas } from '../canvas/EditorCanvas'
 import { CostPanel } from '../costs/CostPanel'
 import { TopRail } from '../chrome/TopRail'
@@ -15,7 +15,6 @@ import { useEditorStore } from '../../stores/editorStore'
 export function EditorLayout() {
   const { fixtures, mainGenres, fixtureMap, costIndex, loading, error } =
     useFixtureData()
-  const catalogCollapsed = useEditorStore((s) => s.catalogCollapsed)
   const costPanelOpen = useEditorStore((s) => s.costPanelOpen)
 
   return (
@@ -50,20 +49,14 @@ export function EditorLayout() {
         <Toolbar compact />
       </div>
 
-      {/* Slot B — Catalog (top:76, left:16, h:740, w: 320|72) */}
+      {/* Slot B — Catalog (top:76, left:16, h:740) — CatalogRail owns its own width animation */}
       {!loading && !error && (
         <div
           data-chrome-slot="catalog"
           className="absolute z-10"
-          style={{
-            top: 76,
-            left: 16,
-            height: 740,
-            width: catalogCollapsed ? 72 : 320,
-            transition: 'width 0.22s ease',
-          }}
+          style={{ top: 76, left: 16, height: 740 }}
         >
-          <CatalogSidebar
+          <CatalogRail
             fixtures={fixtures}
             mainGenres={mainGenres}
             fixtureMap={fixtureMap}
