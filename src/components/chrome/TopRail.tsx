@@ -11,6 +11,7 @@ import { AutosavePill } from './AutosavePill'
 import { AreaLevelDropdown } from './AreaLevelDropdown'
 import { ImportButton } from '../toolbar/ImportButton'
 import { ExportButton } from '../toolbar/ExportButton'
+import { ResetButton } from '../toolbar/ResetButton'
 import type { Fixture } from '../../types/editor'
 
 interface TopRailProps {
@@ -49,7 +50,7 @@ export function TopRail({ fixtureMap, costIndex }: TopRailProps) {
       <CostPill current={costSummary.current} max={costSummary.max} />
       <AutosavePill />
       <AreaLevelDropdown />
-      {/* 导入/导出 ToolButton 放在白色药丸里，保持顶栏视觉一致 */}
+      {/* 导入/导出/重置 ToolButton 放在白色药丸里，保持顶栏视觉一致 */}
       <div
         className="flex items-center"
         style={{
@@ -63,6 +64,7 @@ export function TopRail({ fixtureMap, costIndex }: TopRailProps) {
       >
         <ImportButton />
         <ExportButton />
+        <ResetButton />
       </div>
     </div>
   )
