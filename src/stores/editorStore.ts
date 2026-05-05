@@ -294,14 +294,24 @@ export const useEditorStore = create<EditorState>()(
 
       startEditor: (level: AreaLevel) => {
         const grid = getGridSize(level)
-        // D-23: 自动放置必要建筑（门和房子）
-        // TODO: 从 mysekaiSystemFixtures.json 获取真实 ID
+        // D-23: 自动放置必要建筑（门和房子）—— 用 mysekaiFixtures.json 的真实 ID
+        // 门: id=900002 "ゲート"（mysekaiFixtureType="gate"，gridSize 8×2×6）
+        // 房: id=136   "ナチュラルな家"（mysekaiFixtureType="system"，gridSize 12×12×13）
+        const SYSTEM_GATE_ID = 900002
+        const SYSTEM_HOUSE_ID = 136
+        const GATE_W = 8
+        const GATE_D = 2
+        const HOUSE_W = 12
+        const HOUSE_D = 12
+
         const gateId = crypto.randomUUID()
         const houseId = crypto.randomUUID()
-        const gateX = Math.floor(grid.width / 2) - 1
-        const gateY = grid.depth - 3
-        const houseX = Math.floor(grid.width / 2) - 2
-        const houseY = Math.floor(grid.depth / 2) - 2
+        // 门贴底边居中
+        const gateX = Math.floor((grid.width - GATE_W) / 2)
+        const gateY = grid.depth - GATE_D
+        // 房子在区域上半，水平居中，距门保留缓冲
+        const houseX = Math.floor((grid.width - HOUSE_W) / 2)
+        const houseY = Math.floor((grid.depth - HOUSE_D) / 2) - 4
 
         set({
           areaLevel: level,
@@ -312,7 +322,7 @@ export const useEditorStore = create<EditorState>()(
           placedItems: {
             [gateId]: {
               id: gateId,
-              fixtureId: -1, // 占位 ID — 门
+              fixtureId: SYSTEM_GATE_ID,
               x: gateX,
               y: gateY,
               rotation: 0 as Rotation,
@@ -321,7 +331,7 @@ export const useEditorStore = create<EditorState>()(
             },
             [houseId]: {
               id: houseId,
-              fixtureId: -2, // 占位 ID — 房子
+              fixtureId: SYSTEM_HOUSE_ID,
               x: houseX,
               y: houseY,
               rotation: 0 as Rotation,
