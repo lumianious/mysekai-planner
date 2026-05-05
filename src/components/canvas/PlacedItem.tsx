@@ -132,31 +132,35 @@ export const PlacedItem = React.memo(function PlacedItem({
   //     这样相邻可连接、无 thumbnail 边缘伪影
   //   - 3D 家具 -> iso thumbnail（HID 风格）
   //   - manifest 未命中 -> getFixtureColor 旧路径（D-17 回退）
+  const groundSubtype = getGroundSubtype(fixture)
   const isGroundItem =
-    getGroundSubtype(fixture) !== null ||
+    groundSubtype !== null ||
     fixture.mysekaiSettableLayoutType === 'floor_appearance'
+  // dominantColor 底色仅给"应贴满方格"的项目用（road / color-tile / floor_appearance）；
+  // rug 形状非矩形（扇贝边），底色会在透明边缘外溢成方块光晕。
+  const usesUnderlay =
+    isGroundItem && groundSubtype !== 'rug' && groundSubtype !== 'fence'
   const manifestEntry = getSpriteEntrySync(fixture.assetbundleName)
   const groundColor =
-    isGroundItem && manifestEntry?.dominantColor
+    usesUnderlay && manifestEntry?.dominantColor
       ? `rgb(${manifestEntry.dominantColor.join(',')})`
       : null
-  // 地面项：solid Rect 保证可连接 + thumbnail 叠加在上层提供质感
+  // 地面项：solid Rect 保证可连接 + topdown sprite 叠加（iso thumbnail 会显示 3D 视角不适合地面）
   // 非地面（家具）：直接用 thumbnail（HID 风格）
-  const thumbnailUrl = manifestEntry?.thumbnails?.[0]
-    ? `${import.meta.env.BASE_URL}${manifestEntry.thumbnails[0]}`
+  const groundUrl = isGroundItem
+    ? (resolveSpriteUrl(fixture, import.meta.env.BASE_URL, 'topdown')?.url ?? '')
     : ''
   const furnitureUrl = !isGroundItem
     ? (resolveSpriteUrl(fixture, import.meta.env.BASE_URL)?.url ?? '')
     : ''
-  const [groundImg, groundStatus] = useImage(
-    isGroundItem ? thumbnailUrl : '',
-    'anonymous',
-  )
+  const [groundImg, groundStatus] = useImage(groundUrl, 'anonymous')
   const [spriteImg, spriteStatus] = useImage(furnitureUrl, 'anonymous')
   const renderGroundTexture =
     isGroundItem && groundImg !== undefined && groundStatus === 'loaded'
   const renderSprite =
     !isGroundItem && spriteImg !== undefined && spriteStatus === 'loaded'
+  // rug 走"无底色 + topdown 直贴"路径（usesUnderlay=false 时无 groundColor 但仍是地面项）
+  const renderGroundOnly = !groundColor && renderGroundTexture
 
   return (
     <Group
@@ -181,6 +185,13 @@ export const PlacedItem = React.memo(function PlacedItem({
             />
           )}
         </>
+      ) : renderGroundOnly ? (
+        <KonvaImage
+          image={groundImg}
+          width={pixelWidth}
+          height={pixelHeight}
+          listening={false}
+        />
       ) : renderSprite ? (
         <KonvaImage
           image={spriteImg}
@@ -200,7 +211,7 @@ export const PlacedItem = React.memo(function PlacedItem({
       )}
 
       {/* 名称标签：仅在 fallback rect 路径上展示（地面纯色/sprite 都不需要标签） */}
-      {!renderSprite && !groundColor && (
+      {!renderSprite && !groundColor && !renderGroundOnly && (
         <Text
           text={fixture.name}
           width={pixelWidth}
@@ -221,19 +232,6 @@ export const PlacedItem = React.memo(function PlacedItem({
           width={pixelWidth}
           height={pixelHeight}
           stageScale={stageScale}
-        />
-      )}
-
-      {/* 系统物品锁标识 */}
-      {item.isSystem && (
-        <Rect
-          x={pixelWidth - 8}
-          y={2}
-          width={6}
-          height={6}
-          fill="#f59e0b"
-          cornerRadius={1}
-          listening={false}
         />
       )}
 
