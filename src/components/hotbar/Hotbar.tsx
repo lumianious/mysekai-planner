@@ -52,6 +52,7 @@ function HotbarThumbnail({ fixture }: { fixture: Fixture }) {
       className="w-full h-full object-contain"
       style={{ borderRadius: 'var(--radius-tile)', background: '#ffffff' }}
       loading="lazy"
+      referrerPolicy="no-referrer"
       onError={() => setImgError(true)}
     />
   )

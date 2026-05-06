@@ -59,6 +59,7 @@ export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
               src={thumbnailSrc}
               alt={fixture.name}
               loading="lazy"
+              referrerPolicy="no-referrer"
               className="w-full h-full object-contain bg-surface"
               onError={() => setImgError(true)}
             />

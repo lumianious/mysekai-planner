@@ -44,9 +44,9 @@ interface CatalogRailProps {
   fixtureMap: Map<number, Fixture>
 }
 
-// 视口顶/底安全区
+// 视口顶安全区，以及拖拽时至少保留多少像素的轨在视口内（用于反向抓取）
 const TOP_MARGIN = 16
-const BOTTOM_MARGIN = 96 // 不要遮挡底部 floatbar/hotbar
+const MIN_VISIBLE_HEIGHT = 300
 
 export function CatalogRail({
   fixtures,
@@ -89,10 +89,11 @@ export function CatalogRail({
     (e: React.PointerEvent<HTMLButtonElement>) => {
       if (!e.currentTarget.hasPointerCapture(e.pointerId)) return
       const deltaY = e.clientY - dragStartYRef.current
-      const railHeight = 740
+      // maxTop 仅保证轨顶不会下沉到只剩 MIN_VISIBLE_HEIGHT；轨底允许越过视口底部
+      // （CatalogSidebar 内部已可滚动，且小屏幕上 740px 无论如何都装不下）
       const maxTop = Math.max(
         TOP_MARGIN,
-        window.innerHeight - railHeight - BOTTOM_MARGIN,
+        window.innerHeight - MIN_VISIBLE_HEIGHT,
       )
       const next = Math.max(
         TOP_MARGIN,
