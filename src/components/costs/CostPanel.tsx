@@ -26,11 +26,14 @@ const MATERIAL_TYPE_LABEL: Record<string, string> = {
 
 function MaterialIcon({ assetbundleName }: { assetbundleName: string }) {
   // 实测可用 CDN 路径（其他 thumbnail/ 路径返回 404）
+  // referrerPolicy=no-referrer：CDN 对 localhost Referer 返回 403（盗链保护），
+  //   不带 Referer 时返回 200。生产环境也保留以避免域名变动后再次被拦
   const url = `https://storage.sekai.best/sekai-jp-assets/mysekai/thumbnail/material/${assetbundleName}.webp`
   return (
     <img
       src={url}
       alt=""
+      referrerPolicy="no-referrer"
       style={{
         width: 36,
         height: 36,
