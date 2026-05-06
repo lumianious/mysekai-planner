@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Foundation & Core Editor** - Scaffold the app, build the layered canvas grid, furniture catalog, and complete place/move/remove/rotate workflow with colored rectangles
 - [x] **Phase 2: Roads, Fences & Ground Layer** - Paint brush and segment tools for roads, rugs, and fences on the ground layer (completed 2026-04-10)
 - [ ] **Phase 3: Persistence & Sharing** - Auto-save to localStorage, load designs, and share/import blueprints via URL
-- [ ] **Phase 4: Cost Calculator & Inventory** - Material cost breakdown, inventory input, and remaining-cost calculation
+- [x] **Phase 4: Cost Calculator & Inventory** - Material cost breakdown, inventory input, and remaining-cost calculation (completed 2026-05-06)
 - [ ] **Phase 5: Sprite Pipeline** - Offline Python/Blender pipeline to extract and render top-down sprites, integrate into grid editor
 - [ ] **Phase 6: Internationalization** - Bilingual UI in Chinese and Japanese
 - [ ] **Phase 7: Editor Chrome Redesign** - Floatbar + collapsible catalog + cost popover + zoom dock per claude-design handoff
@@ -125,7 +125,7 @@ Plans:
   2. Flat items (roads, fences, floor surfaces) have 2D textures extracted directly instead of 3D renders
   3. Generated sprites are deployed as static assets alongside the web app on GitHub Pages
   4. Placed items in the grid editor render with top-down sprites instead of colored rectangles
-**Plans:** 4 plans
+**Plans:** 1/1 plans complete
 Plans:
 - [x] 05-01-PLAN.md — Wave 0: tooling, tests, getGroundSubtype Python parity, frontend manifest loader + failing PlacedItem sprite/fallback tests
 - [x] 05-02-PLAN.md — Wave 1: 2D extraction + Blender render + 3-fixture pilot + PILOT-FINDINGS checkpoint
@@ -175,7 +175,7 @@ Phases execute in: 1 -> 2 -> 3 -> 5 -> 4 -> 6 (Phase 5 pulled forward to de-risk
 | 1. Foundation & Core Editor | 0/6 | Planning complete | - |
 | 2. Roads, Fences & Ground Layer | 0/5 | Complete    | 2026-04-10 |
 | 3. Persistence & Sharing | 0/3 | Planning complete | - |
-| 4. Cost Calculator & Inventory | 0/TBD | Not started | - |
+| 4. Cost Calculator & Inventory | 0/TBD | Complete    | 2026-05-06 |
 | 5. Sprite Pipeline | 0/TBD | Not started | - |
 | 6. Internationalization | 0/TBD | Not started | - |
 | 7. Editor Chrome Redesign | 0/TBD | Not started | - |
