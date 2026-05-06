@@ -31,11 +31,14 @@ function MaterialIcon({ assetbundleName }: { assetbundleName: string }) {
     <img
       src={url}
       alt=""
-      loading="lazy"
-      className="w-8 h-8 object-contain shrink-0"
-      style={{ borderRadius: 'var(--radius-chip)', background: '#ffffff' }}
-      onError={(e) => {
-        ;(e.target as HTMLImageElement).style.visibility = 'hidden'
+      style={{
+        width: 36,
+        height: 36,
+        objectFit: 'contain',
+        flexShrink: 0,
+        borderRadius: 'var(--radius-chip)',
+        background: '#ffffff',
+        border: '1px solid var(--color-panel-edge)',
       }}
     />
   )
