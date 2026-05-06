@@ -17,7 +17,8 @@ import { useEditorStore } from '../../stores/editorStore'
 export function EditorLayout() {
   const { fixtures, mainGenres, fixtureMap, costIndex, loading, error } =
     useFixtureData()
-  const catalogTop = useEditorStore((s) => s.catalogTop)
+  // 持久化值若来自旧版本（TOP_MARGIN=16）会让轨被顶栏遮挡，这里强制至少 68
+  const catalogTop = Math.max(68, useEditorStore((s) => s.catalogTop))
 
   return (
     <Tooltip.Provider delayDuration={300}>

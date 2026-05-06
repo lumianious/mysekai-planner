@@ -44,8 +44,9 @@ interface CatalogRailProps {
   fixtureMap: Map<number, Fixture>
 }
 
-// 视口顶安全区，以及拖拽时至少保留多少像素的轨在视口内（用于反向抓取）
-const TOP_MARGIN = 16
+// 视口顶安全区：避免轨上滑到顶栏 chrome（top:16, height:44, z-20）下方
+// 如果允许 < 68，grip 会被顶栏遮挡，导致拖回的入口失效
+const TOP_MARGIN = 68
 const MIN_VISIBLE_HEIGHT = 300
 
 export function CatalogRail({
