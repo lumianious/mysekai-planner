@@ -3,26 +3,37 @@
 // OUTPUT: 仅在 costPanelOpen=true 时挂载的浮层；包裹 CostPanel body
 // POS: src/components/chrome/CostPanelPopover.tsx — Phase 7 成本面板外壳
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
 import { CostPanel } from '../costs/CostPanel'
 import { useEditorStore } from '../../stores/editorStore'
 import type { Fixture } from '../../types/editor'
-import type { CostIndex } from '../../data/cost'
+import { computeMaterialTotals, type CostIndex } from '../../data/cost'
 
 interface CostPanelPopoverProps {
   fixtureMap: Map<number, Fixture>
   costIndex: CostIndex | null
 }
 
-// 18000 是 UI-SPEC 副标题里固定的 cap 引用，与游戏内放置上限对齐（参考值）
-const TOTAL_CAP = 18000
-
 export function CostPanelPopover({ fixtureMap, costIndex }: CostPanelPopoverProps) {
   const open = useEditorStore((s) => s.costPanelOpen)
   const setOpen = useEditorStore((s) => s.setCostPanelOpen)
   const placedItems = useEditorStore((s) => s.placedItems)
-  const itemCount = Object.keys(placedItems).length
+  const inventory = useEditorStore((s) => s.inventory)
+
+  // 副标题数据：材料种类数 + 仍缺数（rows.remaining > 0 即缺）
+  const subtitle = useMemo(() => {
+    if (!costIndex) return null
+    const rows = computeMaterialTotals(
+      Object.values(placedItems),
+      fixtureMap,
+      costIndex,
+      inventory,
+    )
+    const total = rows.length
+    const short = rows.filter((r) => r.remaining > 0).length
+    return { total, short }
+  }, [costIndex, placedItems, fixtureMap, inventory])
 
   // ======== 入场/出场动画：先挂载 → 下一帧切到 open=true 触发 transition ========
   // 关闭时先把 open 翻成 false，等 transition 跑完再彻底卸载
@@ -84,18 +95,20 @@ export function CostPanelPopover({ fixtureMap, costIndex }: CostPanelPopoverProp
           >
             材料コスト
           </h3>
-          <p
-            style={{
-              margin: '4px 0 0',
-              fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
-              fontWeight: 800,
-              fontSize: 11,
-              lineHeight: 1.3,
-              color: 'var(--color-ink-2)',
-            }}
-          >
-            {itemCount} 件 / {TOTAL_CAP.toLocaleString()}
-          </p>
+          {subtitle && subtitle.total > 0 && (
+            <p
+              style={{
+                margin: '4px 0 0',
+                fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
+                fontWeight: 800,
+                fontSize: 11,
+                lineHeight: 1.3,
+                color: 'var(--color-ink-2)',
+              }}
+            >
+              {subtitle.total} 種 ・ 不足 {subtitle.short}
+            </p>
+          )}
         </div>
         <button
           type="button"

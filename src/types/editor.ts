@@ -47,6 +47,8 @@ export interface Fixture {
     | 'road'
     | 'floor_appearance'
   mysekaiFixturePutType: 'none' | 'put_base' | 'put_target'
+  firstPutCost?: number  // 占用 putCostLimit 的硬上限（gate/house 通常为 0）
+  secondPutCost?: number // 第二次起的放置成本（暂未使用）
 }
 
 export interface FixtureMainGenre {

@@ -25,8 +25,8 @@ const MATERIAL_TYPE_LABEL: Record<string, string> = {
 }
 
 function MaterialIcon({ assetbundleName }: { assetbundleName: string }) {
-  // sekai-master-db-diff CDN icon convention
-  const url = `https://storage.sekai.best/sekai-jp-assets/thumbnail/material_rip/${assetbundleName}.webp`
+  // 实测可用 CDN 路径（其他 thumbnail/ 路径返回 404）
+  const url = `https://storage.sekai.best/sekai-jp-assets/mysekai/thumbnail/material/${assetbundleName}.webp`
   return (
     <img
       src={url}
@@ -57,74 +57,12 @@ export function CostPanel({ fixtureMap, costIndex }: CostPanelProps) {
     )
   }, [costIndex, placedItems, fixtureMap, inventory])
 
-  const totalNeeded = rows.reduce((s, r) => s + r.needed, 0)
-  const totalRemaining = rows.reduce((s, r) => s + r.remaining, 0)
-  const owned = totalNeeded - totalRemaining
-  const meterPct = totalNeeded > 0 ? Math.min(100, (owned / totalNeeded) * 100) : 0
-
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* ======== Summary card — レイアウトコスト + 进度计 ======== */}
-      <div
-        style={{
-          margin: 16,
-          padding: 16,
-          borderRadius: 'var(--radius-tile)',
-          background: 'linear-gradient(180deg, #fff8e7, #ecdfb8)',
-          border: '1px solid var(--color-tan-edge)',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
-            fontWeight: 800,
-            fontSize: 11,
-            lineHeight: 1.3,
-            color: 'var(--color-ink-2)',
-            marginBottom: 8,
-          }}
-        >
-          レイアウトコスト
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'baseline',
-            gap: 8,
-            fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
-            fontWeight: 800,
-            color: 'var(--color-ink)',
-          }}
-        >
-          <span style={{ fontSize: 16 }}>{owned.toLocaleString()}</span>
-          <span style={{ fontSize: 11, color: 'var(--color-muted)' }}>
-            / {totalNeeded.toLocaleString()}
-          </span>
-        </div>
-        {/* sky → green progress meter */}
-        <div
-          style={{
-            marginTop: 8,
-            height: 8,
-            borderRadius: 'var(--radius-chip)',
-            background: 'rgba(60,80,140,.10)',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              height: '100%',
-              width: `${meterPct}%`,
-              background: 'linear-gradient(90deg, #69c8ff, #8fdf6c)',
-              borderRadius: 'var(--radius-chip)',
-              transition: 'width .22s ease',
-            }}
-          />
-        </div>
-      </div>
+      {/* 配置コスト 显示在顶栏 CostPill；这里只负责材料明细 */}
 
       {/* ======== Inventory clear (Label-tier link) ======== */}
-      <div style={{ paddingLeft: 16, paddingRight: 16, marginBottom: 8 }}>
+      <div style={{ paddingTop: 12, paddingLeft: 16, paddingRight: 16, marginBottom: 8 }}>
         <button
           onClick={clearInventory}
           style={{
@@ -189,18 +127,21 @@ export function CostPanel({ fixtureMap, costIndex }: CostPanelProps) {
                     >
                       {row.material.name}
                     </div>
-                    <div
-                      style={{
-                        fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
-                        fontWeight: 800,
-                        fontSize: 10,
-                        lineHeight: 1.1,
-                        color: 'var(--color-muted)',
-                      }}
-                    >
-                      {MATERIAL_TYPE_LABEL[row.material.mysekaiMaterialType as string] ??
-                        row.material.mysekaiMaterialType}
-                    </div>
+                    {MATERIAL_TYPE_LABEL[
+                      row.material.mysekaiMaterialType as string
+                    ] && (
+                      <div
+                        style={{
+                          fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
+                          fontWeight: 800,
+                          fontSize: 10,
+                          lineHeight: 1.1,
+                          color: 'var(--color-muted)',
+                        }}
+                      >
+                        {MATERIAL_TYPE_LABEL[row.material.mysekaiMaterialType as string]}
+                      </div>
+                    )}
                   </div>
                   <div
                     style={{

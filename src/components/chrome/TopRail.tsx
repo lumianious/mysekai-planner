@@ -5,7 +5,8 @@
 
 import { useMemo } from 'react'
 import { useEditorStore } from '../../stores/editorStore'
-import { computeMaterialTotals, type CostIndex } from '../../data/cost'
+import { computeLayoutCost, type CostIndex } from '../../data/cost'
+import { getPutCostLimit } from '../../data/areaLevels'
 import { CostPill } from './CostPill'
 import { AutosavePill } from './AutosavePill'
 import { AreaLevelDropdown } from './AreaLevelDropdown'
@@ -19,24 +20,18 @@ interface TopRailProps {
   costIndex: CostIndex | null
 }
 
-export function TopRail({ fixtureMap, costIndex }: TopRailProps) {
+export function TopRail({ fixtureMap, costIndex: _costIndex }: TopRailProps) {
   const placedItems = useEditorStore((s) => s.placedItems)
-  const inventory = useEditorStore((s) => s.inventory)
+  const areaLevel = useEditorStore((s) => s.areaLevel)
 
-  // ======== 成本药丸数值 ========
-  // current = 仍需购买（needed - owned 截断），max = 全量需求
+  // ======== 成本药丸数值 —— 配置コスト（layout cost） ========
+  // current = 已使用 firstPutCost 总和；max = 当前 areaLevel 的 putCostLimit。
+  // 注意：这里不是材料成本（材料在 CostPanel 显示）。
   const costSummary = useMemo(() => {
-    if (!costIndex) return { current: 0, max: 0 }
-    const rows = computeMaterialTotals(
-      Object.values(placedItems),
-      fixtureMap,
-      costIndex,
-      inventory,
-    )
-    const max = rows.reduce((s, r) => s + r.needed, 0)
-    const current = rows.reduce((s, r) => s + (r.needed - r.remaining), 0)
+    const current = computeLayoutCost(Object.values(placedItems), fixtureMap)
+    const max = getPutCostLimit(areaLevel)
     return { current, max }
-  }, [costIndex, placedItems, fixtureMap, inventory])
+  }, [placedItems, fixtureMap, areaLevel])
 
   return (
     <div
