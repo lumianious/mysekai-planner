@@ -12,6 +12,8 @@ import {
   Replace,
   Undo2,
   Redo2,
+  RotateCw,
+  RotateCcw,
 } from 'lucide-react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import {
@@ -39,7 +41,7 @@ function useTemporalState() {
   return { canUndo, canRedo }
 }
 
-type SegmentKind = 'tool' | 'overwrite' | 'undo' | 'redo'
+type SegmentKind = 'tool' | 'overwrite' | 'rotate-cw' | 'rotate-ccw' | 'undo' | 'redo'
 
 interface SegmentSpec {
   kind: SegmentKind
@@ -58,6 +60,12 @@ const TOOL_SEGMENTS: SegmentSpec[] = [
 ]
 const OVERWRITE_SEGMENT: SegmentSpec = {
   kind: 'overwrite', icon: Replace, kbd: 'O', tooltip: '覆盖', ariaLabel: '覆盖',
+}
+const ROTATE_CCW_SEGMENT: SegmentSpec = {
+  kind: 'rotate-ccw', icon: RotateCcw, kbd: '⇧R', tooltip: '逆时针旋转', ariaLabel: '逆时针旋转',
+}
+const ROTATE_CW_SEGMENT: SegmentSpec = {
+  kind: 'rotate-cw', icon: RotateCw, kbd: 'R', tooltip: '顺时针旋转', ariaLabel: '顺时针旋转',
 }
 const UNDO_SEGMENT: SegmentSpec = {
   kind: 'undo', icon: Undo2, kbd: '⌘Z', tooltip: '撤销', ariaLabel: '撤销',
@@ -208,8 +216,18 @@ export function FloatbarToolPill() {
   const setToolMode = useEditorStore((s) => s.setToolMode)
   const overwriteEnabled = useEditorStore((s) => s.overwriteEnabled)
   const toggleOverwrite = useEditorStore((s) => s.toggleOverwrite)
+  const selectedItemId = useEditorStore((s) => s.selectedItemId)
+  const rotateItem = useEditorStore((s) => s.rotateItem)
+  const rotatePreview = useEditorStore((s) => s.rotatePreview)
   const floatbarX = useEditorStore((s) => s.floatbarX)
   const setFloatbarX = useEditorStore((s) => s.setFloatbarX)
+
+  // 旋转按钮：选中物品时旋转该物品；stamp 模式无选中时旋转预览；都没有则禁用
+  const canRotate = selectedItemId !== null || toolMode === 'stamp'
+  const handleRotate = (direction: 'cw' | 'ccw') => {
+    if (selectedItemId !== null) rotateItem(selectedItemId, direction)
+    else if (toolMode === 'stamp') rotatePreview(direction)
+  }
 
   const { canUndo, canRedo } = useTemporalState()
 
@@ -295,6 +313,22 @@ export function FloatbarToolPill() {
           spec={OVERWRITE_SEGMENT}
           active={overwriteEnabled}
           onClick={toggleOverwrite}
+        />
+
+        <Separator />
+
+        {/* 旋转（CCW / CW） */}
+        <Segment
+          spec={ROTATE_CCW_SEGMENT}
+          active={false}
+          disabled={!canRotate}
+          onClick={() => handleRotate('ccw')}
+        />
+        <Segment
+          spec={ROTATE_CW_SEGMENT}
+          active={false}
+          disabled={!canRotate}
+          onClick={() => handleRotate('cw')}
         />
 
         <Separator />
