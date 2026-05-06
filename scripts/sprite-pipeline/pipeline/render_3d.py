@@ -84,11 +84,27 @@ def add_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--limit", type=int, default=None,
                    help="render only first N fixtures (debugging)")
+    p.add_argument("--ids", type=str, default=None,
+                   help="comma-separated fixture ids; only render these (incremental)")
+
+
+def _parse_ids(raw: str | None) -> set[int] | None:
+    if not raw:
+        return None
+    out: set[int] = set()
+    for piece in raw.split(","):
+        s = piece.strip()
+        if s:
+            out.add(int(s))
+    return out or None
 
 
 def run(args: argparse.Namespace) -> int:
     all_fx = json.loads(FIXTURES_JSON_PATH.read_text())
     targets = _outdoor_3d(all_fx)
+    id_filter = _parse_ids(getattr(args, "ids", None))
+    if id_filter is not None:
+        targets = [f for f in targets if f.get("id") in id_filter]
     if args.limit:
         targets = targets[: args.limit]
     if args.dry_run:

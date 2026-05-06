@@ -2,7 +2,7 @@
 # INPUT:  CLI argv
 # OUTPUT: 派发到对应 subcommand
 # POS:    scripts/sprite-pipeline/pipeline/__main__.py
-# 用法：python -m pipeline {download|extract-2d|render-3d|assemble-manifest|run-all}
+# 用法：python -m pipeline {sync|download|extract-2d|render-3d|assemble-manifest|run-all}
 
 from __future__ import annotations
 
@@ -26,6 +26,12 @@ def main() -> int:
     p_dl = sub.add_parser("download", help="Fetch MySekai bundles via sssekai abcache")
     dl.add_args(p_dl)
     p_dl.set_defaults(func=dl.run)
+
+    # ======== sync：拉上游 mysekaiFixtures.json + diff + 可选增量渲染 ========
+    from pipeline import sync as sn
+    p_sn = sub.add_parser("sync", help="Pull latest mysekaiFixtures.json and render new fixtures")
+    sn.add_args(p_sn)
+    p_sn.set_defaults(func=sn.run)
 
     # ======== 占位：先创建子解析器，后续按需替换 ========
     placeholders = ("extract-2d", "render-3d", "assemble-manifest", "run-all")

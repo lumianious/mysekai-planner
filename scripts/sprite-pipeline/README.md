@@ -23,6 +23,31 @@ source .venv/bin/activate           # already provisioned, do NOT recreate
 pip install -r requirements.txt     # idempotent
 ```
 
+## Sync upstream + render only new fixtures
+
+The game ships new MySekai fixtures every few weeks. `mysekaiFixtures.json` in
+`src/data/` is a frozen snapshot the pipeline reads to enumerate render targets,
+so it must be refreshed for the pipeline to even *see* new entries.
+
+```bash
+# Inspect-only: pull upstream JSON, compare vs local + manifest, print diff
+python -m pipeline sync --dry-run
+
+# Pull + write src/data/mysekaiFixtures.json + render only the missing fixtures
+python -m pipeline sync --render
+
+# Variants
+python -m pipeline sync --no-fetch          # work from current local file (manifest gap repair)
+python -m pipeline sync --include-changed   # also re-render fixtures whose assetbundleName changed
+```
+
+`--render` chains `extract-2d → render-3d → assemble-manifest` with an `--ids`
+filter so untouched fixtures are not re-processed. Add untracked sprites to git
+afterwards (`git add public/sprites/`).
+
+You can also pass `--ids 123,456` to `extract-2d` and `render-3d` directly to
+re-render specific fixtures by id.
+
 ## Live run recipe
 
 ```bash

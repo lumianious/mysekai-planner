@@ -133,6 +133,22 @@ def add_args(p):  # type: ignore[no-untyped-def]
         "--skip-thumbnails", action="store_true",
         help="只跑 2D 主纹理（rug/road/floor），不抓缩略图",
     )
+    p.add_argument(
+        "--ids", type=str, default=None,
+        help="逗号分隔的 fixture id，只处理这些（增量重渲染用）",
+    )
+
+
+def _parse_ids(raw: str | None) -> set[int] | None:
+    """逗号分隔字符串 → 整数集合。空/None → 不过滤。"""
+    if not raw:
+        return None
+    out: set[int] = set()
+    for piece in raw.split(","):
+        s = piece.strip()
+        if s:
+            out.add(int(s))
+    return out or None
 
 
 def _variant_count(fx: dict) -> int:
@@ -234,6 +250,9 @@ def run(args) -> int:  # type: ignore[no-untyped-def]
 
     all_fx = json.loads(FIXTURES_JSON_PATH.read_text())
     targets = [f for f in all_fx if is_outdoor(f) and is_2d_branch(f)]
+    id_filter = _parse_ids(getattr(args, "ids", None))
+    if id_filter is not None:
+        targets = [f for f in targets if f.get("id") in id_filter]
     if args.limit:
         targets = targets[: args.limit]
     if args.dry_run:
@@ -271,6 +290,8 @@ def run(args) -> int:  # type: ignore[no-untyped-def]
     # PILOT-FINDINGS 把 thumbnails 加进 schema：每个户外项 1 + len(otherColors) 个变体
     if not getattr(args, "skip_thumbnails", False):
         outdoor = [f for f in all_fx if is_outdoor(f)]
+        if id_filter is not None:
+            outdoor = [f for f in outdoor if f.get("id") in id_filter]
         if args.limit:
             outdoor = outdoor[: args.limit]
         thumb_ok = 0

@@ -35,6 +35,7 @@ Pipeline runs **LOCAL ONLY** (D-03). `assets-cache/` is gitignored.
 | `pipeline/blender_render.py` | Wave 2 | bpy script: ortho top-down render, EEVEE→CYCLES fallback |
 | `pipeline/glb_writer.py` | Wave 3 | UnityPy Mesh + Texture2D → minimal PBR-baseColor GLB via pygltflib |
 | `pipeline/run_all.py` | Wave 3 | Drives extract-2d → render-3d → assemble-manifest |
+| `pipeline/sync.py` | post-Phase 5 | Pulls latest mysekaiFixtures.json, diffs vs manifest, optionally chains a render limited to the new IDs via `--ids` filter |
 | `pipeline/pilot.py` | Wave 2 | 3-fixture pilot: download → route → render/extract → manifest |
 | `pipeline/assemble_manifest.py` | Wave 3 | Writes `public/sprites/manifest.json` (incl. thumbnails[]) |
 | `pipeline/check_size.py` | Wave 3 | Aggregate-size guard (D-02 ≤150MB) |
