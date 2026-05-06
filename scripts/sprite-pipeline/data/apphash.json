@@ -1,30 +1,30 @@
 {
-  "frozen_at": "2026-04-28T09:50:00Z",
-  "source": "sssekai apphash --apk-src <jp 6.4.1 xapk from APKPure>",
+  "frozen_at": "2026-05-06T18:13:00Z",
+  "source": "sssekai apphash --apk-src <jp 6.5.0 xapk from APKPure>",
   "source_archived_at": null,
-  "appVersion": "6.4.1",
-  "appHash": "d67a688b-ff78-4300-bfc5-2120c000d75d",
-  "abVersion": "6.4.0",
+  "appVersion": "6.5.0",
+  "appHash": "3ac99d5a-1857-36ae-0993-99e2f19cbeb6",
+  "abVersion": "6.5.0",
   "appPlatform": "android",
   "appRegion": "jp",
   "raw": {
     "production_android": {
       "package": "com.sega.pjsekai",
       "reported_package": "com.sega.pjsekai",
-      "app_hash": "d67a688b-ff78-4300-bfc5-2120c000d75d",
+      "app_hash": "3ac99d5a-1857-36ae-0993-99e2f19cbeb6",
       "app_region": "jp",
-      "app_version": "6.4.1",
+      "app_version": "6.5.0",
       "app_platform": "android",
-      "ab_version": "6.4.0"
+      "ab_version": "6.5.0"
     },
     "production_ios": {
       "package": "com.sega.pjsekai",
       "reported_package": "com.sega.pjsekai",
-      "app_hash": "d67a688b-ff78-4300-bfc5-2120c000d75d",
+      "app_hash": "3ac99d5a-1857-36ae-0993-99e2f19cbeb6",
       "app_region": "jp",
-      "app_version": "6.4.1",
+      "app_version": "6.5.0",
       "app_platform": "ios",
-      "ab_version": "6.4.0"
+      "ab_version": "6.5.0"
     }
   }
 }
