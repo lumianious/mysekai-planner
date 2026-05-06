@@ -190,14 +190,12 @@ export const PlacedItem = React.memo(function PlacedItem({
           image={groundImg}
           width={pixelWidth}
           height={pixelHeight}
-          listening={false}
         />
       ) : renderSprite ? (
         <KonvaImage
           image={spriteImg}
           width={pixelWidth}
           height={pixelHeight}
-          listening={false}
         />
       ) : (
         <Rect
