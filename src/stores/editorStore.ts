@@ -70,7 +70,8 @@ export function buildOccupancyGrid(
 ): OccupancyGrid {
   const grid: OccupancyGrid = new Map()
   for (const item of Object.values(items)) {
-    if (item.layer !== layer) continue
+    // 系统物品（house / gate）占据物理空间，无视层级 —— 任何层放置都要绕开
+    if (item.layer !== layer && !item.isSystem) continue
     const fixture = fixtureMap.get(item.fixtureId)
     if (!fixture) continue
     const [w, d] = getEffectiveSize(fixture.gridSize, item.rotation)
