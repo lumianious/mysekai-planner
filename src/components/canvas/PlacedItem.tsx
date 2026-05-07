@@ -227,7 +227,7 @@ export const PlacedItem = React.memo(function PlacedItem({
           <Rect
             width={pixelWidth}
             height={pixelHeight}
-            fillPatternImage={tilePattern.canvas}
+            fillPatternImage={tilePattern.canvas as unknown as HTMLImageElement}
             fillPatternRepeat="repeat"
             fillPatternScaleX={TILE_SIZE / tilePattern.sourceTilePx}
             fillPatternScaleY={TILE_SIZE / tilePattern.sourceTilePx}

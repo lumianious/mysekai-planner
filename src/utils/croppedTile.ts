@@ -76,7 +76,8 @@ function maxOpaqueRect(
 // ======== 行同步合成：每行取最长 opaque 段水平铺满，全 α=255 ========
 // 输入：source ImageData (RGBA)
 // 输出：tilePx × tilePx 的离屏 canvas，全像素不透明，砖纹/纹理细节保留。
-function synthesizeCleanTile(source: ImageData, tilePx: number): HTMLCanvasElement {
+// 暂未启用，保留作为备用合成策略。
+export function synthesizeCleanTile(source: ImageData, tilePx: number): HTMLCanvasElement {
   const out = document.createElement('canvas')
   out.width = tilePx
   out.height = tilePx
