@@ -64,6 +64,12 @@
 - [ ] **I18N-01**: UI text is available in Chinese and Japanese
 - [ ] **I18N-02**: Item names display in Japanese (matching in-game data)
 
+### Deployment
+
+- [ ] **DEPLOY-01**: Web app is publicly accessible at a stable GitHub Pages URL
+- [ ] **DEPLOY-02**: Pushes to `main` automatically rebuild and redeploy via GitHub Actions
+- [ ] **DEPLOY-03**: Deploy workflow surfaces build failures (does not silently publish a broken site)
+
 ## v2 Requirements
 
 ### Enhanced Visuals

@@ -165,6 +165,20 @@ Plans:
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 8: Deploy to GitHub Pages
+**Goal**: The current `main` build is publicly served from GitHub Pages and re-deploys automatically on every push to `main`
+**Depends on**: Phase 7 (the chrome users will see at the public URL)
+**Requirements**: DEPLOY-01, DEPLOY-02, DEPLOY-03
+**Success Criteria** (what must be TRUE):
+  1. The site loads at `https://<owner>.github.io/mysekai-planner/` with no 404s on assets, sprites, or data files
+  2. A push to `main` triggers a GitHub Actions workflow that runs `pnpm install && pnpm build` and publishes `dist/` to Pages
+  3. A failing build (TypeScript error, test failure, or missing asset) blocks the deploy and surfaces in the Actions tab — never publishes a broken artifact
+  4. README documents the public URL and the one-time enable-Pages step a fresh fork would need
+**Plans:** 1 plan
+Plans:
+- [ ] 08-01-actions-workflow-PLAN.md — GitHub Actions deploy workflow + README Deployment section + live-site verification
+**UI hint**: no
+
 ## Progress
 
 **Execution Order:**
@@ -178,4 +192,5 @@ Phases execute in: 1 -> 2 -> 3 -> 5 -> 4 -> 6 (Phase 5 pulled forward to de-risk
 | 4. Cost Calculator & Inventory | 0/TBD | Complete    | 2026-05-06 |
 | 5. Sprite Pipeline | 0/TBD | Not started | - |
 | 6. Internationalization | 0/TBD | Not started | - |
-| 7. Editor Chrome Redesign | 0/TBD | Not started | - |
+| 7. Editor Chrome Redesign | 6/6 | Complete | 2026-05-06 |
+| 8. Deploy to GitHub Pages | 0/1 | Planning complete | - |
