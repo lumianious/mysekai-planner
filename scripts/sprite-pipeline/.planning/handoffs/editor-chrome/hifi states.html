@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>MySekai Planner — UI States</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #f0eee9; font-family: -apple-system, system-ui, sans-serif; }
+  #root { width: 100vw; height: 100vh; }
+  /* iframe wraps a 1600x1000 page; we scale the iframe to fit each artboard */
+  .ab-frame {
+    width: 1600px; height: 1000px;
+    transform-origin: top left;
+    border: 0;
+    display: block;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<script type="text/babel">
+// Each artboard renders hifi.html in an iframe with URL params controlling state.
+// Artboard size: 800x500 (½-scale of the 1600x1000 page). Iframe is 1600x1000 scaled 0.5.
+
+const ART_W = 800;
+const ART_H = 500;
+const SCALE = ART_W / 1600;
+
+function StateFrame({ params }) {
+  const src = `hifi.html${params ? '?' + params : ''}`;
+  return (
+    <iframe
+      className="ab-frame"
+      src={src}
+      style={{ transform: `scale(${SCALE})` }}
+      scrolling="no"
+    />
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection
+        id="catalog-states"
+        title="Catalog: expanded vs collapsed"
+        subtitle="The catalog can shrink to a 64px category rail. Click the hamburger toggle to fold; click any category icon to re-expand."
+      >
+        <DCArtboard id="cat-expanded" label="Catalog expanded · cost closed (default)" width={ART_W} height={ART_H}>
+          <StateFrame params="" />
+        </DCArtboard>
+        <DCArtboard id="cat-collapsed" label="Catalog collapsed · cost closed" width={ART_W} height={ART_H}>
+          <StateFrame params="cat=collapsed" />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="cost-states"
+        title="Cost panel: closed vs open"
+        subtitle="The material breakdown panel is hidden by default. Click the cost-pill in the top rail to slide it in. The summary (1,655 / 18,000 + meter) stays visible in the pill."
+      >
+        <DCArtboard id="cost-closed" label="Cost panel closed (default) — summary in top pill" width={ART_W} height={ART_H}>
+          <StateFrame params="" />
+        </DCArtboard>
+        <DCArtboard id="cost-open" label="Cost panel open · catalog expanded" width={ART_W} height={ART_H}>
+          <StateFrame params="cost=open" />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection
+        id="combo"
+        title="Heavy-use combo: catalog folded + cost open"
+        subtitle="What it looks like once the user has loaded their hotbar and is reviewing materials. Maximum canvas, both data panels accessible at the edges."
+      >
+        <DCArtboard id="combo-1" label="Catalog collapsed · cost open — full canvas mode" width={ART_W} height={ART_H}>
+          <StateFrame params="cat=collapsed&cost=open" />
+        </DCArtboard>
+        <DCArtboard id="combo-2" label="Both expanded — initial setup mode" width={ART_W} height={ART_H}>
+          <StateFrame params="cost=open" />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

@@ -1,0 +1,2047 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MySekai Planner — UI Wireframes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Gloria+Hallelujah&family=Kalam:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1a1a2a;
+    --ink-soft: #4a4a5e;
+    --ink-faint: #9a9aac;
+    --paper: #fbf8f1;
+    --paper-2: #f4efe2;
+    --line: #1a1a2a;
+    --hilite-mint: #b8e6dc;
+    --hilite-blush: #f9c7c2;
+    --hilite-cream: #ffe8a8;
+    --hilite-violet: #d8c8ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: 'Patrick Hand', 'Caveat', cursive; }
+  body { padding: 28px 32px 80px; }
+
+  h1 { font-family: 'Caveat', cursive; font-size: 44px; margin: 0 0 4px; letter-spacing: 0.5px; }
+  h1 .scribble { color: var(--ink-faint); font-size: 22px; font-family: 'Patrick Hand', cursive; margin-left: 14px; }
+  .lede { font-family: 'Patrick Hand', cursive; font-size: 17px; color: var(--ink-soft); max-width: 820px; margin: 0 0 20px; line-height: 1.45; }
+
+  /* ============ Tab control ============ */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; align-items: flex-end; }
+  .tab {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 17px;
+    padding: 9px 18px 7px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 18px 22px 6px 20px / 20px 6px 22px 18px;
+    cursor: pointer;
+    color: var(--ink);
+    transform: rotate(-0.6deg);
+    transition: transform 120ms ease;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .tab:nth-child(2n) { transform: rotate(0.7deg); border-radius: 22px 18px 22px 6px / 6px 22px 18px 22px; }
+  .tab:nth-child(3n) { transform: rotate(-0.3deg); }
+  .tab:hover { transform: translateY(-2px) rotate(-0.6deg); }
+  .tab.active { background: var(--hilite-mint); box-shadow: 3px 3px 0 var(--ink); }
+
+  .tab .num { font-family: 'Caveat', cursive; font-weight: 700; font-size: 22px; margin-right: 6px; vertical-align: -2px; color: var(--ink); }
+
+  .pane { display: none; padding: 20px 4px 4px; }
+  .pane.active { display: block; }
+
+  /* ============ Wireframe shared ============ */
+  .frame {
+    position: relative;
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 4px 4px 0 var(--ink);
+    overflow: hidden;
+  }
+  .frame.app { aspect-ratio: 16 / 10; }
+
+  /* Sketchy box, used everywhere. Use SVG filter for that hand-drawn wobble. */
+  svg.wobble { filter: url(#wob); }
+
+  .h-cap {
+    display: inline-block;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 24px;
+    padding: 4px 14px 0;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    transform: rotate(-1deg);
+    margin-bottom: 8px;
+  }
+  .scrib {
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--ink-soft);
+  }
+  .arrow {
+    font-family: 'Caveat', cursive;
+    font-size: 20px;
+    color: var(--ink-soft);
+  }
+
+  /* layout for the wireframe + side notes */
+  .lab { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; align-items: start; }
+  @media (max-width: 1100px) { .lab { grid-template-columns: 1fr; } }
+
+  .notes { font-family: 'Patrick Hand', cursive; font-size: 16px; line-height: 1.5; color: var(--ink); }
+  .notes h3 { font-family: 'Caveat', cursive; font-size: 30px; margin: 0 0 4px; }
+  .notes .pros, .notes .cons { margin: 8px 0; }
+  .notes .pros::before { content: "+ "; color: #2c7d4a; font-weight: 700; }
+  .notes .cons::before { content: "− "; color: #b34948; font-weight: 700; }
+  .notes .tag {
+    display: inline-block; font-family: 'Caveat'; font-weight: 700; font-size: 18px;
+    background: var(--hilite-mint); padding: 2px 10px; border: 1.5px solid var(--ink); border-radius: 8px;
+    transform: rotate(-1deg); margin-right: 4px;
+  }
+  .notes .tag.b { background: var(--hilite-blush); }
+  .notes .tag.c { background: var(--hilite-cream); }
+  .notes .tag.v { background: var(--hilite-violet); }
+
+  /* Design system swatch row */
+  .ds-row { display: flex; flex-wrap: wrap; gap: 18px; margin: 10px 0 26px; }
+  .ds-card { border: 2.5px solid var(--ink); border-radius: 14px; padding: 12px 14px; background: var(--paper); box-shadow: 3px 3px 0 var(--ink); min-width: 220px; }
+  .ds-card h4 { font-family: 'Caveat'; font-size: 22px; margin: 0 0 6px; }
+  .swatch-line { display: flex; gap: 8px; align-items: center; }
+  .sw { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--ink); }
+  .sw-row { display: flex; gap: 8px; margin: 4px 0; }
+  .sw-lab { font-family: 'Patrick Hand'; font-size: 14px; color: var(--ink-soft); }
+
+  /* Tweaks */
+  .tweaks {
+    position: fixed; right: 20px; top: 20px; z-index: 30;
+    background: var(--paper); border: 2.5px solid var(--ink); border-radius: 14px;
+    padding: 12px 14px 10px; box-shadow: 4px 4px 0 var(--ink);
+    font-family: 'Patrick Hand', cursive; font-size: 15px;
+    width: 220px;
+  }
+  .tweaks h4 { font-family: 'Caveat'; font-size: 22px; margin: 0 0 6px; }
+  .tweaks label { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; cursor: pointer; }
+  .tweaks input { accent-color: #1a1a2a; }
+  .tweaks .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    font-family: 'Patrick Hand'; font-size: 14px;
+    padding: 3px 10px; border: 1.5px solid var(--ink); border-radius: 999px; cursor: pointer;
+    background: var(--paper);
+  }
+  .pill.on { background: var(--hilite-mint); }
+
+  /* tape */
+  .tape {
+    position: absolute; width: 90px; height: 22px; background: rgba(255, 220, 130, 0.65);
+    border: 1px dashed rgba(0,0,0,0.3); transform: rotate(-6deg); top: -10px; left: 28px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+  }
+
+  /* anatomy of a frame */
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+    margin: 14px 0 0; font-family: 'Patrick Hand'; font-size: 14px; color: var(--ink-soft);
+  }
+  .legend .key { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .dot { width: 14px; height: 14px; border-radius: 4px; border: 2px solid var(--ink); }
+
+  /* ===== WF specific ============================================ */
+
+  /* shared interior parts. Each WF is one big SVG so spacing is exact */
+  svg.wf { width: 100%; height: 100%; display: block; background: var(--paper); }
+  svg.wf text { font-family: 'Patrick Hand', cursive; fill: var(--ink); }
+  svg.wf .lbl { font-family: 'Caveat', cursive; font-weight: 700; }
+  svg.wf .stroke { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  svg.wf .stroke-thin { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  svg.wf .stroke-faint { fill: none; stroke: var(--ink-faint); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+  svg.wf .fill-paper { fill: var(--paper); }
+  svg.wf .fill-paper2 { fill: var(--paper-2); }
+  svg.wf .fill-mint { fill: var(--hilite-mint); }
+  svg.wf .fill-blush { fill: var(--hilite-blush); }
+  svg.wf .fill-cream { fill: var(--hilite-cream); }
+  svg.wf .fill-violet { fill: var(--hilite-violet); }
+
+  .footer-note { font-family: 'Patrick Hand'; font-size: 14px; color: var(--ink-faint); margin-top: 18px; text-align: center; }
+
+  /* Header strip with screenshot anchors */
+  .anchor-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 8px 0 22px;
+  }
+  .anchor {
+    border: 2px dashed var(--ink-faint); border-radius: 12px; padding: 10px 12px;
+    background: var(--paper-2); font-family: 'Patrick Hand'; font-size: 15px; color: var(--ink-soft);
+  }
+  .anchor b { color: var(--ink); font-family: 'Caveat'; font-size: 19px; display: block; }
+</style>
+</head>
+<body>
+
+<!-- Hand-drawn SVG defs, used by all wireframes -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="wob" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" />
+      <feDisplacementMap in="SourceGraphic" scale="1.6" />
+    </filter>
+    <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.7" fill="#1a1a2a" opacity="0.35" />
+    </pattern>
+    <pattern id="grid" width="22" height="22" patternUnits="userSpaceOnUse">
+      <path d="M 22 0 L 0 0 L 0 22" fill="none" stroke="#1a1a2a" stroke-opacity="0.18" stroke-width="0.8"/>
+    </pattern>
+    <pattern id="diag" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#1a1a2a" stroke-opacity="0.18" stroke-width="1"/>
+    </pattern>
+  </defs>
+</svg>
+
+<h1>MySekai Planner — UI wireframes <span class="scribble">/ low-fi · 5 directions · pick a vibe</span></h1>
+<p class="lede">
+  Goal: take the current makeshift editor and re-skin it to feel like the in-game MySekai layout tool — soft mint panels,
+  cream cards, chunky rounded corners. Below: a quick design-system note, then 5 distinct structural directions on the same canvas.
+  Pick one (or mix), and we commit to a polished design pass next.
+</p>
+
+<!-- Design system mini -->
+<div class="ds-row">
+  <div class="ds-card">
+    <h4>palette ↳ pulled from in-game</h4>
+    <div class="sw-row">
+      <div class="sw" style="background:#b8e6dc" title="mint panel"></div>
+      <div class="sw" style="background:#fbf8f1" title="cream card"></div>
+      <div class="sw" style="background:#f9c7c2" title="blush save"></div>
+      <div class="sw" style="background:#d8c8ee" title="violet hover"></div>
+      <div class="sw" style="background:#1a1a2a" title="navy ink"></div>
+      <div class="sw" style="background:#7fc99a" title="grass"></div>
+    </div>
+    <div class="sw-lab">mint · cream · blush · violet · ink · grass</div>
+  </div>
+  <div class="ds-card">
+    <h4>shape language</h4>
+    <div class="sw-lab">corners ≈ 18–28px · panels float w/ 2–3px ink stroke · cards have soft drop shadow · 4–6px chunky button shadow</div>
+  </div>
+  <div class="ds-card">
+    <h4>type</h4>
+    <div class="sw-lab" style="font-family:'Patrick Hand'">UI: rounded sans (M PLUS Rounded) · numbers tabular · ja/zh: Noto Sans JP/SC</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs" id="tabs">
+  <button class="tab active" data-pane="A"><span class="num">A.</span> Floating panels</button>
+  <button class="tab" data-pane="B"><span class="num">B.</span> Fixed sidebars (polished current)</button>
+  <button class="tab" data-pane="C"><span class="num">C.</span> Bottom hotbar + drawers</button>
+  <button class="tab" data-pane="D"><span class="num">D.</span> Top pill-tabs + radial cost</button>
+  <button class="tab" data-pane="E"><span class="num">E.</span> Diorama frame</button>
+  <button class="tab" data-pane="F"><span class="num">F.</span> A+D · floating + pill-tabs</button>
+  <button class="tab" data-pane="G"><span class="num">G.</span> E+D · diorama + pill-tabs</button>
+  <button class="tab" data-pane="H"><span class="num">H.</span> A+E · floating books</button>
+  <button class="tab" data-pane="F2"><span class="num">F2.</span> F deep-dive · collapse + connectors</button>
+</div>
+
+<!-- ===== Pane A : Floating panels ============================== -->
+<section class="pane active" data-pane="A">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <!-- background grid (canvas) -->
+        <rect x="0" y="0" width="1600" height="1000" fill="url(#grid)" />
+        <!-- isometric-ish dashed footprints to suggest furniture -->
+        <g class="stroke-faint">
+          <rect x="540" y="380" width="120" height="80" rx="6" />
+          <rect x="700" y="500" width="80" height="80" rx="6" />
+          <rect x="820" y="420" width="160" height="60" rx="6" />
+          <rect x="600" y="600" width="200" height="40" rx="6" />
+          <text x="565" y="426" class="lbl" font-size="18" fill="#9a9aac">bed 4×2</text>
+          <text x="715" y="546" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="850" y="458" class="lbl" font-size="18" fill="#9a9aac">desk 6×2</text>
+          <text x="650" y="626" class="lbl" font-size="18" fill="#9a9aac">rug / road</text>
+        </g>
+
+        <!-- floating top-left: globe + layout pill (in-game) -->
+        <g>
+          <rect x="40" y="36" width="60" height="60" rx="30" class="stroke fill-paper" />
+          <text x="58" y="76" font-size="26">⌂</text>
+          <rect x="116" y="36" width="170" height="60" rx="30" class="stroke fill-mint" />
+          <text x="138" y="76" font-size="22" class="lbl">＋ レイアウト</text>
+        </g>
+
+        <!-- floating top-right: progress + menu -->
+        <g>
+          <rect x="980" y="36" width="380" height="60" rx="30" class="stroke fill-paper" />
+          <text x="1000" y="74" font-size="20">マイセカイ家具を作ろう  (その23)   2/5</text>
+          <rect x="1018" y="86" width="220" height="6" rx="3" class="fill-mint stroke-thin" />
+          <rect x="1380" y="36" width="60" height="60" rx="14" class="stroke fill-paper" />
+          <text x="1397" y="76" font-size="26">≡</text>
+        </g>
+
+        <!-- left floating: tool well -->
+        <g>
+          <rect x="40" y="140" width="76" height="380" rx="24" class="stroke fill-paper" />
+          <g font-size="22">
+            <rect x="56" y="160" width="44" height="44" rx="14" class="stroke fill-mint"/><text x="68" y="190">✋</text>
+            <rect x="56" y="216" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="246">⊞</text>
+            <rect x="56" y="272" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="302">▱</text>
+            <rect x="56" y="328" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="358">↻</text>
+            <rect x="56" y="384" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="414">⌫</text>
+            <rect x="56" y="440" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="470">↶</text>
+          </g>
+        </g>
+
+        <!-- left floating: catalog drawer (compact, expand-able) -->
+        <g>
+          <rect x="40" y="540" width="360" height="400" rx="24" class="stroke fill-mint" />
+          <text x="60" y="582" font-size="22" class="lbl">家具目録</text>
+          <text x="320" y="582" font-size="22" class="lbl">↕</text>
+          <!-- search -->
+          <rect x="60" y="600" width="300" height="34" rx="17" class="stroke fill-paper" />
+          <text x="76" y="624" font-size="18" fill="#9a9aac">🔍 search…</text>
+          <!-- chip row -->
+          <g>
+            <rect x="60"  y="650" width="58" height="26" rx="13" class="stroke fill-paper"/>
+            <text x="76"  y="670" font-size="16">全部</text>
+            <rect x="124" y="650" width="58" height="26" rx="13" class="stroke fill-paper2"/>
+            <text x="142" y="670" font-size="16">一般</text>
+            <rect x="188" y="650" width="58" height="26" rx="13" class="stroke fill-paper2"/>
+            <text x="206" y="670" font-size="16">小物</text>
+            <rect x="252" y="650" width="58" height="26" rx="13" class="stroke fill-paper2"/>
+            <text x="270" y="670" font-size="16">壁掛</text>
+          </g>
+          <!-- item grid 4x3 -->
+          <g>
+            <g>
+              <!-- row 1 -->
+              <rect x="60"  y="694" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="138" y="694" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="216" y="694" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="294" y="694" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <!-- row 2 -->
+              <rect x="60"  y="772" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="138" y="772" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="216" y="772" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="294" y="772" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <!-- row 3 -->
+              <rect x="60"  y="850" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="138" y="850" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="216" y="850" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <rect x="294" y="850" width="68" height="68" rx="14" class="stroke fill-paper"/>
+              <!-- selected highlight -->
+              <rect x="138" y="694" width="68" height="68" rx="14" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+              <!-- placeholder ×N badge -->
+              <text x="84"  y="754" font-size="14" fill="#9a9aac">×1</text>
+              <text x="162" y="754" font-size="14" fill="#9a9aac">×3</text>
+              <text x="240" y="754" font-size="14" fill="#9a9aac">×1</text>
+              <text x="318" y="754" font-size="14" fill="#9a9aac">×2</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- right floating: cost panel (collapsed card) -->
+        <g>
+          <rect x="1320" y="140" width="240" height="500" rx="24" class="stroke fill-paper" />
+          <text x="1340" y="184" class="lbl" font-size="22">材料コスト</text>
+          <text x="1340" y="208" font-size="16" fill="#9a9aac">133件 / 還清</text>
+          <line x1="1340" y1="222" x2="1540" y2="222" class="stroke-thin"/>
+          <!-- material rows -->
+          <g font-size="18">
+            <text x="1340" y="252">釘</text>
+            <text x="1340" y="272" font-size="14" fill="#9a9aac">junk</text>
+            <text x="1500" y="252" text-anchor="end">12 / 0</text>
+            <rect x="1340" y="282" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1340" y="322">鉄</text>
+            <text x="1340" y="342" font-size="14" fill="#9a9aac">mineral</text>
+            <text x="1500" y="322" text-anchor="end">28 / 0</text>
+            <rect x="1340" y="352" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1340" y="392">想いの石</text>
+            <text x="1340" y="412" font-size="14" fill="#9a9aac">mineral</text>
+            <text x="1500" y="392" text-anchor="end">28 / 0</text>
+            <rect x="1340" y="422" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1340" y="462">想いの木材</text>
+            <text x="1500" y="462" text-anchor="end">65 / 0</text>
+            <rect x="1340" y="482" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1340" y="522">さらさらリネン</text>
+            <text x="1500" y="522" text-anchor="end">3 / 0</text>
+            <rect x="1340" y="532" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+          </g>
+          <!-- inventory edit -->
+          <rect x="1340" y="572" width="200" height="40" rx="20" class="stroke fill-paper2"/>
+          <text x="1378" y="599" font-size="18">✎ 在庫を編集</text>
+        </g>
+
+        <!-- bottom-right: save + camera + run pill cluster (in-game) -->
+        <g>
+          <rect x="1320" y="660" width="240" height="280" rx="24" class="stroke fill-paper" />
+          <rect x="1340" y="680" width="200" height="56" rx="28" class="stroke fill-blush"/>
+          <text x="1408" y="716" class="lbl" font-size="24">保存</text>
+          <rect x="1340" y="752" width="200" height="44" rx="22" class="stroke fill-paper2"/>
+          <text x="1378" y="780" font-size="18">プリセット</text>
+          <rect x="1340" y="804" width="200" height="44" rx="22" class="stroke fill-paper2"/>
+          <text x="1378" y="832" font-size="18">一括片付け</text>
+          <rect x="1340" y="856" width="200" height="68" rx="22" class="stroke fill-paper2"/>
+          <text x="1378" y="884" font-size="18">Lv.3  70×70</text>
+          <text x="1378" y="908" font-size="16" fill="#9a9aac">配置 13件 · 100%</text>
+        </g>
+
+        <!-- bottom-center page dots -->
+        <g>
+          <rect x="600" y="930" width="400" height="46" rx="23" class="stroke fill-paper" />
+          <g font-size="18">
+            <text x="624" y="958">1</text><text x="664" y="958">2</text>
+            <text x="704" y="958">3</text><text x="744" y="958">4</text>
+            <text x="784" y="958">5</text><text x="824" y="958">6</text>
+            <text x="864" y="958">7</text><text x="904" y="958">8</text>
+            <text x="944" y="958">9</text>
+          </g>
+          <circle cx="668" cy="952" r="14" fill="none" stroke="#1a1a2a" stroke-width="3"/>
+        </g>
+
+        <!-- canvas annotations -->
+        <g>
+          <text x="700" y="220" class="lbl" font-size="22" fill="#9a9aac">↓ canvas, full-bleed under floating panels</text>
+          <path d="M 720 240 Q 760 270, 760 300" class="stroke-faint"/>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>A. Floating panels</h3>
+      <div><span class="tag">in-game match</span><span class="tag b">spacious</span></div>
+      <p>All chrome floats over a full-bleed canvas, just like the actual game UI. Tool well + catalog drawer on the left, cost panel + save cluster on the right, page dots bottom-center.</p>
+      <p class="pros">Looks closest to the real game, breathing room around the canvas.</p>
+      <p class="pros">Catalog and cost can each collapse to icon-only when not in use.</p>
+      <p class="cons">Floating panels can occlude the corners of the design — needs auto-hide on hover-out.</p>
+      <p class="cons">Less canvas width on small screens.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== Pane B : Fixed sidebars ================================ -->
+<section class="pane" data-pane="B">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <!-- toolbar strip -->
+        <rect x="0" y="0" width="1600" height="64" class="fill-mint stroke" />
+        <g font-size="20">
+          <rect x="20" y="14" width="36" height="36" rx="10" class="stroke fill-paper"/><text x="32" y="38">←</text>
+          <rect x="68" y="14" width="36" height="36" rx="10" class="stroke fill-paper"/><text x="80" y="38">↶</text>
+          <rect x="112" y="14" width="36" height="36" rx="10" class="stroke fill-paper"/><text x="124" y="38">↷</text>
+          <rect x="172" y="14" width="36" height="36" rx="10" class="stroke fill-paper"/><text x="184" y="38">⊞</text>
+          <rect x="216" y="14" width="36" height="36" rx="10" class="stroke fill-paper"/><text x="228" y="38">▱</text>
+          <rect x="260" y="14" width="36" height="36" rx="10" class="stroke fill-paper"/><text x="272" y="38">⌫</text>
+          <text x="320" y="40" class="lbl" font-size="22">マイセカイ プランナー</text>
+          <rect x="1340" y="14" width="80" height="36" rx="18" class="stroke fill-paper"/><text x="1356" y="38">✎ 在庫</text>
+          <rect x="1430" y="14" width="80" height="36" rx="18" class="stroke fill-paper"/><text x="1452" y="38">↗ 共有</text>
+          <rect x="1520" y="14" width="60" height="36" rx="18" class="stroke fill-blush"/><text x="1538" y="38">保存</text>
+        </g>
+
+        <!-- left catalog sidebar -->
+        <rect x="0" y="64" width="320" height="936" class="fill-mint stroke" />
+        <g>
+          <text x="22" y="100" class="lbl" font-size="22">家具目録</text>
+          <text x="278" y="100" class="lbl" font-size="22">«</text>
+          <rect x="22" y="118" width="276" height="34" rx="17" class="stroke fill-paper" />
+          <text x="40" y="142" font-size="18" fill="#9a9aac">🔍 search 家具…</text>
+          <!-- category strip vertical -->
+          <g>
+            <rect x="22" y="162" width="60" height="26" rx="13" class="stroke fill-cream"/><text x="38" y="182" font-size="15">全部</text>
+            <rect x="86" y="162" width="60" height="26" rx="13" class="stroke fill-paper"/><text x="102" y="182" font-size="15">一般</text>
+            <rect x="150" y="162" width="60" height="26" rx="13" class="stroke fill-paper"/><text x="168" y="182" font-size="15">小物</text>
+            <rect x="214" y="162" width="60" height="26" rx="13" class="stroke fill-paper"/><text x="232" y="182" font-size="15">壁掛</text>
+            <rect x="22" y="194" width="60" height="26" rx="13" class="stroke fill-paper"/><text x="36" y="214" font-size="15">ﾃﾞｨｽﾌﾟﾚｲ</text>
+            <rect x="86" y="194" width="60" height="26" rx="13" class="stroke fill-paper"/><text x="106" y="214" font-size="15">ｷｬﾝﾊﾞｽ</text>
+            <rect x="150" y="194" width="60" height="26" rx="13" class="stroke fill-paper"/><text x="168" y="214" font-size="15">ﾗｸﾞ</text>
+            <rect x="214" y="194" width="60" height="26" rx="13" class="stroke fill-paper"/><text x="234" y="214" font-size="15">道</text>
+          </g>
+          <!-- 3-col grid -->
+          <g>
+            <g font-size="14" fill="#9a9aac">
+              <rect x="22"  y="240" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="112" y="240" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="202" y="240" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <text x="86"  y="318">×1</text><text x="176" y="318">×1</text><text x="266" y="318">×1</text>
+
+              <rect x="22"  y="332" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="112" y="332" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="202" y="332" width="84" height="84" rx="14" class="stroke fill-paper"/>
+
+              <rect x="22"  y="424" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="112" y="424" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="202" y="424" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <!-- selected -->
+              <rect x="112" y="332" width="84" height="84" rx="14" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+
+              <rect x="22"  y="516" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="112" y="516" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="202" y="516" width="84" height="84" rx="14" class="stroke fill-paper"/>
+
+              <rect x="22"  y="608" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="112" y="608" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="202" y="608" width="84" height="84" rx="14" class="stroke fill-paper"/>
+
+              <rect x="22"  y="700" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="112" y="700" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="202" y="700" width="84" height="84" rx="14" class="stroke fill-paper"/>
+
+              <rect x="22"  y="792" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="112" y="792" width="84" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="202" y="792" width="84" height="84" rx="14" class="stroke fill-paper"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- canvas -->
+        <rect x="320" y="64" width="980" height="884" fill="url(#grid)" />
+        <g class="stroke-faint">
+          <rect x="540" y="380" width="120" height="80" rx="6" />
+          <rect x="700" y="500" width="80" height="80" rx="6" />
+          <rect x="820" y="420" width="160" height="60" rx="6" />
+          <rect x="600" y="600" width="200" height="40" rx="6" />
+          <text x="565" y="426" class="lbl" font-size="18" fill="#9a9aac">bed 4×2</text>
+          <text x="715" y="546" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="850" y="458" class="lbl" font-size="18" fill="#9a9aac">desk 6×2</text>
+          <text x="650" y="626" class="lbl" font-size="18" fill="#9a9aac">rug / road</text>
+        </g>
+
+        <!-- canvas bottom strip: page dots + zoom -->
+        <rect x="320" y="948" width="980" height="52" class="fill-paper2 stroke-thin"/>
+        <g font-size="18">
+          <text x="700" y="980">1  2  3  4  5  6  7  8  9</text>
+          <text x="340" y="980" fill="#9a9aac">Lv.3 · 70×70 · 配置 13件</text>
+          <text x="1280" y="980" text-anchor="end" fill="#9a9aac">100%   −  +</text>
+        </g>
+
+        <!-- right cost sidebar -->
+        <rect x="1300" y="64" width="300" height="936" class="fill-paper2 stroke" />
+        <g>
+          <text x="1320" y="100" class="lbl" font-size="22">材料コスト</text>
+          <text x="1322" y="124" font-size="14" fill="#9a9aac">合計 133件 · 還清 0</text>
+          <line x1="1320" y1="138" x2="1580" y2="138" class="stroke-thin"/>
+
+          <g font-size="18">
+            <!-- row template -->
+            <text x="1320" y="176">釘</text>
+            <text x="1322" y="196" font-size="13" fill="#9a9aac">junk</text>
+            <text x="1580" y="176" text-anchor="end">12 / 0</text>
+            <rect x="1320" y="208" width="260" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1320" y="246">鉄</text>
+            <text x="1322" y="266" font-size="13" fill="#9a9aac">mineral</text>
+            <text x="1580" y="246" text-anchor="end">28 / 0</text>
+            <rect x="1320" y="278" width="260" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1320" y="316">想いの石ころ</text>
+            <text x="1322" y="336" font-size="13" fill="#9a9aac">mineral</text>
+            <text x="1580" y="316" text-anchor="end">28 / 0</text>
+            <rect x="1320" y="348" width="260" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1320" y="386">想いの木材</text>
+            <text x="1322" y="406" font-size="13" fill="#9a9aac">wood</text>
+            <text x="1580" y="386" text-anchor="end">65 / 0</text>
+            <rect x="1320" y="418" width="260" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1320" y="456">おもたい木材</text>
+            <text x="1580" y="456" text-anchor="end">5 / 0</text>
+            <rect x="1320" y="478" width="260" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1320" y="516">さらさらリネン</text>
+            <text x="1580" y="516" text-anchor="end">3 / 0</text>
+            <rect x="1320" y="538" width="260" height="6" rx="3" class="fill-cream stroke-thin"/>
+
+            <text x="1320" y="576">ふわふわコットン</text>
+            <text x="1580" y="576" text-anchor="end">5 / 0</text>
+            <rect x="1320" y="598" width="260" height="6" rx="3" class="fill-cream stroke-thin"/>
+          </g>
+
+          <line x1="1320" y1="640" x2="1580" y2="640" class="stroke-thin"/>
+          <text x="1320" y="676" class="lbl" font-size="22">レイアウトコスト</text>
+          <text x="1322" y="700" font-size="16" fill="#9a9aac">budget</text>
+          <text x="1580" y="700" text-anchor="end" font-size="20">1655 / 18000</text>
+          <rect x="1320" y="714" width="260" height="10" rx="5" class="fill-mint stroke-thin"/>
+
+          <line x1="1320" y1="760" x2="1580" y2="760" class="stroke-thin"/>
+          <text x="1320" y="794" class="lbl" font-size="22">プリセット</text>
+          <rect x="1320" y="810" width="260" height="56" rx="14" class="stroke fill-paper"/>
+          <rect x="1320" y="876" width="260" height="56" rx="14" class="stroke fill-paper"/>
+          <text x="1340" y="844" font-size="16">slot 1 · empty</text>
+          <text x="1340" y="910" font-size="16">slot 2 · empty</text>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>B. Fixed sidebars (polished current)</h3>
+      <div><span class="tag c">least risky</span><span class="tag">structure-preserving</span></div>
+      <p>Same skeleton as today — toolbar / left catalog / center canvas / right cost panel — re-skinned with the in-game palette. Cost panel grows: progress bars per material, layout-cost meter, preset slots.</p>
+      <p class="pros">Smallest engineering change; existing components map 1:1.</p>
+      <p class="pros">Material costs always visible — strong for the planning use case.</p>
+      <p class="cons">Doesn't read as in-game-y; feels more "tool".</p>
+      <p class="cons">Eats canvas width with two fixed columns.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== Pane C : Bottom hotbar + drawers ======================== -->
+<section class="pane" data-pane="C">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <!-- canvas full -->
+        <rect x="0" y="0" width="1600" height="1000" fill="url(#grid)" />
+        <g class="stroke-faint">
+          <rect x="540" y="320" width="120" height="80" rx="6" />
+          <rect x="700" y="440" width="80" height="80" rx="6" />
+          <rect x="820" y="360" width="160" height="60" rx="6" />
+          <rect x="600" y="540" width="200" height="40" rx="6" />
+          <text x="565" y="366" class="lbl" font-size="18" fill="#9a9aac">bed</text>
+          <text x="715" y="486" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="850" y="398" class="lbl" font-size="18" fill="#9a9aac">desk</text>
+          <text x="650" y="566" class="lbl" font-size="18" fill="#9a9aac">rug</text>
+        </g>
+
+        <!-- top strip: pretty thin -->
+        <g>
+          <rect x="40" y="36" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="58" y="74" font-size="26">←</text>
+          <rect x="110" y="36" width="280" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="130" y="72" font-size="20" class="lbl">My Layout · 70×70</text>
+          <rect x="1208" y="36" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="1226" y="74" font-size="22">↶</text>
+          <rect x="1278" y="36" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="1296" y="74" font-size="22">↷</text>
+          <rect x="1348" y="36" width="92" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="1364" y="72" font-size="20">↗ share</text>
+          <rect x="1454" y="36" width="106" height="56" rx="28" class="stroke fill-blush"/>
+          <text x="1486" y="72" font-size="22" class="lbl">保存</text>
+        </g>
+
+        <!-- left mini-rail: tools only -->
+        <g>
+          <rect x="40" y="120" width="64" height="320" rx="20" class="stroke fill-paper"/>
+          <g font-size="22">
+            <rect x="52" y="134" width="40" height="40" rx="12" class="stroke fill-mint"/><text x="62" y="162">✋</text>
+            <rect x="52" y="184" width="40" height="40" rx="12" class="stroke fill-paper2"/><text x="62" y="212">⊞</text>
+            <rect x="52" y="234" width="40" height="40" rx="12" class="stroke fill-paper2"/><text x="62" y="262">▱</text>
+            <rect x="52" y="284" width="40" height="40" rx="12" class="stroke fill-paper2"/><text x="62" y="312">↻</text>
+            <rect x="52" y="334" width="40" height="40" rx="12" class="stroke fill-paper2"/><text x="62" y="362">⌫</text>
+            <rect x="52" y="384" width="40" height="40" rx="12" class="stroke fill-paper2"/><text x="62" y="412">↶</text>
+          </g>
+        </g>
+
+        <!-- right mini-rail: cost handle -->
+        <g>
+          <rect x="1496" y="120" width="64" height="200" rx="20" class="stroke fill-paper"/>
+          <text x="1518" y="150" font-size="20" class="lbl">¥</text>
+          <text x="1500" y="180" font-size="14">133</text>
+          <text x="1500" y="200" font-size="12" fill="#9a9aac">items</text>
+          <line x1="1506" y1="218" x2="1554" y2="218" class="stroke-thin"/>
+          <text x="1500" y="244" font-size="14">1655</text>
+          <text x="1500" y="260" font-size="12" fill="#9a9aac">/18000</text>
+          <text x="1518" y="300" font-size="22">▸</text>
+          <text x="1378" y="220" font-size="14" fill="#9a9aac" class="lbl">tap to expand →</text>
+        </g>
+
+        <!-- BOTTOM hotbar: catalog as a horizontal strip -->
+        <g>
+          <rect x="40" y="800" width="1520" height="160" rx="32" class="stroke fill-mint"/>
+          <!-- category tabs across top of strip -->
+          <g font-size="18">
+            <rect x="60"  y="816" width="74" height="30" rx="15" class="stroke fill-cream"/><text x="80"  y="838">全部</text>
+            <rect x="142" y="816" width="74" height="30" rx="15" class="stroke fill-paper"/><text x="162" y="838">一般</text>
+            <rect x="224" y="816" width="74" height="30" rx="15" class="stroke fill-paper"/><text x="244" y="838">小物</text>
+            <rect x="306" y="816" width="74" height="30" rx="15" class="stroke fill-paper"/><text x="324" y="838">壁掛</text>
+            <rect x="388" y="816" width="74" height="30" rx="15" class="stroke fill-paper"/><text x="402" y="838">ﾃﾞｨｽﾌﾟﾚｲ</text>
+            <rect x="470" y="816" width="74" height="30" rx="15" class="stroke fill-paper"/><text x="492" y="838">ﾗｸﾞ</text>
+            <rect x="552" y="816" width="74" height="30" rx="15" class="stroke fill-paper"/><text x="572" y="838">道</text>
+            <rect x="634" y="816" width="74" height="30" rx="15" class="stroke fill-paper"/><text x="654" y="838">大型</text>
+
+            <rect x="1340" y="816" width="200" height="30" rx="15" class="stroke fill-paper"/>
+            <text x="1356" y="838" font-size="16" fill="#9a9aac">🔍 search…</text>
+          </g>
+          <!-- horizontal scrollable item row -->
+          <g>
+            <g>
+              <rect x="60"  y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="160" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="260" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="360" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="460" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="560" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="660" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="760" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="860" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="960" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="1060" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="1160" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <rect x="1260" y="858" width="92" height="84" rx="14" class="stroke fill-paper"/>
+              <!-- selected -->
+              <rect x="260" y="858" width="92" height="84" rx="14" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+              <text x="294" y="918" font-size="14" fill="#9a9aac">×3</text>
+              <!-- scroll hint -->
+              <text x="1360" y="908" font-size="22" fill="#9a9aac">›</text>
+              <text x="1430" y="908" font-size="14" fill="#9a9aac">+128</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- annotation: "drag from hotbar onto canvas" -->
+        <g>
+          <text x="780" y="780" font-size="20" class="lbl" fill="#9a9aac">↑ drag furniture up onto the canvas</text>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>C. Bottom hotbar + drawers</h3>
+      <div><span class="tag b">mobile-first</span><span class="tag">most canvas</span></div>
+      <p>Catalog becomes a wide bottom strip (like a hotbar/inventory). Tools rail left, tiny cost handle right that expands into a panel on tap. Maximum canvas width.</p>
+      <p class="pros">Familiar from mobile games; thumb-friendly drag direction.</p>
+      <p class="pros">Most canvas real estate of any direction here.</p>
+      <p class="cons">Cost panel is hidden by default — extra tap to see materials.</p>
+      <p class="cons">Long category lists need horizontal scroll, less scannable than a vertical grid.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== Pane D : Top pill-tabs + radial cost ===================== -->
+<section class="pane" data-pane="D">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <!-- background canvas -->
+        <rect x="0" y="0" width="1600" height="1000" fill="url(#grid)"/>
+        <g class="stroke-faint">
+          <rect x="600" y="380" width="120" height="80" rx="6" />
+          <rect x="760" y="500" width="80" height="80" rx="6" />
+          <rect x="880" y="420" width="160" height="60" rx="6" />
+          <text x="630" y="426" class="lbl" font-size="18" fill="#9a9aac">bed</text>
+          <text x="775" y="546" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="910" y="458" class="lbl" font-size="18" fill="#9a9aac">desk</text>
+        </g>
+
+        <!-- top: pill-tab category bar (the heart of D) -->
+        <g>
+          <rect x="40" y="40" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="58" y="78" font-size="24">←</text>
+
+          <rect x="120" y="40" width="1080" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="20">
+            <rect x="138" y="50" width="86" height="36" rx="18" class="stroke fill-cream"/><text x="158" y="74">全部</text>
+            <rect x="232" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="254" y="74">一般</text>
+            <rect x="326" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="350" y="74">小物</text>
+            <rect x="420" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="442" y="74">壁掛</text>
+            <rect x="514" y="50" width="100" height="36" rx="18" class="stroke fill-paper"/><text x="528" y="74">ﾃﾞｨｽﾌﾟﾚｲ</text>
+            <rect x="622" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="644" y="74">ﾗｸﾞ</text>
+            <rect x="716" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="746" y="74">道</text>
+            <rect x="810" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="832" y="74">植物</text>
+            <rect x="904" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="926" y="74">大型</text>
+            <rect x="998" y="50" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="1020" y="74">その他</text>
+            <text x="1116" y="74" font-size="18" fill="#9a9aac">🔍</text>
+            <line x1="1140" y1="58" x2="1140" y2="78" class="stroke-thin"/>
+            <text x="1156" y="74" font-size="18" fill="#9a9aac">入手順 ▾</text>
+          </g>
+
+          <!-- toolset on the right -->
+          <rect x="1220" y="40" width="160" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="20">
+            <text x="1238" y="76">↶</text><text x="1278" y="76">↷</text><text x="1318" y="76">⊞</text><text x="1358" y="76">⌫</text>
+          </g>
+          <rect x="1396" y="40" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="1414" y="78" font-size="22">↗</text>
+          <rect x="1466" y="40" width="94" height="56" rx="28" class="stroke fill-blush"/>
+          <text x="1496" y="76" class="lbl" font-size="22">保存</text>
+        </g>
+
+        <!-- left: catalog tray, FLOATING but slim, expanded -->
+        <g>
+          <rect x="40" y="120" width="280" height="700" rx="24" class="stroke fill-paper"/>
+          <text x="60" y="156" class="lbl" font-size="22">家具 — 全部</text>
+          <text x="290" y="156" font-size="18" class="lbl">«</text>
+          <line x1="60" y1="170" x2="300" y2="170" class="stroke-thin"/>
+          <!-- 3-col grid -->
+          <g font-size="14" fill="#9a9aac">
+            <rect x="60"  y="184" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="142" y="184" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="224" y="184" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="60"  y="266" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="142" y="266" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="224" y="266" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="60"  y="348" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="142" y="348" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="224" y="348" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="60"  y="430" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="142" y="430" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="224" y="430" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="60"  y="512" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="142" y="512" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="224" y="512" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="60"  y="594" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="142" y="594" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="224" y="594" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="60"  y="676" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="142" y="676" width="72" height="72" rx="14" class="stroke fill-paper"/>
+            <rect x="224" y="676" width="72" height="72" rx="14" class="stroke fill-paper"/>
+
+            <rect x="142" y="266" width="72" height="72" rx="14" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+            <text x="98" y="244">×1</text><text x="180" y="244">×3</text><text x="262" y="244">×1</text>
+          </g>
+        </g>
+
+        <!-- bottom-right: RADIAL cost dial -->
+        <g transform="translate(1380, 800)">
+          <circle r="140" class="stroke fill-paper"/>
+          <!-- segments -->
+          <g class="stroke-thin">
+            <line x1="0" y1="-140" x2="0" y2="-110"/>
+            <line x1="99" y1="-99" x2="78" y2="-78"/>
+            <line x1="140" y1="0" x2="110" y2="0"/>
+            <line x1="99" y1="99" x2="78" y2="78"/>
+            <line x1="0" y1="140" x2="0" y2="110"/>
+            <line x1="-99" y1="99" x2="-78" y2="78"/>
+            <line x1="-140" y1="0" x2="-110" y2="0"/>
+            <line x1="-99" y1="-99" x2="-78" y2="-78"/>
+          </g>
+          <!-- material labels around the ring -->
+          <g font-size="14" fill="#1a1a2a" font-family="Patrick Hand">
+            <text x="0"   y="-90" text-anchor="middle">釘</text><text x="0" y="-72" text-anchor="middle" fill="#9a9aac">12</text>
+            <text x="64"  y="-58" text-anchor="middle">鉄</text><text x="64" y="-42" text-anchor="middle" fill="#9a9aac">28</text>
+            <text x="92"  y="6"   text-anchor="middle">石</text><text x="92" y="22" text-anchor="middle" fill="#9a9aac">28</text>
+            <text x="64"  y="68"  text-anchor="middle">麻</text><text x="64" y="84" text-anchor="middle" fill="#9a9aac">3</text>
+            <text x="0"   y="100" text-anchor="middle">綿</text><text x="0" y="116" text-anchor="middle" fill="#9a9aac">5</text>
+            <text x="-64" y="68"  text-anchor="middle">木</text><text x="-64" y="84" text-anchor="middle" fill="#9a9aac">65</text>
+            <text x="-92" y="6"   text-anchor="middle">重木</text><text x="-92" y="22" text-anchor="middle" fill="#9a9aac">5</text>
+            <text x="-64" y="-58" text-anchor="middle">他</text><text x="-64" y="-42" text-anchor="middle" fill="#9a9aac">3</text>
+          </g>
+          <!-- center -->
+          <circle r="58" class="stroke fill-mint"/>
+          <text x="0" y="-4" text-anchor="middle" font-size="14" fill="#1a1a2a">layout</text>
+          <text x="0" y="18" text-anchor="middle" font-size="20" class="lbl">1655</text>
+          <text x="0" y="36" text-anchor="middle" font-size="13" fill="#9a9aac">/18000</text>
+        </g>
+
+        <!-- bottom-left: page dots + size pill -->
+        <g>
+          <rect x="380" y="900" width="380" height="60" rx="30" class="stroke fill-paper"/>
+          <g font-size="18">
+            <text x="404" y="938">1</text><text x="444" y="938">2</text>
+            <text x="484" y="938">3</text><text x="524" y="938">4</text>
+            <text x="564" y="938">5</text><text x="604" y="938">6</text>
+            <text x="644" y="938">7</text><text x="684" y="938">8</text>
+            <text x="724" y="938">9</text>
+          </g>
+          <circle cx="448" cy="930" r="14" fill="none" stroke="#1a1a2a" stroke-width="3"/>
+        </g>
+        <g>
+          <rect x="40" y="900" width="220" height="60" rx="30" class="stroke fill-paper"/>
+          <text x="60" y="938" font-size="18">Lv.3 · 70×70 · 100%</text>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>D. Top pill-tabs + radial cost</h3>
+      <div><span class="tag v">most novel</span><span class="tag">compact</span></div>
+      <p>All categories live as a horizontal pill bar at the top — fewer clicks to jump categories. Cost becomes a radial dial in the corner: a glance shows which materials are biggest cost.</p>
+      <p class="pros">Top pill bar is fast — one tap to category, no nested menus.</p>
+      <p class="pros">Radial cost is a unique signature element that's compact + scannable.</p>
+      <p class="cons">Radial labels get cramped if there are >8 materials.</p>
+      <p class="cons">Top bar can feel busy with all categories visible at once.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== Pane E : Diorama frame ================================== -->
+<section class="pane" data-pane="E">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <!-- outer mint room -->
+        <rect x="0" y="0" width="1600" height="1000" class="fill-mint"/>
+        <!-- inner cream "viewport" frame around canvas -->
+        <rect x="320" y="120" width="1000" height="720" rx="36" class="fill-paper stroke" />
+        <rect x="328" y="128" width="984" height="704" rx="30" fill="url(#grid)" />
+        <g class="stroke-faint">
+          <rect x="540" y="380" width="120" height="80" rx="6" />
+          <rect x="700" y="500" width="80" height="80" rx="6" />
+          <rect x="820" y="420" width="160" height="60" rx="6" />
+          <text x="565" y="426" class="lbl" font-size="18" fill="#9a9aac">bed</text>
+          <text x="715" y="546" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="850" y="458" class="lbl" font-size="18" fill="#9a9aac">desk</text>
+        </g>
+        <!-- frame "label" tape -->
+        <g transform="translate(720, 96) rotate(-3)">
+          <rect x="-100" y="0" width="200" height="40" rx="8" class="stroke fill-cream"/>
+          <text x="0" y="28" text-anchor="middle" class="lbl" font-size="22">My Layout · 70×70</text>
+        </g>
+
+        <!-- left: stacked panel "books" -->
+        <g>
+          <!-- catalog book -->
+          <rect x="40" y="120" width="260" height="500" rx="22" class="stroke fill-paper"/>
+          <rect x="40" y="120" width="260" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="60" y="148" class="lbl" font-size="22">家具目録</text>
+          <text x="276" y="148" font-size="18">▾</text>
+
+          <rect x="60" y="172" width="220" height="32" rx="16" class="stroke fill-paper2"/>
+          <text x="76" y="194" font-size="16" fill="#9a9aac">🔍 search…</text>
+
+          <!-- 3-col grid -->
+          <g>
+            <rect x="60"  y="216" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="216" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="216" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+
+            <rect x="60"  y="290" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="290" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="290" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+
+            <rect x="60"  y="364" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="364" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="364" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+
+            <rect x="60"  y="438" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="438" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="438" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+
+            <rect x="60"  y="512" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="512" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="512" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+
+            <rect x="134" y="290" width="64" height="64" rx="12" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+          </g>
+
+          <!-- tools book -->
+          <rect x="40" y="640" width="260" height="240" rx="22" class="stroke fill-paper"/>
+          <rect x="40" y="640" width="260" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="60" y="668" class="lbl" font-size="22">道具</text>
+          <g font-size="22">
+            <rect x="60"  y="696" width="50" height="50" rx="14" class="stroke fill-mint"/><text x="76" y="730">✋</text>
+            <rect x="124" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="140" y="730">⊞</text>
+            <rect x="188" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="206" y="730">▱</text>
+            <rect x="252" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="268" y="730">↻</text>
+            <rect x="60"  y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="76" y="790">⌫</text>
+            <rect x="124" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="140" y="790">↶</text>
+            <rect x="188" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="206" y="790">↷</text>
+            <rect x="252" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="268" y="790">⊕</text>
+          </g>
+        </g>
+
+        <!-- right: stacked "books": cost + presets + actions -->
+        <g>
+          <rect x="1340" y="120" width="240" height="380" rx="22" class="stroke fill-paper"/>
+          <rect x="1340" y="120" width="240" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="1360" y="148" class="lbl" font-size="22">材料コスト</text>
+          <g font-size="16">
+            <text x="1360" y="186">釘</text>          <text x="1560" y="186" text-anchor="end">12</text>
+            <rect x="1360" y="194" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="222">鉄</text>          <text x="1560" y="222" text-anchor="end">28</text>
+            <rect x="1360" y="230" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="258">想いの石</text>     <text x="1560" y="258" text-anchor="end">28</text>
+            <rect x="1360" y="266" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="294">想いの木材</text>   <text x="1560" y="294" text-anchor="end">65</text>
+            <rect x="1360" y="302" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="330">おもたい木材</text> <text x="1560" y="330" text-anchor="end">5</text>
+            <rect x="1360" y="338" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="366">さらさら麻</text>   <text x="1560" y="366" text-anchor="end">3</text>
+            <rect x="1360" y="374" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="402">ふわふわ綿</text>   <text x="1560" y="402" text-anchor="end">5</text>
+            <rect x="1360" y="410" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+          </g>
+          <line x1="1360" y1="436" x2="1560" y2="436" class="stroke-thin"/>
+          <text x="1360" y="466" class="lbl" font-size="20">layout cost</text>
+          <text x="1560" y="466" text-anchor="end" font-size="20">1655 / 18000</text>
+          <rect x="1360" y="476" width="200" height="8" rx="4" class="fill-mint stroke-thin"/>
+
+          <!-- presets book -->
+          <rect x="1340" y="520" width="240" height="200" rx="22" class="stroke fill-paper"/>
+          <rect x="1340" y="520" width="240" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="1360" y="548" class="lbl" font-size="22">プリセット</text>
+          <rect x="1360" y="572" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1374" y="600" font-size="16">slot 1 · empty</text>
+          <rect x="1360" y="624" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1374" y="652" font-size="16">slot 2 · empty</text>
+          <rect x="1360" y="676" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1374" y="704" font-size="16">＋ new preset</text>
+
+          <!-- actions book -->
+          <rect x="1340" y="740" width="240" height="160" rx="22" class="stroke fill-paper"/>
+          <rect x="1360" y="760" width="200" height="50" rx="14" class="stroke fill-blush"/>
+          <text x="1432" y="794" text-anchor="middle" class="lbl" font-size="24">保存</text>
+          <rect x="1360" y="820" width="96" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1408" y="848" text-anchor="middle" font-size="16">↗ share</text>
+          <rect x="1464" y="820" width="96" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1512" y="848" text-anchor="middle" font-size="16">↧ import</text>
+        </g>
+
+        <!-- bottom strip: page dots and stat card under viewport -->
+        <g>
+          <rect x="320" y="860" width="1000" height="60" rx="22" class="stroke fill-paper"/>
+          <text x="340" y="898" font-size="18" fill="#9a9aac">Lv.3 · 70×70 · 配置 13件</text>
+          <g font-size="18">
+            <text x="700" y="898">1</text><text x="740" y="898">2</text>
+            <text x="780" y="898">3</text><text x="820" y="898">4</text>
+            <text x="860" y="898">5</text><text x="900" y="898">6</text>
+            <text x="940" y="898">7</text><text x="980" y="898">8</text>
+            <text x="1020" y="898">9</text>
+          </g>
+          <circle cx="744" cy="892" r="14" fill="none" stroke="#1a1a2a" stroke-width="3"/>
+          <text x="1300" y="898" text-anchor="end" font-size="18" fill="#9a9aac">100%   −  +</text>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>E. Diorama frame</h3>
+      <div><span class="tag v">most game-like</span><span class="tag c">cohesive</span></div>
+      <p>The whole app sits inside a soft mint "room", canvas is a cream-framed window. Side panels are stacked "books" with cream caps. Strongest visual identity, most tied to in-game vibes.</p>
+      <p class="pros">Reads as a finished product, not a tool. Distinct, memorable.</p>
+      <p class="pros">Stacked "books" let us fit cost + presets + actions on the right without one giant scroll.</p>
+      <p class="cons">Frame eats screen real estate (esp. on smaller windows).</p>
+      <p class="cons">Mint-everywhere can feel monotone — needs careful accent rhythm.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== Pane F : A + D · floating panels with top pill-tab category bar =========== -->
+<section class="pane" data-pane="F">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <rect x="0" y="0" width="1600" height="1000" fill="url(#grid)"/>
+        <g class="stroke-faint">
+          <rect x="560" y="380" width="120" height="80" rx="6"/>
+          <rect x="720" y="500" width="80" height="80" rx="6"/>
+          <rect x="840" y="420" width="160" height="60" rx="6"/>
+          <rect x="620" y="600" width="200" height="40" rx="6"/>
+          <text x="585" y="426" class="lbl" font-size="18" fill="#9a9aac">bed 4×2</text>
+          <text x="735" y="546" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="870" y="458" class="lbl" font-size="18" fill="#9a9aac">desk 6×2</text>
+          <text x="670" y="626" class="lbl" font-size="18" fill="#9a9aac">rug / road</text>
+        </g>
+
+        <!-- TOP: pill-tab category bar (from D) -->
+        <g>
+          <rect x="40" y="36" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="58" y="74" font-size="26">←</text>
+
+          <rect x="116" y="36" width="1100" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="20">
+            <rect x="134" y="46" width="86" height="36" rx="18" class="stroke fill-cream"/><text x="154" y="70">全部</text>
+            <rect x="228" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="250" y="70">一般</text>
+            <rect x="322" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="346" y="70">小物</text>
+            <rect x="416" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="438" y="70">壁掛</text>
+            <rect x="510" y="46" width="100" height="36" rx="18" class="stroke fill-paper"/><text x="524" y="70">ﾃﾞｨｽﾌﾟﾚｲ</text>
+            <rect x="618" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="640" y="70">ﾗｸﾞ</text>
+            <rect x="712" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="742" y="70">道</text>
+            <rect x="806" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="828" y="70">植物</text>
+            <rect x="900" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="922" y="70">大型</text>
+            <rect x="994" y="46" width="86" height="36" rx="18" class="stroke fill-paper"/><text x="1016" y="70">その他</text>
+            <text x="1112" y="70" font-size="18" fill="#9a9aac">🔍</text>
+            <line x1="1140" y1="54" x2="1140" y2="74" class="stroke-thin"/>
+            <text x="1156" y="70" font-size="18" fill="#9a9aac">入手順 ▾</text>
+          </g>
+
+          <!-- top-right action cluster (floating, from A) -->
+          <rect x="1240" y="36" width="160" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="20">
+            <text x="1258" y="72">↶</text><text x="1298" y="72">↷</text><text x="1338" y="72">↗</text><text x="1378" y="72">⊕</text>
+          </g>
+          <rect x="1416" y="36" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="1434" y="74" font-size="22">≡</text>
+          <rect x="1486" y="36" width="74" height="56" rx="28" class="stroke fill-blush"/>
+          <text x="1504" y="72" class="lbl" font-size="22">保存</text>
+        </g>
+
+        <!-- LEFT: floating tool well + catalog grid (from A, expanded since PC) -->
+        <g>
+          <rect x="40" y="120" width="76" height="380" rx="24" class="stroke fill-paper"/>
+          <g font-size="22">
+            <rect x="56" y="140" width="44" height="44" rx="14" class="stroke fill-mint"/><text x="68" y="170">✋</text>
+            <rect x="56" y="196" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="226">⊞</text>
+            <rect x="56" y="252" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="282">▱</text>
+            <rect x="56" y="308" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="338">↻</text>
+            <rect x="56" y="364" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="394">⌫</text>
+            <rect x="56" y="420" width="44" height="44" rx="14" class="stroke fill-paper2"/><text x="68" y="450">↶</text>
+          </g>
+        </g>
+        <g>
+          <rect x="136" y="120" width="320" height="820" rx="24" class="stroke fill-paper"/>
+          <text x="156" y="156" class="lbl" font-size="22">家具 — 全部</text>
+          <text x="436" y="156" font-size="18" class="lbl">«</text>
+          <rect x="156" y="172" width="280" height="32" rx="16" class="stroke fill-paper2"/>
+          <text x="174" y="194" font-size="16" fill="#9a9aac">🔍 search 家具…</text>
+          <!-- 3-col item grid -->
+          <g font-size="14" fill="#9a9aac">
+            <rect x="156" y="218" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="218" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="340" y="218" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="156" y="310" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="310" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="340" y="310" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="156" y="402" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="402" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="340" y="402" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="156" y="494" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="494" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="340" y="494" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="156" y="586" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="586" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="340" y="586" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="156" y="678" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="678" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="340" y="678" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="156" y="770" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="770" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="340" y="770" width="84" height="84" rx="14" class="stroke fill-paper2"/>
+            <rect x="248" y="218" width="84" height="84" rx="14" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+          </g>
+        </g>
+
+        <!-- RIGHT: floating cost panel (compact, full-height) -->
+        <g>
+          <rect x="1340" y="120" width="220" height="500" rx="24" class="stroke fill-paper"/>
+          <text x="1360" y="156" class="lbl" font-size="22">材料コスト</text>
+          <text x="1360" y="178" font-size="14" fill="#9a9aac">133件 · 還清 0</text>
+          <line x1="1360" y1="190" x2="1540" y2="190" class="stroke-thin"/>
+          <g font-size="16">
+            <text x="1360" y="216">釘</text><text x="1540" y="216" text-anchor="end">12 / 0</text>
+            <rect x="1360" y="224" width="180" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="252">鉄</text><text x="1540" y="252" text-anchor="end">28 / 0</text>
+            <rect x="1360" y="260" width="180" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="288">想いの石</text><text x="1540" y="288" text-anchor="end">28 / 0</text>
+            <rect x="1360" y="296" width="180" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="324">想いの木材</text><text x="1540" y="324" text-anchor="end">65 / 0</text>
+            <rect x="1360" y="332" width="180" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="360">おもたい木材</text><text x="1540" y="360" text-anchor="end">5 / 0</text>
+            <rect x="1360" y="368" width="180" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="396">さらさら麻</text><text x="1540" y="396" text-anchor="end">3 / 0</text>
+            <rect x="1360" y="404" width="180" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="432">ふわふわ綿</text><text x="1540" y="432" text-anchor="end">5 / 0</text>
+            <rect x="1360" y="440" width="180" height="6" rx="3" class="fill-cream stroke-thin"/>
+          </g>
+          <line x1="1360" y1="468" x2="1540" y2="468" class="stroke-thin"/>
+          <text x="1360" y="496" class="lbl" font-size="20">layout</text>
+          <text x="1540" y="496" text-anchor="end" font-size="18">1655 / 18000</text>
+          <rect x="1360" y="504" width="180" height="8" rx="4" class="fill-mint stroke-thin"/>
+          <rect x="1360" y="528" width="180" height="36" rx="18" class="stroke fill-paper2"/>
+          <text x="1392" y="552" font-size="16">✎ 在庫を編集</text>
+          <rect x="1360" y="572" width="180" height="36" rx="18" class="stroke fill-paper2"/>
+          <text x="1402" y="596" font-size="16">プリセット</text>
+        </g>
+
+        <!-- bottom-center page dots (from A) -->
+        <g>
+          <rect x="620" y="900" width="380" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="18">
+            <text x="644" y="934">1</text><text x="684" y="934">2</text>
+            <text x="724" y="934">3</text><text x="764" y="934">4</text>
+            <text x="804" y="934">5</text><text x="844" y="934">6</text>
+            <text x="884" y="934">7</text><text x="924" y="934">8</text>
+            <text x="964" y="934">9</text>
+          </g>
+          <circle cx="688" cy="928" r="14" fill="none" stroke="#1a1a2a" stroke-width="3"/>
+        </g>
+        <g>
+          <rect x="1340" y="640" width="220" height="60" rx="28" class="stroke fill-paper"/>
+          <text x="1360" y="678" font-size="18">Lv.3 · 70×70 · 100%</text>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>F. A + D · floating, with top pill-tabs</h3>
+      <div><span class="tag">A's bones</span><span class="tag v">D's category bar</span></div>
+      <p>A's full-bleed floating layout, but categories live as a pill-tab strip up top instead of inside the catalog drawer. Catalog stays expanded by default (PC has the room).</p>
+      <p class="pros">Switching categories = single tap, no nested chrome.</p>
+      <p class="pros">Catalog drawer becomes a clean grid with no internal tabs — better item density.</p>
+      <p class="cons">Top bar gets crowded if there are >10 categories — may need overflow ▸.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== Pane G : E + D · diorama frame with top pill-tabs ====================== -->
+<section class="pane" data-pane="G">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <rect x="0" y="0" width="1600" height="1000" class="fill-mint"/>
+
+        <!-- TOP: pill-tab category bar embedded in mint room -->
+        <g>
+          <rect x="40" y="32" width="56" height="56" rx="28" class="stroke fill-paper"/>
+          <text x="58" y="70" font-size="24">←</text>
+          <rect x="116" y="32" width="1100" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="20">
+            <rect x="134" y="42" width="86" height="36" rx="18" class="stroke fill-cream"/><text x="154" y="66">全部</text>
+            <rect x="228" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="250" y="66">一般</text>
+            <rect x="322" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="346" y="66">小物</text>
+            <rect x="416" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="438" y="66">壁掛</text>
+            <rect x="510" y="42" width="100" height="36" rx="18" class="stroke fill-paper2"/><text x="524" y="66">ﾃﾞｨｽﾌﾟﾚｲ</text>
+            <rect x="618" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="640" y="66">ﾗｸﾞ</text>
+            <rect x="712" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="742" y="66">道</text>
+            <rect x="806" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="828" y="66">植物</text>
+            <rect x="900" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="922" y="66">大型</text>
+            <rect x="994" y="42" width="86" height="36" rx="18" class="stroke fill-paper2"/><text x="1016" y="66">他</text>
+            <text x="1112" y="66" font-size="18" fill="#9a9aac">🔍</text>
+            <text x="1156" y="66" font-size="18" fill="#9a9aac">入手順 ▾</text>
+          </g>
+          <rect x="1240" y="32" width="160" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="20"><text x="1258" y="68">↶</text><text x="1298" y="68">↷</text><text x="1338" y="68">↗</text><text x="1378" y="68">⊕</text></g>
+          <rect x="1416" y="32" width="64" height="56" rx="28" class="stroke fill-paper"/><text x="1434" y="70" font-size="22">≡</text>
+          <rect x="1496" y="32" width="64" height="56" rx="28" class="stroke fill-blush"/><text x="1512" y="68" class="lbl" font-size="22">保存</text>
+        </g>
+
+        <!-- inner cream "viewport" canvas (from E) -->
+        <rect x="320" y="120" width="1000" height="720" rx="36" class="fill-paper stroke"/>
+        <rect x="328" y="128" width="984" height="704" rx="30" fill="url(#grid)"/>
+        <g class="stroke-faint">
+          <rect x="540" y="380" width="120" height="80" rx="6"/>
+          <rect x="700" y="500" width="80" height="80" rx="6"/>
+          <rect x="820" y="420" width="160" height="60" rx="6"/>
+          <text x="565" y="426" class="lbl" font-size="18" fill="#9a9aac">bed</text>
+          <text x="715" y="546" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="850" y="458" class="lbl" font-size="18" fill="#9a9aac">desk</text>
+        </g>
+        <g transform="translate(720, 96) rotate(-3)">
+          <rect x="-100" y="0" width="200" height="38" rx="8" class="stroke fill-cream"/>
+          <text x="0" y="26" text-anchor="middle" class="lbl" font-size="22">My Layout · 70×70</text>
+        </g>
+
+        <!-- LEFT: catalog "book" — items only, no internal tabs -->
+        <g>
+          <rect x="40" y="120" width="260" height="500" rx="22" class="stroke fill-paper"/>
+          <rect x="40" y="120" width="260" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="60" y="148" class="lbl" font-size="22">家具 · 全部</text>
+          <rect x="60" y="172" width="220" height="32" rx="16" class="stroke fill-paper2"/>
+          <text x="76" y="194" font-size="16" fill="#9a9aac">🔍 search…</text>
+          <g>
+            <rect x="60" y="216" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="216" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="216" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="60" y="290" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="290" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="290" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="60" y="364" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="364" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="364" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="60" y="438" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="438" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="438" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="60" y="512" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="512" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="208" y="512" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+            <rect x="134" y="290" width="64" height="64" rx="12" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+          </g>
+        </g>
+        <!-- tools book under catalog -->
+        <g>
+          <rect x="40" y="640" width="260" height="240" rx="22" class="stroke fill-paper"/>
+          <rect x="40" y="640" width="260" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="60" y="668" class="lbl" font-size="22">道具</text>
+          <g font-size="22">
+            <rect x="60" y="696" width="50" height="50" rx="14" class="stroke fill-mint"/><text x="76" y="730">✋</text>
+            <rect x="124" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="140" y="730">⊞</text>
+            <rect x="188" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="206" y="730">▱</text>
+            <rect x="252" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="268" y="730">↻</text>
+            <rect x="60" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="76" y="790">⌫</text>
+            <rect x="124" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="140" y="790">↶</text>
+            <rect x="188" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="206" y="790">↷</text>
+            <rect x="252" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="268" y="790">⊕</text>
+          </g>
+        </g>
+
+        <!-- RIGHT: stacked books (cost / presets / actions) -->
+        <g>
+          <rect x="1340" y="120" width="240" height="380" rx="22" class="stroke fill-paper"/>
+          <rect x="1340" y="120" width="240" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="1360" y="148" class="lbl" font-size="22">材料コスト</text>
+          <g font-size="16">
+            <text x="1360" y="186">釘</text><text x="1560" y="186" text-anchor="end">12</text>
+            <rect x="1360" y="194" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="222">鉄</text><text x="1560" y="222" text-anchor="end">28</text>
+            <rect x="1360" y="230" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="258">想いの石</text><text x="1560" y="258" text-anchor="end">28</text>
+            <rect x="1360" y="266" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="294">想いの木材</text><text x="1560" y="294" text-anchor="end">65</text>
+            <rect x="1360" y="302" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="330">おもたい木材</text><text x="1560" y="330" text-anchor="end">5</text>
+            <rect x="1360" y="338" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="366">さらさら麻</text><text x="1560" y="366" text-anchor="end">3</text>
+            <rect x="1360" y="374" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1360" y="402">ふわふわ綿</text><text x="1560" y="402" text-anchor="end">5</text>
+            <rect x="1360" y="410" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+          </g>
+          <line x1="1360" y1="436" x2="1560" y2="436" class="stroke-thin"/>
+          <text x="1360" y="466" class="lbl" font-size="20">layout</text>
+          <text x="1560" y="466" text-anchor="end" font-size="18">1655 / 18000</text>
+          <rect x="1360" y="476" width="200" height="8" rx="4" class="fill-mint stroke-thin"/>
+        </g>
+        <g>
+          <rect x="1340" y="520" width="240" height="200" rx="22" class="stroke fill-paper"/>
+          <rect x="1340" y="520" width="240" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="1360" y="548" class="lbl" font-size="22">プリセット</text>
+          <rect x="1360" y="572" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1374" y="600" font-size="16">slot 1 · empty</text>
+          <rect x="1360" y="624" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1374" y="652" font-size="16">slot 2 · empty</text>
+          <rect x="1360" y="676" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1374" y="704" font-size="16">＋ new preset</text>
+        </g>
+
+        <!-- bottom strip: page dots under viewport -->
+        <g>
+          <rect x="320" y="860" width="1000" height="60" rx="22" class="stroke fill-paper"/>
+          <text x="340" y="898" font-size="18" fill="#9a9aac">Lv.3 · 70×70 · 配置 13件</text>
+          <g font-size="18">
+            <text x="700" y="898">1</text><text x="740" y="898">2</text>
+            <text x="780" y="898">3</text><text x="820" y="898">4</text>
+            <text x="860" y="898">5</text><text x="900" y="898">6</text>
+            <text x="940" y="898">7</text><text x="980" y="898">8</text>
+            <text x="1020" y="898">9</text>
+          </g>
+          <circle cx="744" cy="892" r="14" fill="none" stroke="#1a1a2a" stroke-width="3"/>
+          <text x="1300" y="898" text-anchor="end" font-size="18" fill="#9a9aac">100%   −  +</text>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>G. E + D · diorama with top pill-tabs</h3>
+      <div><span class="tag v">most distinct</span><span class="tag">cohesive</span></div>
+      <p>The diorama frame, but the catalog "book" no longer holds category tabs — those move to the pill bar at top, freeing the catalog to be a clean item grid. Most game-like + fastest category access.</p>
+      <p class="pros">Strongest visual identity of the bunch.</p>
+      <p class="pros">Categories at the very top, items on the side — clear hierarchy.</p>
+      <p class="cons">Top bar floats on mint, side panels float on mint — needs careful contrast tuning.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ===== Pane H : A + E · floating "books" over canvas =================== -->
+<section class="pane" data-pane="H">
+  <div class="lab">
+    <div class="frame app">
+      <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+        <!-- full-bleed canvas (from A) -->
+        <rect x="0" y="0" width="1600" height="1000" fill="url(#grid)"/>
+        <g class="stroke-faint">
+          <rect x="540" y="380" width="120" height="80" rx="6"/>
+          <rect x="700" y="500" width="80" height="80" rx="6"/>
+          <rect x="820" y="420" width="160" height="60" rx="6"/>
+          <rect x="600" y="600" width="200" height="40" rx="6"/>
+          <text x="565" y="426" class="lbl" font-size="18" fill="#9a9aac">bed 4×2</text>
+          <text x="715" y="546" class="lbl" font-size="18" fill="#9a9aac">chair</text>
+          <text x="850" y="458" class="lbl" font-size="18" fill="#9a9aac">desk 6×2</text>
+          <text x="650" y="626" class="lbl" font-size="18" fill="#9a9aac">rug / road</text>
+        </g>
+
+        <!-- top floating cluster -->
+        <g>
+          <rect x="40" y="36" width="60" height="60" rx="30" class="stroke fill-paper"/>
+          <text x="58" y="76" font-size="26">⌂</text>
+          <rect x="116" y="36" width="170" height="60" rx="30" class="stroke fill-mint"/>
+          <text x="138" y="76" font-size="22" class="lbl">＋ レイアウト</text>
+          <rect x="980" y="36" width="380" height="60" rx="30" class="stroke fill-paper"/>
+          <text x="1000" y="74" font-size="20">マイセカイ家具を作ろう (その23)  2/5</text>
+          <rect x="1380" y="36" width="60" height="60" rx="14" class="stroke fill-paper"/>
+          <text x="1397" y="76" font-size="26">≡</text>
+        </g>
+
+        <!-- LEFT: stacked "books" (from E) but FLOATING -->
+        <!-- catalog book -->
+        <g>
+          <rect x="40" y="120" width="280" height="500" rx="22" class="stroke fill-paper"/>
+          <rect x="40" y="120" width="280" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="60" y="148" class="lbl" font-size="22">家具目録</text>
+          <text x="296" y="148" font-size="18">▾</text>
+          <rect x="60" y="172" width="240" height="32" rx="16" class="stroke fill-paper2"/>
+          <text x="76" y="194" font-size="16" fill="#9a9aac">🔍 search…</text>
+          <!-- chips: simplified -->
+          <g font-size="14">
+            <rect x="60" y="214" width="58" height="24" rx="12" class="stroke fill-cream"/><text x="76" y="232">全部</text>
+            <rect x="124" y="214" width="58" height="24" rx="12" class="stroke fill-paper2"/><text x="140" y="232">一般</text>
+            <rect x="188" y="214" width="58" height="24" rx="12" class="stroke fill-paper2"/><text x="208" y="232">小物</text>
+            <rect x="252" y="214" width="48" height="24" rx="12" class="stroke fill-paper2"/><text x="266" y="232">他</text>
+          </g>
+          <g>
+            <rect x="60" y="248" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="144" y="248" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="228" y="248" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="60" y="332" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="144" y="332" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="228" y="332" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="60" y="416" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="144" y="416" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="228" y="416" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="60" y="500" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="144" y="500" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="228" y="500" width="74" height="74" rx="14" class="stroke fill-paper2"/>
+            <rect x="144" y="248" width="74" height="74" rx="14" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+          </g>
+        </g>
+        <!-- tools book -->
+        <g>
+          <rect x="40" y="640" width="280" height="240" rx="22" class="stroke fill-paper"/>
+          <rect x="40" y="640" width="280" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="60" y="668" class="lbl" font-size="22">道具</text>
+          <g font-size="22">
+            <rect x="60" y="696" width="50" height="50" rx="14" class="stroke fill-mint"/><text x="76" y="730">✋</text>
+            <rect x="124" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="140" y="730">⊞</text>
+            <rect x="188" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="206" y="730">▱</text>
+            <rect x="252" y="696" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="268" y="730">↻</text>
+            <rect x="60" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="76" y="790">⌫</text>
+            <rect x="124" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="140" y="790">↶</text>
+            <rect x="188" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="206" y="790">↷</text>
+            <rect x="252" y="756" width="50" height="50" rx="14" class="stroke fill-paper2"/><text x="268" y="790">⊕</text>
+          </g>
+        </g>
+
+        <!-- RIGHT: floating cost book + actions book -->
+        <g>
+          <rect x="1320" y="120" width="240" height="500" rx="22" class="stroke fill-paper"/>
+          <rect x="1320" y="120" width="240" height="38" rx="22" class="stroke fill-cream"/>
+          <text x="1340" y="148" class="lbl" font-size="22">材料コスト</text>
+          <g font-size="16">
+            <text x="1340" y="186">釘</text><text x="1540" y="186" text-anchor="end">12</text>
+            <rect x="1340" y="194" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1340" y="222">鉄</text><text x="1540" y="222" text-anchor="end">28</text>
+            <rect x="1340" y="230" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1340" y="258">想いの石</text><text x="1540" y="258" text-anchor="end">28</text>
+            <rect x="1340" y="266" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1340" y="294">想いの木材</text><text x="1540" y="294" text-anchor="end">65</text>
+            <rect x="1340" y="302" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1340" y="330">おもたい木材</text><text x="1540" y="330" text-anchor="end">5</text>
+            <rect x="1340" y="338" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1340" y="366">さらさら麻</text><text x="1540" y="366" text-anchor="end">3</text>
+            <rect x="1340" y="374" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+            <text x="1340" y="402">ふわふわ綿</text><text x="1540" y="402" text-anchor="end">5</text>
+            <rect x="1340" y="410" width="200" height="6" rx="3" class="fill-cream stroke-thin"/>
+          </g>
+          <line x1="1340" y1="436" x2="1540" y2="436" class="stroke-thin"/>
+          <text x="1340" y="466" class="lbl" font-size="20">layout</text>
+          <text x="1540" y="466" text-anchor="end" font-size="18">1655 / 18000</text>
+          <rect x="1340" y="476" width="200" height="8" rx="4" class="fill-mint stroke-thin"/>
+          <rect x="1340" y="500" width="200" height="36" rx="18" class="stroke fill-paper2"/>
+          <text x="1372" y="524" font-size="16">✎ 在庫を編集</text>
+          <rect x="1340" y="544" width="200" height="36" rx="18" class="stroke fill-paper2"/>
+          <text x="1382" y="568" font-size="16">プリセット</text>
+        </g>
+        <g>
+          <rect x="1320" y="640" width="240" height="240" rx="22" class="stroke fill-paper"/>
+          <rect x="1340" y="660" width="200" height="56" rx="28" class="stroke fill-blush"/>
+          <text x="1408" y="696" text-anchor="middle" class="lbl" font-size="24">保存</text>
+          <rect x="1340" y="724" width="96" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1388" y="752" text-anchor="middle" font-size="16">↗ share</text>
+          <rect x="1444" y="724" width="96" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1492" y="752" text-anchor="middle" font-size="16">↧ import</text>
+          <rect x="1340" y="774" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1402" y="802" text-anchor="middle" font-size="16">一括片付け</text>
+          <rect x="1340" y="824" width="200" height="42" rx="12" class="stroke fill-paper2"/>
+          <text x="1402" y="852" text-anchor="middle" font-size="16">Lv.3 · 70×70</text>
+        </g>
+
+        <!-- bottom-center page dots -->
+        <g>
+          <rect x="600" y="900" width="400" height="56" rx="28" class="stroke fill-paper"/>
+          <g font-size="18">
+            <text x="624" y="934">1</text><text x="664" y="934">2</text>
+            <text x="704" y="934">3</text><text x="744" y="934">4</text>
+            <text x="784" y="934">5</text><text x="824" y="934">6</text>
+            <text x="864" y="934">7</text><text x="904" y="934">8</text>
+            <text x="944" y="934">9</text>
+          </g>
+          <circle cx="668" cy="928" r="14" fill="none" stroke="#1a1a2a" stroke-width="3"/>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="notes">
+      <h3>H. A + E · floating "books" over canvas</h3>
+      <div><span class="tag">A's canvas</span><span class="tag c">E's panel chrome</span></div>
+      <p>A's full-bleed canvas, but every floating panel becomes an E-style "book" with a cream cap header. Side panels feel like polished objects sitting in the world, not flat HUD chrome.</p>
+      <p class="pros">Cream caps add visual rhythm — each panel reads as its own thing.</p>
+      <p class="pros">Keeps maximum canvas real estate (no mint-room overhead like G).</p>
+      <p class="cons">More chrome density on the sides than plain A.</p>
+      <p class="cons">No top pill-tabs — categories still nested inside catalog book.</p>
+    </aside>
+  </div>
+</section>
+
+<p class="footer-note">A–E are the original directions; F–H are remixes; F2 drills into the chosen direction with cleaner organization, collapse states, and category↔catalog connector variations</p>
+
+<!-- ===== Pane F2 : F deep-dive ============================================ -->
+<section class="pane" data-pane="F2">
+
+  <h2 style="font-family:'Caveat'; font-size:34px; margin: 16px 0 4px;">F2 · F deep-dive</h2>
+  <p class="lede">
+    Cleaning up the toolbar mess from F. New rule: <b>verbs of the same kind cluster together</b> —
+    actions (save/share/undo) on the top-right, modes (select/place/erase/rotate) on the left tool rail,
+    canvas state (zoom/preset slot/grid) along the bottom. The 9 dots = preset slots (assumed).
+    Then four ways to visually connect the top pill-tab to the catalog underneath.
+  </p>
+
+  <h3 style="font-family:'Caveat'; font-size:28px; margin:18px 0 4px;">F2-a · cleaned-up baseline + collapsed catalog</h3>
+  <p class="scrib" style="margin:0 0 8px;">two states side by side: catalog open (default) ↔ collapsed (canvas takes over)</p>
+  <div class="frame app">
+    <svg class="wf wobble" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet">
+      <!-- canvas bg -->
+      <rect x="0" y="0" width="1600" height="1000" fill="url(#grid)"/>
+
+      <!-- divider line down the middle -->
+      <line x1="800" y1="100" x2="800" y2="900" stroke="#9a9aac" stroke-dasharray="6 8" stroke-width="1.5"/>
+      <text x="380" y="80" text-anchor="middle" class="lbl" font-size="22">▾ catalog OPEN (default)</text>
+      <text x="1200" y="80" text-anchor="middle" class="lbl" font-size="22">▾ catalog COLLAPSED</text>
+
+      <!-- ============= LEFT HALF: catalog open ============= -->
+      <g>
+        <!-- TOP-LEFT cluster: home + project name -->
+        <rect x="20" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="34" y="132" font-size="22">⌂</text>
+        <rect x="74" y="100" width="160" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="92" y="130" font-size="16" class="lbl">My Layout</text>
+
+        <!-- pill bar (categories ONLY) — active pill uses MINT to match catalog header (color echo) -->
+        <rect x="244" y="100" width="320" height="44" rx="22" class="stroke fill-paper"/>
+        <g font-size="14">
+          <rect x="254" y="108" width="50" height="28" rx="14" class="stroke" fill="#b8e6dc"/><text x="266" y="128">全部</text>
+          <rect x="310" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="324" y="128">一般</text>
+          <rect x="366" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="380" y="128">小物</text>
+          <rect x="422" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="436" y="128">壁掛</text>
+          <rect x="478" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="494" y="128">道</text>
+          <text x="538" y="128" font-size="14" fill="#9a9aac">…</text>
+        </g>
+
+        <!-- TOP-RIGHT cluster: ACTIONS only (undo/redo/share/save) -->
+        <rect x="586" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="600" y="132" font-size="20">↶</text>
+        <rect x="640" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="654" y="132" font-size="20">↷</text>
+        <rect x="694" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="708" y="132" font-size="20">↗</text>
+        <rect x="748" y="100" width="44" height="44" rx="22" class="stroke fill-blush"/>
+        <text x="754" y="130" font-size="14" class="lbl">保存</text>
+
+        <!-- LEFT TOOL RAIL: modes only (select / place / erase / rotate / fence / road) -->
+        <rect x="20" y="160" width="56" height="320" rx="20" class="stroke fill-paper"/>
+        <g font-size="20">
+          <rect x="32" y="172" width="32" height="32" rx="10" class="stroke fill-mint"/><text x="42" y="195">✋</text>
+          <rect x="32" y="212" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="235">＋</text>
+          <rect x="32" y="252" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="275">⌫</text>
+          <line x1="28" y1="296" x2="68" y2="296" class="stroke-thin"/>
+          <rect x="32" y="308" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="331">↻</text>
+          <rect x="32" y="348" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="371">▱</text>
+          <rect x="32" y="388" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="411">▭</text>
+        </g>
+        <text x="84" y="180" font-size="13" fill="#9a9aac">place tools</text>
+        <text x="84" y="320" font-size="13" fill="#9a9aac">obj tools</text>
+
+        <!-- catalog panel (open) — header MINT to match active pill (color echo) -->
+        <rect x="86" y="160" width="240" height="680" rx="22" class="stroke fill-paper"/>
+        <rect x="86" y="160" width="240" height="32" rx="22" class="stroke" fill="#b8e6dc"/>
+        <text x="100" y="182" class="lbl" font-size="18">家具 · 全部</text>
+        <text x="306" y="182" font-size="14">«</text>
+        <rect x="100" y="202" width="212" height="28" rx="14" class="stroke fill-paper2"/>
+        <text x="114" y="220" font-size="14" fill="#9a9aac">🔍 search…</text>
+        <g>
+          <rect x="100" y="240" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="174" y="240" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="248" y="240" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="100" y="312" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="174" y="312" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="248" y="312" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="100" y="384" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="174" y="384" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="248" y="384" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="100" y="456" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="174" y="456" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="248" y="456" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="100" y="528" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="174" y="528" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="248" y="528" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="100" y="600" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="174" y="600" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="248" y="600" width="64" height="64" rx="12" class="stroke fill-paper2"/>
+          <rect x="174" y="240" width="64" height="64" rx="12" fill="none" stroke="#1a1a2a" stroke-width="3.5"/>
+        </g>
+
+        <!-- BOTTOM canvas-state strip: preset slots + zoom + size -->
+        <!-- LARGE hotbar with thumbnail slots: drag furniture in, press 1–9 to swap -->
+        <rect x="86" y="850" width="660" height="94" rx="22" class="stroke fill-paper"/>
+        <text x="98" y="868" font-size="12" fill="#9a9aac">hotbar — drag furniture in, press 1–9 to hot-swap</text>
+        <g>
+          <!-- slot 1: filled (chair thumb) - active -->
+          <rect x="98"  y="876" width="60" height="60" rx="10" class="stroke" fill="#b8e6dc"/>
+          <rect x="108" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <rect x="114" y="894" width="28" height="24" rx="3" fill="#9a9aac" opacity="0.5"/>
+          <text x="102" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">1</text>
+          <!-- slot 2: filled (bed thumb) -->
+          <rect x="166" y="876" width="60" height="60" rx="10" class="stroke fill-paper2"/>
+          <rect x="176" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <rect x="180" y="896" width="32" height="20" rx="3" fill="#9a9aac" opacity="0.5"/>
+          <text x="170" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">2</text>
+          <!-- slot 3: filled (lamp thumb) -->
+          <rect x="234" y="876" width="60" height="60" rx="10" class="stroke fill-paper2"/>
+          <rect x="244" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <circle cx="264" cy="906" r="10" fill="#9a9aac" opacity="0.5"/>
+          <text x="238" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">3</text>
+          <!-- slot 4: filled (rug thumb) -->
+          <rect x="302" y="876" width="60" height="60" rx="10" class="stroke fill-paper2"/>
+          <rect x="312" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <rect x="315" y="904" width="34" height="14" rx="3" fill="#9a9aac" opacity="0.5"/>
+          <text x="306" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">4</text>
+          <!-- slot 5: empty -->
+          <rect x="370" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="374" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">5</text>
+          <text x="394" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <!-- slot 6-9: empty -->
+          <rect x="438" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="442" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">6</text>
+          <text x="462" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <rect x="506" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="510" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">7</text>
+          <text x="530" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <rect x="574" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="578" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">8</text>
+          <text x="598" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <rect x="642" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="646" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">9</text>
+          <text x="666" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+        </g>
+        <g font-size="12">
+          <text x="712" y="892" fill="#9a9aac" text-anchor="end">Lv.3</text>
+          <text x="712" y="908" fill="#9a9aac" text-anchor="end">70×70</text>
+          <text x="712" y="924" fill="#9a9aac" text-anchor="end">100%</text>
+        </g>
+
+        <!-- canvas placeholder items -->
+        <g class="stroke-faint">
+          <rect x="440" y="380" width="100" height="70" rx="6"/>
+          <rect x="560" y="500" width="70" height="70" rx="6"/>
+          <rect x="640" y="420" width="120" height="50" rx="6"/>
+        </g>
+      </g>
+
+      <!-- ============= RIGHT HALF: catalog COLLAPSED ============= -->
+      <g transform="translate(820, 0)">
+        <rect x="20" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="34" y="132" font-size="22">⌂</text>
+        <rect x="74" y="100" width="160" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="92" y="130" font-size="16" class="lbl">My Layout</text>
+
+        <!-- pill bar still present (categories independent of catalog visibility) -->
+        <rect x="244" y="100" width="320" height="44" rx="22" class="stroke fill-paper"/>
+        <g font-size="14">
+          <rect x="254" y="108" width="50" height="28" rx="14" class="stroke" fill="#b8e6dc"/><text x="266" y="128">全部</text>
+          <rect x="310" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="324" y="128">一般</text>
+          <rect x="366" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="380" y="128">小物</text>
+          <rect x="422" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="436" y="128">壁掛</text>
+          <rect x="478" y="108" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="494" y="128">道</text>
+          <text x="538" y="128" font-size="14" fill="#9a9aac">…</text>
+        </g>
+
+        <rect x="586" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="600" y="132" font-size="20">↶</text>
+        <rect x="640" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="654" y="132" font-size="20">↷</text>
+        <rect x="694" y="100" width="44" height="44" rx="22" class="stroke fill-paper"/>
+        <text x="708" y="132" font-size="20">↗</text>
+        <rect x="748" y="100" width="44" height="44" rx="22" class="stroke fill-blush"/>
+        <text x="754" y="130" font-size="14" class="lbl">保存</text>
+
+        <!-- left tool rail unchanged -->
+        <rect x="20" y="160" width="56" height="320" rx="20" class="stroke fill-paper"/>
+        <g font-size="20">
+          <rect x="32" y="172" width="32" height="32" rx="10" class="stroke fill-mint"/><text x="42" y="195">✋</text>
+          <rect x="32" y="212" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="235">＋</text>
+          <rect x="32" y="252" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="275">⌫</text>
+          <line x1="28" y1="296" x2="68" y2="296" class="stroke-thin"/>
+          <rect x="32" y="308" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="331">↻</text>
+          <rect x="32" y="348" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="371">▱</text>
+          <rect x="32" y="388" width="32" height="32" rx="10" class="stroke fill-paper2"/><text x="42" y="411">▭</text>
+        </g>
+
+        <!-- catalog COLLAPSED: tiny tab on left edge — still mint to echo active pill -->
+        <rect x="86" y="200" width="40" height="160" rx="20" class="stroke" fill="#b8e6dc"/>
+        <text x="98" y="220" font-size="13" fill="#9a9aac" class="lbl">家具</text>
+        <text x="100" y="284" font-size="22">»</text>
+        <text x="100" y="320" font-size="11" fill="#9a9aac">click to open</text>
+
+        <!-- canvas placeholder items - now shows MORE area -->
+        <g class="stroke-faint">
+          <rect x="180" y="320" width="200" height="100" rx="6"/>
+          <rect x="420" y="450" width="120" height="80" rx="6"/>
+          <rect x="200" y="540" width="180" height="70" rx="6"/>
+          <rect x="500" y="320" width="240" height="60" rx="6"/>
+        </g>
+
+        <!-- LARGE hotbar (collapsed view) -->
+        <rect x="140" y="850" width="606" height="94" rx="22" class="stroke fill-paper"/>
+        <text x="152" y="868" font-size="12" fill="#9a9aac">hotbar (1–9 hotkeys)</text>
+        <g>
+          <rect x="152" y="876" width="60" height="60" rx="10" class="stroke" fill="#b8e6dc"/>
+          <rect x="162" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <rect x="168" y="894" width="28" height="24" rx="3" fill="#9a9aac" opacity="0.5"/>
+          <text x="156" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">1</text>
+          <rect x="220" y="876" width="60" height="60" rx="10" class="stroke fill-paper2"/>
+          <rect x="230" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <rect x="234" y="896" width="32" height="20" rx="3" fill="#9a9aac" opacity="0.5"/>
+          <text x="224" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">2</text>
+          <rect x="288" y="876" width="60" height="60" rx="10" class="stroke fill-paper2"/>
+          <rect x="298" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <circle cx="318" cy="906" r="10" fill="#9a9aac" opacity="0.5"/>
+          <text x="292" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">3</text>
+          <rect x="356" y="876" width="60" height="60" rx="10" class="stroke fill-paper2"/>
+          <rect x="366" y="888" width="40" height="36" rx="4" class="stroke-thin" fill="#fbf8f1"/>
+          <rect x="369" y="904" width="34" height="14" rx="3" fill="#9a9aac" opacity="0.5"/>
+          <text x="360" y="890" font-size="11" fill="#1a1a2a" font-family="Caveat" font-weight="700">4</text>
+          <rect x="424" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="428" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">5</text>
+          <text x="448" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <rect x="492" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="496" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">6</text>
+          <text x="516" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <rect x="560" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="564" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">7</text>
+          <text x="584" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <rect x="628" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="632" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">8</text>
+          <text x="652" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+          <rect x="696" y="876" width="60" height="60" rx="10" class="stroke fill-paper2" stroke-dasharray="4 4"/>
+          <text x="700" y="890" font-size="11" fill="#9a9aac" font-family="Caveat" font-weight="700">9</text>
+          <text x="720" y="914" font-size="22" fill="#9a9aac" text-anchor="middle">＋</text>
+        </g>
+      </g>
+
+      <!-- callouts -->
+      <g font-family="Caveat" font-size="20" fill="#4a4a5e">
+        <text x="120" y="160" class="lbl">↘ verbs grouped</text>
+        <text x="700" y="160" class="lbl" text-anchor="end">↙ actions only</text>
+        <text x="104" y="846" class="lbl" font-size="16">↓ large hotbar w/ thumbnails — drag from catalog, hotkeys 1–9</text>
+        <text x="600" y="94" class="lbl" font-size="16" fill="#2c7d4a">↑ active pill = mint = catalog header (color echo)</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- =================== Connector variations =================== -->
+  <h3 style="font-family:'Caveat'; font-size:28px; margin: 28px 0 4px;">F2-b · how the category pill connects to the catalog</h3>
+  <p class="scrib" style="margin:0 0 12px;">four ways. select the active pill = "全部"; catalog reflects it.</p>
+
+  <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 18px;">
+
+    <!-- Variation 1: Anchor pointer/tail -->
+    <div class="frame" style="aspect-ratio: 4 / 3;">
+      <svg class="wf wobble" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+        <rect x="0" y="0" width="800" height="600" fill="url(#grid)"/>
+        <!-- pill bar -->
+        <rect x="180" y="40" width="440" height="50" rx="25" class="stroke fill-paper"/>
+        <g font-size="16">
+          <rect x="196" y="50" width="70" height="30" rx="15" class="stroke fill-cream"/><text x="216" y="71">全部</text>
+          <rect x="272" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="294" y="71">一般</text>
+          <rect x="348" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="368" y="71">小物</text>
+          <rect x="424" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="444" y="71">壁掛</text>
+          <rect x="500" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="522" y="71">道</text>
+        </g>
+        <!-- TAIL: triangle pointing down from active pill to catalog header -->
+        <path d="M 220 80 L 232 100 L 244 80 Z" fill="#ffe8a8" stroke="#1a1a2a" stroke-width="2"/>
+        <!-- catalog -->
+        <rect x="40" y="100" width="280" height="460" rx="22" class="stroke fill-paper"/>
+        <rect x="40" y="100" width="280" height="40" rx="22" class="stroke fill-cream"/>
+        <text x="60" y="126" class="lbl" font-size="20">家具 · 全部</text>
+        <g>
+          <rect x="60" y="160" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="160" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="160" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="244" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="244" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="244" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="328" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="328" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="328" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="412" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="412" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="412" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+        </g>
+        <text x="500" y="290" class="lbl" font-size="22" fill="#4a4a5e" text-anchor="middle">① anchor tail</text>
+        <text x="500" y="316" font-size="15" fill="#9a9aac" text-anchor="middle">selected pill drops a triangle</text>
+        <text x="500" y="334" font-size="15" fill="#9a9aac" text-anchor="middle">that "lands" on the catalog header</text>
+      </svg>
+    </div>
+
+    <!-- Variation 2: Color echo -->
+    <div class="frame" style="aspect-ratio: 4 / 3;">
+      <svg class="wf wobble" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+        <rect x="0" y="0" width="800" height="600" fill="url(#grid)"/>
+        <rect x="180" y="40" width="440" height="50" rx="25" class="stroke fill-paper"/>
+        <g font-size="16">
+          <rect x="196" y="50" width="70" height="30" rx="15" class="stroke" fill="#b8e6dc"/><text x="216" y="71">全部</text>
+          <rect x="272" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="294" y="71">一般</text>
+          <rect x="348" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="368" y="71">小物</text>
+          <rect x="424" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="444" y="71">壁掛</text>
+          <rect x="500" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="522" y="71">道</text>
+        </g>
+        <!-- catalog header takes mint to match -->
+        <rect x="40" y="100" width="280" height="460" rx="22" class="stroke fill-paper"/>
+        <rect x="40" y="100" width="280" height="40" rx="22" class="stroke" fill="#b8e6dc"/>
+        <text x="60" y="126" class="lbl" font-size="20">家具 · 全部</text>
+        <g>
+          <rect x="60" y="160" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="160" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="160" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="244" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="244" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="244" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="328" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="328" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="328" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="412" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="412" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="412" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+        </g>
+        <text x="500" y="290" class="lbl" font-size="22" fill="#4a4a5e" text-anchor="middle">② color echo</text>
+        <text x="500" y="316" font-size="15" fill="#9a9aac" text-anchor="middle">active pill + catalog header</text>
+        <text x="500" y="334" font-size="15" fill="#9a9aac" text-anchor="middle">share the same accent color</text>
+        <text x="500" y="362" font-size="13" fill="#9a9aac" text-anchor="middle">(works even when distance is large)</text>
+      </svg>
+    </div>
+
+    <!-- Variation 3: Connector ribbon -->
+    <div class="frame" style="aspect-ratio: 4 / 3;">
+      <svg class="wf wobble" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+        <rect x="0" y="0" width="800" height="600" fill="url(#grid)"/>
+        <rect x="180" y="40" width="440" height="50" rx="25" class="stroke fill-paper"/>
+        <g font-size="16">
+          <rect x="196" y="50" width="70" height="30" rx="15" class="stroke fill-cream"/><text x="216" y="71">全部</text>
+          <rect x="272" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="294" y="71">一般</text>
+          <rect x="348" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="368" y="71">小物</text>
+          <rect x="424" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="444" y="71">壁掛</text>
+          <rect x="500" y="50" width="70" height="30" rx="15" class="stroke fill-paper2"/><text x="522" y="71">道</text>
+        </g>
+        <!-- ribbon: thick cream stripe from pill down to catalog -->
+        <path d="M 196 80 Q 196 95, 180 100 L 60 100 Q 40 100, 40 120 L 40 130"
+              fill="none" stroke="#ffe8a8" stroke-width="14" stroke-linecap="round"/>
+        <path d="M 196 80 Q 196 95, 180 100 L 60 100 Q 40 100, 40 120 L 40 130"
+              fill="none" stroke="#1a1a2a" stroke-width="2" stroke-linecap="round"/>
+        <!-- catalog -->
+        <rect x="40" y="130" width="280" height="430" rx="22" class="stroke fill-paper"/>
+        <rect x="40" y="130" width="280" height="40" rx="22" class="stroke fill-cream"/>
+        <text x="60" y="156" class="lbl" font-size="20">家具 · 全部</text>
+        <g>
+          <rect x="60" y="190" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="190" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="190" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="274" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="274" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="274" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="358" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="358" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="358" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="60" y="442" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="142" y="442" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+          <rect x="224" y="442" width="72" height="72" rx="12" class="stroke fill-paper2"/>
+        </g>
+        <text x="500" y="290" class="lbl" font-size="22" fill="#4a4a5e" text-anchor="middle">③ ribbon</text>
+        <text x="500" y="316" font-size="15" fill="#9a9aac" text-anchor="middle">a literal cream stripe links</text>
+        <text x="500" y="334" font-size="15" fill="#9a9aac" text-anchor="middle">active pill → catalog header</text>
+        <text x="500" y="362" font-size="13" fill="#9a9aac" text-anchor="middle">animates when switching</text>
+      </svg>
+    </div>
+
+    <!-- Variation 4: Pills move ONTO catalog -->
+    <div class="frame" style="aspect-ratio: 4 / 3;">
+      <svg class="wf wobble" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+        <rect x="0" y="0" width="800" height="600" fill="url(#grid)"/>
+        <!-- top bar holds ONLY actions now -->
+        <rect x="40" y="40" width="280" height="50" rx="25" class="stroke fill-paper"/>
+        <text x="60" y="71" font-size="16" class="lbl">⌂  My Layout</text>
+        <rect x="500" y="40" width="120" height="50" rx="25" class="stroke fill-paper"/>
+        <g font-size="16">
+          <text x="520" y="71">↶</text><text x="548" y="71">↷</text><text x="576" y="71">↗</text>
+        </g>
+        <rect x="630" y="40" width="60" height="50" rx="25" class="stroke fill-blush"/>
+        <text x="640" y="71" font-size="16" class="lbl">保存</text>
+
+        <!-- catalog with pill-tabs ATTACHED to its top -->
+        <rect x="40" y="120" width="320" height="440" rx="22" class="stroke fill-paper"/>
+        <rect x="40" y="120" width="320" height="48" rx="22" class="stroke fill-cream"/>
+        <g font-size="14">
+          <rect x="56" y="130" width="50" height="28" rx="14" class="stroke fill-paper"/><text x="68" y="150">全部</text>
+          <rect x="112" y="130" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="126" y="150">一般</text>
+          <rect x="168" y="130" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="182" y="150">小物</text>
+          <rect x="224" y="130" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="238" y="150">壁掛</text>
+          <rect x="280" y="130" width="50" height="28" rx="14" class="stroke fill-paper2"/><text x="296" y="150">道</text>
+        </g>
+        <rect x="56" y="180" width="288" height="28" rx="14" class="stroke fill-paper2"/>
+        <text x="70" y="198" font-size="13" fill="#9a9aac">🔍 search…</text>
+        <g>
+          <rect x="56" y="220" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="148" y="220" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="240" y="220" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="56" y="312" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="148" y="312" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="240" y="312" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="56" y="404" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="148" y="404" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+          <rect x="240" y="404" width="80" height="80" rx="12" class="stroke fill-paper2"/>
+        </g>
+        <text x="540" y="290" class="lbl" font-size="22" fill="#4a4a5e" text-anchor="middle">④ pills on catalog</text>
+        <text x="540" y="316" font-size="15" fill="#9a9aac" text-anchor="middle">categories live as the catalog's</text>
+        <text x="540" y="334" font-size="15" fill="#9a9aac" text-anchor="middle">own header — one component</text>
+        <text x="540" y="362" font-size="13" fill="#9a9aac" text-anchor="middle">↳ collapsing catalog hides them too</text>
+      </svg>
+    </div>
+
+  </div>
+
+  <aside class="notes" style="margin-top: 22px; max-width: 820px;">
+    <h3>recommendation</h3>
+    <p>
+      <span class="tag c">pick</span>
+      <b>② color echo + ① anchor tail</b> together — color makes the link readable at a glance, the tail
+      confirms it on inspection. Both are subtle in static mockup but feel obvious in motion.
+    </p>
+    <p>
+      <span class="tag b">avoid</span>
+      <b>④ pills-on-catalog</b> if you ever want category switching while catalog is collapsed (you'd lose
+      the category bar entirely). Good if collapse is rare; bad if it's a primary state.
+    </p>
+    <p>
+      <b>Toolbar reorganization</b> (top of pane): home + project on far left; categories in the middle;
+      undo / redo / share / save on the right. Modes (select/place/erase + rotate/fence/road) drop into a
+      vertical rail next to the catalog, where they should have been. The 1–9 strip at bottom is now a
+      hotbar (drag furniture in, press 1–9 to hot-swap), with level/size/zoom on the same row.
+    </p>
+  </aside>
+
+</section>
+
+<p class="footer-note">A–E are the original directions; F–H are remixes; F2 drills into the chosen direction with cleaner organization, collapse states, and category↔catalog connector variations</p>
+
+
+<!-- ============ Tweaks panel ============ -->
+<div class="tweaks" id="tweaks" hidden>
+  <h4>Tweaks</h4>
+  <label>Sketchy stroke <input type="checkbox" id="tw-sketch" checked /></label>
+  <label>Show grid in canvas <input type="checkbox" id="tw-grid" checked /></label>
+  <label>Show example items <input type="checkbox" id="tw-items" checked /></label>
+  <div style="margin-top:8px">Paper tone</div>
+  <div class="row" style="margin-top:4px">
+    <button class="pill on" data-tone="cream">cream</button>
+    <button class="pill" data-tone="white">white</button>
+    <button class="pill" data-tone="grid">graph</button>
+  </div>
+  <div style="margin-top:8px">Accent</div>
+  <div class="row" style="margin-top:4px">
+    <button class="pill on" data-accent="mint">mint</button>
+    <button class="pill" data-accent="blush">blush</button>
+    <button class="pill" data-accent="violet">violet</button>
+    <button class="pill" data-accent="cream">honey</button>
+  </div>
+  <button id="tw-close" style="margin-top:10px; width:100%;" class="pill">close</button>
+</div>
+
+<script>
+  // tabs
+  const tabs = document.querySelectorAll('.tab');
+  const panes = document.querySelectorAll('.pane');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    panes.forEach(p => p.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelector(`.pane[data-pane="${t.dataset.pane}"]`).classList.add('active');
+  }));
+
+  // ====== tweaks (host edit-mode protocol) ======
+  const tweakDefaults = /*EDITMODE-BEGIN*/{
+    "sketchy": true,
+    "showGrid": true,
+    "showItems": true,
+    "paperTone": "cream",
+    "accent": "mint"
+  }/*EDITMODE-END*/;
+
+  const tweaks = { ...tweakDefaults };
+
+  function applyTweaks() {
+    // sketchy filter
+    document.querySelectorAll('svg.wobble, svg.wf').forEach(s => {
+      s.classList.toggle('wobble', !!tweaks.sketchy);
+    });
+
+    // hide grid
+    document.querySelectorAll('svg.wf rect[fill="url(#grid)"]').forEach(r => {
+      r.setAttribute('fill', tweaks.showGrid ? 'url(#grid)' : 'transparent');
+    });
+
+    // hide example items (footprints) — toggle by class group
+    document.querySelectorAll('svg.wf .stroke-faint').forEach(g => {
+      g.style.display = tweaks.showItems ? '' : 'none';
+    });
+
+    // paper tone
+    const root = document.documentElement;
+    if (tweaks.paperTone === 'white') {
+      root.style.setProperty('--paper', '#ffffff');
+      root.style.setProperty('--paper-2', '#f3f3ee');
+    } else if (tweaks.paperTone === 'grid') {
+      root.style.setProperty('--paper', '#fbf8f1');
+      root.style.setProperty('--paper-2', '#eee8d6');
+    } else {
+      root.style.setProperty('--paper', '#fbf8f1');
+      root.style.setProperty('--paper-2', '#f4efe2');
+    }
+
+    // accent
+    const accents = { mint: '#b8e6dc', blush: '#f9c7c2', violet: '#d8c8ee', cream: '#ffe8a8' };
+    document.querySelectorAll('svg.wf .fill-mint').forEach(el => el.setAttribute('fill', accents[tweaks.accent]));
+    document.querySelectorAll('.tab.active').forEach(el => el.style.background = accents[tweaks.accent]);
+
+    // pill states
+    document.querySelectorAll('[data-tone]').forEach(b => b.classList.toggle('on', b.dataset.tone === tweaks.paperTone));
+    document.querySelectorAll('[data-accent]').forEach(b => b.classList.toggle('on', b.dataset.accent === tweaks.accent));
+    document.getElementById('tw-sketch').checked = tweaks.sketchy;
+    document.getElementById('tw-grid').checked = tweaks.showGrid;
+    document.getElementById('tw-items').checked = tweaks.showItems;
+  }
+
+  function setTweak(patch) {
+    Object.assign(tweaks, patch);
+    applyTweaks();
+    try { window.parent.postMessage({ type: '__edit_mode_set_keys', edits: patch }, '*'); } catch (_) {}
+  }
+
+  // wire panel
+  document.getElementById('tw-sketch').addEventListener('change', e => setTweak({ sketchy: e.target.checked }));
+  document.getElementById('tw-grid').addEventListener('change', e => setTweak({ showGrid: e.target.checked }));
+  document.getElementById('tw-items').addEventListener('change', e => setTweak({ showItems: e.target.checked }));
+  document.querySelectorAll('[data-tone]').forEach(b => b.addEventListener('click', () => setTweak({ paperTone: b.dataset.tone })));
+  document.querySelectorAll('[data-accent]').forEach(b => b.addEventListener('click', () => setTweak({ accent: b.dataset.accent })));
+
+  // host protocol — register listener BEFORE announcing
+  window.addEventListener('message', (e) => {
+    const d = e.data || {};
+    if (d.type === '__activate_edit_mode') {
+      document.getElementById('tweaks').hidden = false;
+    } else if (d.type === '__deactivate_edit_mode') {
+      document.getElementById('tweaks').hidden = true;
+    }
+  });
+  document.getElementById('tw-close').addEventListener('click', () => {
+    document.getElementById('tweaks').hidden = true;
+    try { window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); } catch (_) {}
+  });
+  try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch (_) {}
+
+  applyTweaks();
+</script>
+
+</body>
+</html>

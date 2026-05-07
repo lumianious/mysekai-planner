@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>MySekai Planner — Hi-fi F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Panel chrome — bright cream paper, soft sky-blue tint (mysekai/prsk vibe) */
+    --panel:        #ffffff;
+    --panel-2:      #fbf6ea;
+    --panel-edge:   rgba(60,80,140,.14);
+    --panel-inner:  rgba(255,255,255,.7);
+
+    /* Accents — prsk sky-blue primary, blush + sun-yellow highlights */
+    --sky:          #69c8ff;       /* primary accent / color echo */
+    --sky-deep:     #2ea8ee;
+    --sky-soft:     #cfeeff;
+    --blush:        #ffb6c8;       /* secondary accent */
+    --sun:          #ffe27a;       /* warm highlight */
+    --mint:         #69c8ff;       /* legacy alias → sky for old refs */
+    --mint-deep:    #2ea8ee;
+    --mint-soft:    #e7f6ff;
+    --cream:        #fff8e7;
+    --ink:          #1f3556;
+    --ink-2:        #4f6a8e;
+    --muted:        #8aa0bd;
+
+    /* Buttons / status */
+    --green:        #8fdf6c;
+    --green-deep:   #5db232;
+    --warn:         #ffb84d;
+    --danger:       #ff7a8a;
+
+    /* Lawn / canvas — brighter, fresher */
+    --lawn-1:       #b8e58a;
+    --lawn-2:       #9bd566;
+    --lawn-3:       #7fbe48;
+    --gravel:       #e3c592;
+    --road:         #d39769;
+    --water:        #a3e6f7;
+
+    --shadow-lg:    0 16px 36px -14px rgba(60,90,160,.30), 0 4px 12px -6px rgba(60,90,160,.18);
+    --shadow-md:    0 6px 16px -8px rgba(60,90,160,.28), 0 2px 4px -2px rgba(60,90,160,.16);
+    --shadow-sm:    0 2px 6px -2px rgba(60,90,160,.18);
+  }
+
+  *{ box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body{
+    font-family: 'Nunito', 'M PLUS Rounded 1c', system-ui, sans-serif;
+    color: var(--ink);
+    background: #d9efff;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* === Stage =============================================================== */
+  .stage{
+    position: fixed; inset: 0;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(120% 80% at 50% 0%, #eaf6ff 0%, #cfe8ff 60%, #b9dcff 100%);
+  }
+  .app{
+    position: relative;
+    width: 1600px; height: 1000px;
+    transform-origin: center center;
+    overflow: hidden;
+    border-radius: 0;
+    background:
+      radial-gradient(120% 80% at 30% 0%, #b6e496 0%, #9fd97a 30%, #84c95a 65%, #6cb348 100%);
+  }
+
+  /* low-poly grass texture overlay (pure CSS) */
+  .lawn-noise{
+    position:absolute; inset:0; pointer-events:none; opacity:.55;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(255,255,255,.18) 0 6px, transparent 7px),
+      radial-gradient(circle at 78% 32%, rgba(0,0,0,.05) 0 8px, transparent 9px),
+      radial-gradient(circle at 42% 70%, rgba(255,255,255,.12) 0 4px, transparent 5px),
+      radial-gradient(circle at 88% 80%, rgba(0,0,0,.05) 0 6px, transparent 7px),
+      radial-gradient(circle at 22% 88%, rgba(255,255,255,.10) 0 5px, transparent 6px);
+    background-size: 240px 240px, 220px 220px, 200px 200px, 260px 260px, 180px 180px;
+    mix-blend-mode: soft-light;
+  }
+  /* triangulated low-poly look */
+  .lawn-tri{
+    position:absolute; inset:0; pointer-events:none; opacity:.35;
+    background:
+      conic-gradient(from 30deg at 25% 25%, rgba(255,255,255,.15) 0 60deg, transparent 60deg 180deg, rgba(0,0,0,.06) 180deg 240deg, transparent 240deg 360deg) 0 0/180px 180px,
+      conic-gradient(from 0deg at 75% 75%, rgba(255,255,255,.08) 0 60deg, transparent 60deg 180deg, rgba(0,0,0,.04) 180deg 240deg, transparent 240deg 360deg) 0 0/220px 220px;
+    mix-blend-mode: overlay;
+  }
+  /* faint grid hint, looks like in-game placement grid */
+  .lawn-grid{
+    position:absolute; inset:0; pointer-events:none; opacity:.18;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,.45) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,.45) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* === Generic panel ======================================================= */
+  .panel{
+    position: absolute;
+    background: linear-gradient(180deg, #ffffff 0%, #fbf6ea 100%);
+    border: 1px solid var(--panel-edge);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 0 0 1px rgba(255,255,255,.5),
+      var(--shadow-lg);
+    border-radius: 22px;
+    color: var(--ink);
+  }
+  .panel-light{
+    background: linear-gradient(180deg, #fff 0%, #f7f3e8 100%);
+    color: var(--ink);
+    border-color: var(--panel-edge);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* === Top bar ============================================================= */
+  .topbar{
+    position:absolute; top:18px; left:18px; right:18px;
+    display:flex; gap:8px; align-items:center;
+    pointer-events:none;
+  }
+  .topbar > *{ pointer-events:auto; }
+
+  /* segmented tool group: select / stamp / brush / remove */
+  .toolgroup{
+    height: 44px;
+    border-radius: 22px;
+    background: rgba(255,255,255,.96);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,.06);
+    padding: 4px;
+    display:flex; gap: 2px; align-items:center;
+  }
+  .tg-btn{
+    height: 36px; min-width: 36px; padding: 0 10px;
+    border: 0; background: transparent;
+    border-radius: 16px;
+    color: var(--ink-2);
+    display:inline-flex; align-items:center; gap:6px;
+    font-weight: 800; font-size: 12.5px;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+  .tg-btn:hover:not(:disabled){ background: #f1efe5; color: var(--ink); }
+  .tg-btn:disabled{ opacity:.32; cursor: not-allowed; }
+  .tg-btn.on{
+    background: linear-gradient(180deg, #9bdcff 0%, #69c8ff 100%);
+    color: #0e3955;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .tg-btn.danger.on{
+    background: linear-gradient(180deg, #ff8c8c 0%, #ff6f6f 100%);
+    color:#fff; text-shadow: 0 1px 0 rgba(0,0,0,.18);
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .tg-btn .kbd{
+    font-family: 'M PLUS Rounded 1c', monospace;
+    font-size: 10px; font-weight: 800;
+    color: rgba(0,0,0,.32);
+    padding: 1px 5px; border-radius: 6px;
+    background: rgba(0,0,0,.06);
+    margin-left: 2px;
+  }
+  .tg-btn.on .kbd{ background: rgba(0,0,0,.14); color: rgba(255,255,255,.85); }
+  .tg-btn.danger.on .kbd{ background: rgba(0,0,0,.22); color: rgba(255,255,255,.95); }
+  .tg-divider{
+    width: 1px; height: 22px;
+    background: rgba(0,0,0,.10);
+    margin: 0 2px;
+  }
+
+  /* area-level pill */
+  .arealv{
+    height: 44px; padding: 0 14px;
+    border-radius: 22px;
+    background: rgba(255,255,255,.96);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,.06);
+    display:inline-flex; align-items:center; gap:8px;
+    font-weight: 800; font-size: 13px; color: var(--ink);
+    cursor: pointer;
+  }
+  .arealv .lv{
+    background: linear-gradient(180deg, #9bdcff 0%, #69c8ff 100%);
+    color: #0e3955;
+    padding: 3px 8px; border-radius: 10px;
+    font-size: 12px; font-weight: 900;
+    border: 1px solid rgba(0,0,0,.10);
+  }
+  .arealv .dim{
+    font-family: 'M PLUS Rounded 1c', monospace;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .pill, .icon-btn, .btn{
+    height: 44px;
+    border-radius: 22px;
+    background: rgba(255,255,255,.96);
+    color: var(--ink);
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: var(--shadow-md);
+    display:inline-flex; align-items:center; justify-content:center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    user-select: none;
+  }
+  .pill:hover, .icon-btn:hover, .btn:hover{ transform: translateY(-1px); }
+  .icon-btn{ width: 44px; padding: 0; }
+  .pill{ padding: 0 16px; }
+  .btn{ padding: 0 18px; font-size: 14px; }
+
+  .btn.primary{
+    background: linear-gradient(180deg, #9ae263 0%, #7ac845 100%);
+    color: #1a3b0a;
+    border-color: rgba(0,0,0,.18);
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.4), var(--shadow-md);
+    text-shadow: 0 1px 0 rgba(255,255,255,.45);
+  }
+  .btn.ghost{
+    background: rgba(255,255,255,.0);
+    border: 1px dashed rgba(0,0,0,.18);
+  }
+
+  /* category pill bar (D2: separate from catalog) */
+  .cat-bar{
+    position: absolute;
+    top: 78px; left: 18px; right: 18px;
+    height: 48px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbf6ea 100%);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--panel-edge);
+    padding: 4px;
+    display:flex; gap: 4px;
+    align-items: center;
+    overflow: hidden;
+  }
+  .cat-bar .cat{
+    height: 38px; padding: 0 16px;
+    border-radius: 19px;
+    display:inline-flex; align-items:center; gap:6px;
+    font-weight: 800; font-size: 14px;
+    color: var(--ink-2);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background .12s ease, color .12s ease, transform .12s ease;
+    white-space: nowrap;
+  }
+  .cat-bar .cat:hover{ background: #eef6fc; color: var(--ink); }
+  .cat-bar .cat.active{
+    background: linear-gradient(180deg, #9bdcff 0%, #69c8ff 100%);
+    color: #0e3955;
+    border-color: rgba(14,57,85,.18);
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.55);
+  }
+  .cat-bar .cat .ji{ font-family: 'M PLUS Rounded 1c'; font-weight:800; }
+  .cat-bar .cat-overflow{
+    margin-left: auto;
+    color: var(--muted);
+    padding: 0 12px;
+    font-weight: 800;
+  }
+
+  .spacer{ flex:1; }
+
+  /* === Catalog (left) — D2: catalog is items only, categories live in top cat-bar === */
+  .catalog{
+    position:absolute;
+    top: 142px; left: 18px;
+    width: 312px; height: 676px;
+    border-radius: 22px;
+    overflow: hidden;
+    display:flex; flex-direction:column;
+  }
+  .catalog .head{
+    height: 48px;
+    background: linear-gradient(180deg, #9bdcff 0%, #69c8ff 100%);
+    color: #0e3955;
+    display:flex; align-items:center;
+    padding: 0 14px;
+    border-bottom: 1px solid rgba(0,0,0,.10);
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.08);
+  }
+  .catalog .head h3{
+    margin: 0; font-size: 16px; font-weight: 900; letter-spacing: .2px;
+    font-family:'M PLUS Rounded 1c'; flex:1;
+  }
+  .catalog .head .chip{
+    background: rgba(255,255,255,.55);
+    border-radius: 12px; padding: 4px 10px;
+    font-size: 12px; font-weight: 800;
+  }
+  .catalog .body{
+    flex:1; padding: 12px;
+    display:flex; flex-direction:column; gap:10px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #ffffff 0%, #fbf6ea 100%);
+  }
+  .search{
+    height: 36px;
+    background: #f4f8fc;
+    border: 1px solid rgba(60,90,140,.12);
+    border-radius: 18px;
+    padding: 0 12px;
+    display:flex; align-items:center; gap:8px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .subcats{
+    display:flex; gap:6px; flex-wrap:wrap;
+  }
+  .subcat{
+    padding: 5px 10px;
+    font-size: 12px; font-weight: 700;
+    background: #f4f8fc;
+    border: 1px solid rgba(60,90,140,.12);
+    border-radius: 12px;
+    color: var(--ink-2);
+    cursor:pointer;
+  }
+  .subcat.on{
+    background: var(--sky-soft);
+    border-color: rgba(46,168,238,.45);
+    color: var(--sky-deep);
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    overflow-y: auto; padding-right: 4px;
+  }
+  .grid::-webkit-scrollbar{ width:6px; }
+  .grid::-webkit-scrollbar-thumb{ background: rgba(60,90,140,.18); border-radius:3px;}
+
+  .tile{
+    aspect-ratio: 1/1;
+    background: linear-gradient(180deg, #ffffff 0%, #f1f7fc 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(60,90,140,.14);
+    box-shadow: inset 0 -2px 0 rgba(60,90,140,.10), inset 0 1px 0 rgba(255,255,255,.85);
+    position: relative;
+    cursor: grab;
+    overflow: hidden;
+  }
+  .tile.selected{
+    outline: 3px solid #fff;
+    outline-offset: -1px;
+    box-shadow: inset 0 -2px 0 rgba(60,90,140,.10), inset 0 1px 0 rgba(255,255,255,.85), 0 0 0 3px var(--sky);
+  }
+  .tile .size{
+    position:absolute; left:6px; bottom:4px;
+    font-size: 11px; font-weight: 800; color: var(--ink);
+    background: rgba(255,255,255,.85);
+    padding: 1px 6px; border-radius: 8px;
+  }
+  .tile .qty{
+    position:absolute; right:6px; top:4px;
+    font-size: 11px; font-weight: 800; color:#fff;
+    background: rgba(0,0,0,.45);
+    padding: 1px 6px; border-radius: 8px;
+  }
+  .tile-art{
+    position:absolute; inset:8px;
+    display:grid; place-items:center;
+  }
+  /* ==== faux 45° furniture sprites (CSS only) ==== */
+  .iso{ position:relative; width:60%; height:60%; }
+
+  .iso.chair{
+    --c: #c98a4a;
+    background: var(--c);
+    transform: skewY(-15deg);
+    border-radius: 4px;
+    box-shadow: 0 6px 0 #8b5a2b, 4px 0 0 #b3793f;
+  }
+  .iso.chair::before{
+    content:''; position:absolute; left:0; top:-50%;
+    width:100%; height:60%;
+    background:#dba569;
+    transform: skewY(-15deg);
+    border-radius:3px;
+    box-shadow: 4px 0 0 #b3793f;
+  }
+
+  .iso.sofa{
+    --c: #4d8edc;
+    width: 80%; height: 50%;
+    background: linear-gradient(180deg,#5fa0ee,#3978c6);
+    transform: rotate(-20deg) skewY(20deg);
+    border-radius: 6px;
+    box-shadow: 0 6px 0 #2e5fa0;
+  }
+  .iso.sofa::before{
+    content:''; position:absolute; left:0; right:0; top:-35%; height:55%;
+    background: linear-gradient(180deg,#6fb0ff,#4684cf);
+    transform: skewY(0);
+    border-radius: 5px;
+  }
+  .iso.sofa::after{
+    content:''; position:absolute; left:-10%; bottom:0; width:18%; height:130%;
+    background: linear-gradient(180deg,#6fb0ff,#3978c6);
+    border-radius: 4px;
+  }
+
+  .iso.bed{
+    --c: #5b8df1;
+    width:90%; height:55%;
+    background: linear-gradient(180deg,#9bb6ff,#5b8df1);
+    transform: rotate(-22deg) skewY(22deg);
+    border-radius: 6px;
+    box-shadow: 0 8px 0 #355cc1;
+  }
+  .iso.bed::before{
+    content:''; position:absolute; left:6%; top:-30%; width:38%; height:55%;
+    background:#fff;
+    border-radius:4px;
+    transform: skewY(0);
+  }
+
+  .iso.lamp{
+    width:30%; height: 80%;
+    background: #b3a07e;
+    border-radius:2px;
+  }
+  .iso.lamp::before{
+    content:''; position:absolute; left:-90%; top:-20%;
+    width:280%; height:55%;
+    background: radial-gradient(ellipse at center, #fff5b8 0%, #efd070 65%, #c79a31 100%);
+    border-radius: 50%;
+  }
+
+  .iso.rug{
+    width: 92%; height: 60%;
+    background:
+      repeating-linear-gradient(45deg, #d96d6d 0 10px, #b54d4d 10px 20px);
+    transform: rotate(-25deg) skewY(25deg);
+    border-radius: 4px;
+    box-shadow: 0 3px 0 rgba(0,0,0,.18);
+  }
+
+  .iso.plant{
+    width: 50%; height: 80%;
+  }
+  .iso.plant::before{
+    content:''; position:absolute; left:18%; bottom:0; width:64%; height:35%;
+    background: linear-gradient(180deg,#b9805b,#8a5a3a);
+    border-radius: 3px 3px 8px 8px;
+  }
+  .iso.plant::after{
+    content:''; position:absolute; left:5%; top:0; width:90%; height:75%;
+    background: radial-gradient(circle at 30% 30%, #79c95a 0%, #4f9c34 70%);
+    border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+  }
+
+  .iso.shelf{
+    width: 80%; height: 80%;
+    background: linear-gradient(180deg,#b9805b,#8a5a3a);
+    transform: rotate(-22deg) skewY(22deg);
+    border-radius: 3px;
+    box-shadow: 0 6px 0 #5d3b22;
+  }
+  .iso.shelf::before, .iso.shelf::after{
+    content:''; position:absolute; left:8%; right:8%; height:6%;
+    background: rgba(255,255,255,.18);
+  }
+  .iso.shelf::before{ top: 28%; }
+  .iso.shelf::after { top: 60%; }
+
+  .iso.fridge{
+    width: 50%; height: 85%;
+    background: linear-gradient(180deg,#fff,#e3e8f0);
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 4px;
+    transform: rotate(-22deg) skewY(22deg);
+    box-shadow: 0 6px 0 #aab1c0;
+  }
+  .iso.fridge::before{
+    content:''; position:absolute; left:10%; top:38%; width:22%; height:4%;
+    background:#aab1c0; border-radius:2px;
+  }
+
+  .iso.washer{
+    width: 60%; height: 80%;
+    background: linear-gradient(180deg,#fff,#dbe4ee);
+    transform: rotate(-22deg) skewY(22deg);
+    border-radius: 4px;
+    box-shadow: 0 6px 0 #9aa3b3;
+  }
+  .iso.washer::before{
+    content:''; position:absolute; left:25%; top:35%; width:50%; height:50%;
+    background: radial-gradient(circle, #cfdce8, #94a8bd 80%);
+    border-radius: 50%;
+  }
+
+  .iso.tv{
+    width: 90%; height: 55%;
+    background: #1a1d2f;
+    transform: rotate(-22deg) skewY(22deg);
+    border-radius: 4px;
+    box-shadow: 0 5px 0 #0d0e1a;
+  }
+  .iso.tv::before{
+    content:''; position:absolute; inset: 8% 6%;
+    background: linear-gradient(45deg,#7eecd4,#5cb6d8 50%,#9b7ddc);
+    border-radius: 2px;
+  }
+
+  .iso.box{
+    width: 70%; height: 70%;
+    background: linear-gradient(180deg,#ff8aa1,#df5874);
+    transform: rotate(-22deg) skewY(22deg);
+    border-radius: 4px;
+    box-shadow: 0 6px 0 #a83f56;
+  }
+
+  .iso.ladder{
+    width: 60%; height: 90%;
+    background: repeating-linear-gradient(0deg, transparent 0 8px, #b9805b 8px 12px),
+                linear-gradient(90deg, #b9805b 0 6px, transparent 6px calc(100% - 6px), #b9805b calc(100% - 6px) 100%);
+    transform: rotate(-22deg) skewY(22deg);
+  }
+
+
+
+  /* === Right: cost / materials ============================================= */
+  .right{
+    position:absolute;
+    top: 142px; right: 18px;
+    width: 320px; height: 580px;
+    border-radius: 22px;
+    overflow: hidden;
+    display:flex; flex-direction:column;
+  }
+  .right .head{
+    height: 48px; padding: 0 14px;
+    display:flex; align-items:center;
+    background: linear-gradient(180deg, #fff 0%, #fbf6ea 100%);
+    color: var(--ink);
+    border-bottom: 1px solid var(--panel-edge);
+  }
+  .right .head h3{
+    margin:0; font-size:16px; font-weight:900;
+    font-family:'M PLUS Rounded 1c'; flex:1;
+  }
+  .right .head .small{ font-size:12px; color: var(--muted); font-weight:700; }
+  .right .body{
+    flex:1; padding: 12px;
+    display:flex; flex-direction:column; gap: 10px;
+    background:#fff;
+    overflow-y:auto;
+  }
+
+  .cost-summary{
+    background: #f6f3ea;
+    border:1px solid rgba(0,0,0,.06);
+    border-radius:14px;
+    padding: 10px 12px;
+    display:flex; align-items:center; gap: 12px;
+  }
+  .cost-meter{
+    flex:1; height: 10px; background: #ece7d6;
+    border-radius: 6px; overflow:hidden;
+    border: 1px solid rgba(0,0,0,.06);
+  }
+  .cost-meter > i{
+    display:block; height:100%;
+    width: 9.2%;
+    background: linear-gradient(90deg,#69c8ff,#8fdf6c);
+    border-radius: 6px;
+  }
+  .cost-num{ font-weight:900; font-size:14px; color: var(--ink); white-space:nowrap; }
+  .cost-num small{ color: var(--muted); font-weight:700; }
+
+  .mat{
+    display:grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 10px; align-items:center;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: #fbf9f3;
+    border: 1px solid rgba(0,0,0,.05);
+  }
+  .mat .icon{
+    width: 36px; height: 36px; border-radius:10px;
+    display:grid; place-items:center; font-size: 18px;
+    background: linear-gradient(180deg,#f1e9d3,#e3d6ad);
+    border:1px solid rgba(0,0,0,.08);
+  }
+  .mat .name{ font-weight:800; font-size:13px; color: var(--ink); }
+  .mat .name small{ display:block; font-weight:700; color: var(--muted); font-size:11px; letter-spacing:.4px; text-transform:lowercase;}
+  .mat .nums{ text-align:right; font-size:12px; font-weight:800; display:flex; flex-direction:column; gap:1px; line-height:1.25; white-space:nowrap; }
+  .mat .nums .need{ color: var(--ink); }
+  .mat .nums .have{ color: var(--muted); }
+  .mat .nums .short{ color: #d33; }
+  .mat.ok .nums .short{ color: #2c8a3a; }
+
+  /* === Hotbar ============================================================== */
+  .hotbar{
+    position:absolute;
+    left: 18px; right: 18px; bottom: 18px;
+    height: 92px;
+    border-radius: 22px;
+    padding: 10px;
+    display:flex; align-items:center; gap: 8px;
+  }
+  .hslot{
+    width: 72px; height: 72px;
+    border-radius: 14px;
+    background: #f4f8fc;
+    border: 1px solid rgba(60,90,140,.14);
+    position: relative;
+    cursor: pointer;
+    transition: transform .12s ease, background .12s ease;
+  }
+  .hslot:hover{ transform: translateY(-2px); }
+  .hslot.empty{
+    border: 1px dashed rgba(60,90,140,.28);
+    background: transparent;
+    display:grid; place-items:center;
+    color: rgba(60,90,140,.4);
+    font-size: 22px;
+    font-weight: 800;
+  }
+  .hslot.active{
+    background: linear-gradient(180deg,#9bdcff,#69c8ff);
+    border-color: rgba(14,57,85,.25);
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.12), 0 0 0 3px rgba(105,200,255,.4);
+  }
+  .hslot .num{
+    position:absolute; top:4px; left:6px;
+    font-family:'M PLUS Rounded 1c'; font-weight:800;
+    font-size: 11px; color: #fff;
+    background: rgba(31,53,86,.55);
+    padding: 1px 6px; border-radius: 8px;
+    pointer-events:none;
+  }
+  .hslot.active .num{ color: #0e3955; background: rgba(255,255,255,.65); }
+  .hslot .art{
+    position:absolute; inset:8px 8px 14px 8px;
+    background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.55));
+    border-radius: 8px;
+    display:grid; place-items:center;
+    overflow:hidden;
+  }
+  .hslot .lbl{
+    position:absolute; left:4px; right:4px; bottom:3px;
+    font-size: 10px; font-weight: 800;
+    color: var(--ink);
+    text-align:center;
+    text-overflow: ellipsis; white-space: nowrap; overflow:hidden;
+  }
+  .hslot.active .lbl{ color:#0e3955; }
+
+  .hotbar .meta{
+    margin-left: auto;
+    display:flex; flex-direction:column; align-items:flex-end;
+    gap: 2px;
+    color: var(--ink-2);
+    font-size: 12px; font-weight: 700;
+    padding-right: 8px; padding-left: 16px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .hotbar .meta b{ color: var(--ink); font-size: 13px; font-weight:900;}
+
+  /* (zoomdock removed) */
+
+  /* === Scene (faithful to old 2D mock) ==================================== */
+  .scene-floor{
+    position:absolute;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,.15);
+  }
+  .floor-wood{
+    left: 760px; top: 380px;
+    width: 240px; height: 140px;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0 1px, transparent 1px 22px),
+      linear-gradient(180deg,#e0a47e,#c47e54);
+  }
+  .floor-stone{
+    left: 1020px; top: 380px;
+    width: 200px; height: 140px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,.05) 0 1px, transparent 1px 18px),
+      linear-gradient(180deg,#dccfb1,#b8a981);
+  }
+  .floor-mat{
+    left: 760px; top: 540px;
+    width: 220px; height: 90px;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 1px, transparent 1px 16px),
+      linear-gradient(180deg,#cf6464,#a94646);
+  }
+  .scene-line{
+    position:absolute;
+    background: #5a3a25;
+    opacity:.85;
+    border-radius: 2px;
+  }
+  .line-h{ left: 480px; top: 420px; width: 280px; height: 4px; }
+  .line-v{ left: 1230px; top: 360px; width: 4px; height: 240px; }
+  .scene-tag{
+    position:absolute; left: 360px; top: 660px;
+    background: rgba(126,236,212,.35);
+    border: 1px solid rgba(126,236,212,.7);
+    color: #143b34;
+    font-weight: 800; font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+  }
+
+  /* === Undo/redo group ==================================================== */
+  .undogroup{
+    height: 44px; border-radius: 22px;
+    background: rgba(255,255,255,.96);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,.06);
+    display:flex; align-items:center; padding: 4px;
+  }
+  .ug-btn{
+    width: 38px; height: 36px;
+    border: 0; background: transparent;
+    border-radius: 14px;
+    color: var(--ink-2);
+    display:grid; place-items:center;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+  .ug-btn:hover:not(:disabled){ background: #f1efe5; color: var(--ink); }
+  .ug-btn:disabled{ opacity:.35; cursor: not-allowed; }
+  .ug-divider{
+    width: 1px; height: 22px;
+    background: rgba(0,0,0,.10);
+    margin: 0 1px;
+  }
+
+  /* === Autosave indicator ================================================= */
+  .autosave{
+    height: 44px; padding: 0 14px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbf6ea 100%);
+    border: 1px solid var(--panel-edge);
+    color: var(--ink);
+    display:inline-flex; align-items:center; gap: 8px;
+    font-size: 12.5px; font-weight: 800;
+    box-shadow: var(--shadow-md);
+  }
+  .autosave .dot{
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #8fdf6c;
+    box-shadow: 0 0 8px rgba(143,223,108,.7);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .55; transform: scale(.9); }
+  }
+
+  /* zoom mini for corner info */
+  .zoom-mini{
+    margin-left: auto;
+    display:flex; align-items:center; gap:4px;
+    background: rgba(255,255,255,.6);
+    border-radius: 12px;
+    padding: 3px 4px;
+    color: var(--ink); font-weight: 800; font-size: 11px;
+  }
+  .zoom-mini .zm{
+    width: 22px; height: 22px;
+    border: 0; border-radius: 8px;
+    background: rgba(255,255,255,.7);
+    color: var(--ink); font-size: 13px; font-weight: 800;
+    cursor: pointer;
+  }
+  .zoom-mini .zm:hover{ background: #fff; }
+  .zoom-mini > span{ min-width: 38px; text-align:center; }
+
+  /* === Canvas furniture (placed) ========================================== */
+  .scene-bed.selected{ outline: 3px dashed #fff; outline-offset: 4px; }
+
+  /* === Tweaks panel (toggled) ============================================= */
+  #tweaks{
+    position:fixed; right: 16px; bottom: 16px;
+    width: 280px;
+    background: #ffffff; color: var(--ink);
+    border-radius: 16px;
+    padding: 14px;
+    border: 1px solid var(--panel-edge);
+    box-shadow: var(--shadow-lg);
+    font-size: 13px;
+    z-index: 999;
+    display:none;
+  }
+  #tweaks.on{ display:block; }
+  #tweaks h4{ margin: 0 0 10px; font-size: 13px; font-weight: 800; color: var(--ink); }
+  #tweaks .row{ display:flex; align-items:center; gap:8px; margin: 6px 0; }
+  #tweaks label{ flex:1; color: var(--ink-2); font-size: 12px; font-weight: 700; }
+  #tweaks select, #tweaks input[type=range]{ flex: 1; }
+  #tweaks .swatches{ display:flex; gap:6px; }
+  #tweaks .sw{ width: 22px; height:22px; border-radius:6px; cursor:pointer; border: 2px solid transparent;}
+  #tweaks .sw.on{ border-color: var(--ink); }
+
+  .corner-info{
+    position:absolute; left: 18px; bottom: 122px;
+    width: 320px; height: 64px;
+    border-radius: 18px;
+    padding: 10px 14px;
+    display:flex; align-items:center; gap: 12px;
+    color: var(--ink-2); font-size: 12px; font-weight: 700;
+  }
+  .corner-info .level{
+    background: linear-gradient(180deg,#9bdcff,#69c8ff);
+    color:#0e3955; padding: 6px 10px; border-radius: 12px;
+    font-size: 13px; font-weight: 900;
+    border:1px solid rgba(0,0,0,.15);
+  }
+  .corner-info .stat b{ color: var(--ink); font-size:13px; }
+
+  /* small util */
+  .ico{ font-family:'M PLUS Rounded 1c'; font-weight:800; }
+
+  /* fit to viewport */
+  @media (max-aspect-ratio: 1600/1000){
+    .app{ transform: scale(min(calc(100vw / 1600), calc(100vh / 1000))); }
+  }
+  @media (min-aspect-ratio: 1600/1000){
+    .app{ transform: scale(min(calc(100vw / 1600), calc(100vh / 1000))); }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="app" id="app">
+
+    <!-- LAWN background layers -->
+    <div class="lawn-noise"></div>
+    <div class="lawn-tri"></div>
+    <div class="lawn-grid"></div>
+
+    <!-- placed scene (faithful to old 2D mock: simple flat shapes, floor textures, sparse furniture) -->
+    <div class="scene-floor floor-wood"></div>
+    <div class="scene-floor floor-stone"></div>
+    <div class="scene-floor floor-mat"></div>
+    <div class="scene-line line-h"></div>
+    <div class="scene-line line-v"></div>
+    <div class="scene-bed selected"></div>
+    <div class="sel-ring"></div>
+    <div class="scene-sofa"></div>
+    <div class="scene-tag">きらめく池</div>
+
+    <!-- TOP BAR — single horizontal toolbar matching source: tool modes + overwrite + import/export + undo/redo + area-level dropdown -->
+    <div class="topbar">
+      <!-- Tool mode segmented group: select / stamp / brush / remove -->
+      <div class="toolgroup" role="group" aria-label="ツールモード">
+        <button class="tg-btn" title="選択 / 移動 (V)" aria-pressed="false">
+          <!-- MousePointer2 -->
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"/></svg>
+          <span class="kbd">V</span>
+        </button>
+        <button class="tg-btn on" title="放置 (B)" aria-pressed="true">
+          <!-- Stamp -->
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M19.27 13.73A2.5 2.5 0 0 0 17.5 13h-11A2.5 2.5 0 0 0 4 15.5V17a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1.5c0-.66-.26-1.3-.73-1.77Z"/><path d="M14 13V8.5C14 7 15 7 15 5a3 3 0 0 0-3-3c-1.66 0-3 1-3 3s1 2 1 3.5V13"/></svg>
+          <span class="kbd">B</span>
+        </button>
+        <button class="tg-btn" title="画刷 (P)" aria-pressed="false">
+          <!-- Paintbrush -->
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.622 17.897l-10.68-2.913"/><path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/><path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15"/></svg>
+          <span class="kbd">P</span>
+        </button>
+        <button class="tg-btn danger" title="削除 (X)" aria-pressed="false">
+          <!-- Eraser -->
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21"/><path d="m5.082 11.09 8.828 8.828"/></svg>
+          <span class="kbd">X</span>
+        </button>
+      </div>
+
+      <!-- Overwrite mode toggle -->
+      <div class="toolgroup">
+        <button class="tg-btn" title="覆盖モード (O)" aria-pressed="false">
+          <!-- Replace -->
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4c0-1.1.9-2 2-2"/><path d="M20 2c1.1 0 2 .9 2 2"/><path d="M22 8c0 1.1-.9 2-2 2"/><path d="M16 10c-1.1 0-2-.9-2-2"/><path d="m3 7 3 3 3-3"/><path d="M6 10V5c0-1.7 1.3-3 3-3h1"/><rect x="2" y="14" width="8" height="8" rx="2"/></svg>
+          <span style="margin-left:2px;">覆盖</span>
+        </button>
+      </div>
+
+      <!-- Import / Export -->
+      <div class="toolgroup">
+        <button class="tg-btn" title="読込">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          <span>読込</span>
+        </button>
+        <button class="tg-btn" title="書出">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
+          <span>書出</span>
+        </button>
+      </div>
+
+      <!-- Undo / Redo -->
+      <div class="toolgroup">
+        <button class="tg-btn" title="撤销 (⌘Z)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>
+        </button>
+        <button class="tg-btn" title="重做 (⌘⇧Z)" disabled>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/></svg>
+        </button>
+      </div>
+
+      <div class="spacer"></div>
+
+      <!-- Autosaved indicator -->
+      <div class="autosave" title="Autosaved 2 seconds ago">
+        <span class="dot"></span>
+        <span>自動保存 · 2s</span>
+      </div>
+
+      <!-- Area level dropdown (top-right, matches source) -->
+      <button class="arealv" title="区域等级">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#4dc6ad" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg>
+        <span>Lv.3</span>
+        <span class="dim">70×70</span>
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px;opacity:.55;"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+
+    <!-- CATEGORY PILL BAR (D2: separated from catalog) -->
+    <div class="cat-bar">
+      <button class="cat active"><span class="ji">全部</span></button>
+      <button class="cat"><span class="ji">ディスプレイ</span></button>
+      <button class="cat"><span class="ji">キャンバス</span></button>
+      <button class="cat"><span class="ji">ラグ</span></button>
+      <button class="cat"><span class="ji">道</span></button>
+      <button class="cat"><span class="ji">棚</span></button>
+      <button class="cat"><span class="ji">植物</span></button>
+      <button class="cat"><span class="ji">ブロック</span></button>
+      <span class="cat-overflow">+ 4</span>
+    </div>
+
+    <!-- CATALOG -->
+    <div class="catalog panel">
+      <div class="head">
+        <h3>家具目録</h3>
+        <span class="chip">133 件</span>
+      </div>
+      <div class="body">
+        <div class="search">
+          <span>🔍</span><span>家具を検索…</span>
+        </div>
+
+        <div class="grid" id="grid">
+          <!-- tiles -->
+          <div class="tile selected"><div class="tile-art"><div class="iso sofa"></div></div><span class="size">3×2</span><span class="qty">×1</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso bed"></div></div><span class="size">4×2</span><span class="qty">×2</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso chair"></div></div><span class="size">1×1</span><span class="qty">×4</span></div>
+
+          <div class="tile"><div class="tile-art"><div class="iso lamp"></div></div><span class="size">1×1</span><span class="qty">×1</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso shelf"></div></div><span class="size">2×1</span><span class="qty">×2</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso fridge"></div></div><span class="size">1×1</span><span class="qty">×1</span></div>
+
+          <div class="tile"><div class="tile-art"><div class="iso washer"></div></div><span class="size">1×1</span><span class="qty">×1</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso plant"></div></div><span class="size">1×1</span><span class="qty">×3</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso rug"></div></div><span class="size">3×2</span><span class="qty">×2</span></div>
+
+          <div class="tile"><div class="tile-art"><div class="iso tv"></div></div><span class="size">2×1</span><span class="qty">×1</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso box"></div></div><span class="size">1×1</span><span class="qty">×3</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso ladder"></div></div><span class="size">1×2</span><span class="qty">×1</span></div>
+
+          <div class="tile"><div class="tile-art"><div class="iso chair"></div></div><span class="size">1×1</span><span class="qty">×2</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso bed"></div></div><span class="size">6×4</span><span class="qty">×1</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso shelf"></div></div><span class="size">2×1</span><span class="qty">×3</span></div>
+
+          <div class="tile"><div class="tile-art"><div class="iso plant"></div></div><span class="size">1×1</span><span class="qty">×2</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso lamp"></div></div><span class="size">1×1</span><span class="qty">×1</span></div>
+          <div class="tile"><div class="tile-art"><div class="iso sofa"></div></div><span class="size">3×2</span><span class="qty">×1</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: cost + materials -->
+    <div class="right panel-light panel">
+      <div class="head">
+        <h3>材料コスト</h3>
+        <span class="small">133 件 / 18,000</span>
+      </div>
+      <div class="body">
+        <div class="cost-summary">
+          <div>
+            <div class="cost-num">1,655 <small>/ 18,000</small></div>
+            <div style="font-size:11px; color:var(--muted); font-weight:700;">レイアウトコスト</div>
+          </div>
+          <div class="cost-meter"><i></i></div>
+        </div>
+
+        <div class="mat">
+          <div class="icon">🌳</div>
+          <div class="name">想いの木材<small>mineral</small></div>
+          <div class="nums"><div class="need">必要 65</div><div class="have">持 0</div><div class="short">差 65</div></div>
+        </div>
+        <div class="mat">
+          <div class="icon">⛏️</div>
+          <div class="name">想いの石ころ<small>mineral</small></div>
+          <div class="nums"><div class="need">必要 28</div><div class="have">持 0</div><div class="short">差 28</div></div>
+        </div>
+        <div class="mat">
+          <div class="icon">🔩</div>
+          <div class="name">釘<small>junk</small></div>
+          <div class="nums"><div class="need">必要 12</div><div class="have">持 0</div><div class="short">差 12</div></div>
+        </div>
+        <div class="mat">
+          <div class="icon">🌿</div>
+          <div class="name">さらさらリネン<small>植物</small></div>
+          <div class="nums"><div class="need">必要 5</div><div class="have">持 0</div><div class="short">差 5</div></div>
+        </div>
+        <div class="mat">
+          <div class="icon">☁️</div>
+          <div class="name">ふわふわコットン<small>植物</small></div>
+          <div class="nums"><div class="need">必要 5</div><div class="have">持 0</div><div class="short">差 5</div></div>
+        </div>
+        <div class="mat">
+          <div class="icon">⚙️</div>
+          <div class="name">鉄<small>mineral</small></div>
+          <div class="nums"><div class="need">必要 3</div><div class="have">持 0</div><div class="short">差 3</div></div>
+        </div>
+        <div class="mat ok">
+          <div class="icon">🎮</div>
+          <div class="name">ストリクトプル…<small>game_character</small></div>
+          <div class="nums"><div class="need">必要 3</div><div class="have">持 3</div><div class="short">差 0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOTBAR -->
+    <div class="hotbar panel">
+      <div class="hslot active">
+        <span class="num">1</span>
+        <div class="art"><div class="iso sofa" style="width:78%; height:62%;"></div></div>
+        <div class="lbl">ソファ</div>
+      </div>
+      <div class="hslot">
+        <span class="num">2</span>
+        <div class="art"><div class="iso bed" style="width:84%; height:60%;"></div></div>
+        <div class="lbl">ベッド</div>
+      </div>
+      <div class="hslot">
+        <span class="num">3</span>
+        <div class="art"><div class="iso lamp" style="width:30%; height:72%;"></div></div>
+        <div class="lbl">ランプ</div>
+      </div>
+      <div class="hslot">
+        <span class="num">4</span>
+        <div class="art"><div class="iso rug" style="width:88%; height:60%;"></div></div>
+        <div class="lbl">ラグ</div>
+      </div>
+      <div class="hslot">
+        <span class="num">5</span>
+        <div class="art"><div class="iso plant" style="width:50%; height:78%;"></div></div>
+        <div class="lbl">植物</div>
+      </div>
+      <div class="hslot empty"><span class="num">6</span>＋</div>
+      <div class="hslot empty"><span class="num">7</span>＋</div>
+      <div class="hslot empty"><span class="num">8</span>＋</div>
+      <div class="hslot empty"><span class="num">9</span>＋</div>
+
+      <div class="meta">
+        <div><b>13</b> 件配置</div>
+        <div>選択: <b>ソファ</b></div>
+      </div>
+    </div>
+
+    <!-- CORNER INFO (bottom-left) — Lv / size / zoom (compact, single bar) -->
+    <div class="corner-info panel">
+      <div class="level">Lv.3</div>
+      <div class="stat" style="line-height:1.3; white-space:nowrap;">
+        <div><b>70 × 70</b></div>
+        <div style="opacity:.65; font-size:11px;">配置 13件</div>
+      </div>
+      <div class="zoom-mini">
+        <button class="zm" title="Zoom out">−</button>
+        <span>100%</span>
+        <button class="zm" title="Zoom in">+</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Tweaks panel -->
+<div id="tweaks">
+  <h4>Tweaks</h4>
+  <div class="row">
+    <label>Accent</label>
+    <div class="swatches">
+      <div class="sw on" data-accent="#7eecd4" style="background:#7eecd4"></div>
+      <div class="sw" data-accent="#a6e7ff" style="background:#a6e7ff"></div>
+      <div class="sw" data-accent="#ffc6e3" style="background:#ffc6e3"></div>
+      <div class="sw" data-accent="#ffd97a" style="background:#ffd97a"></div>
+      <div class="sw" data-accent="#c9a3ff" style="background:#c9a3ff"></div>
+    </div>
+  </div>
+  <div class="row">
+    <label>Panel chrome</label>
+    <select id="chrome">
+      <option value="navy">deep navy (in-game)</option>
+      <option value="cream">cream &amp; ink</option>
+      <option value="forest">forest</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>Lawn brightness</label>
+    <input type="range" id="lawn" min="0" max="100" value="60"/>
+  </div>
+  <div class="row">
+    <label>Show grid</label>
+    <input type="checkbox" id="grid-toggle" checked/>
+  </div>
+</div>
+
+<script>
+  // wire tweaks
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks').classList.add('on');
+    if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('on');
+  });
+  // register listener first, then announce
+  window.parent.postMessage({type:'__edit_mode_available'}, '*');
+
+  const root = document.documentElement;
+  document.querySelectorAll('#tweaks .sw').forEach(sw => sw.addEventListener('click', () => {
+    document.querySelectorAll('#tweaks .sw').forEach(s => s.classList.remove('on'));
+    sw.classList.add('on');
+    const c = sw.dataset.accent;
+    root.style.setProperty('--mint', c);
+    document.querySelectorAll('.catalog .head, .tg-btn.on:not(.danger), .hslot.active, .arealv .lv').forEach(el => el.style.background = `linear-gradient(180deg, ${c} 0%, ${c} 100%)`);
+  }));
+
+  document.getElementById('chrome').addEventListener('change', (e) => {
+    const v = e.target.value;
+    if (v === 'navy'){ root.style.setProperty('--panel','#2b2e4a'); root.style.setProperty('--panel-2','#383c5d'); }
+    if (v === 'cream'){ root.style.setProperty('--panel','#f6efe1'); root.style.setProperty('--panel-2','#fff8e7'); }
+    if (v === 'forest'){ root.style.setProperty('--panel','#1f3a2c'); root.style.setProperty('--panel-2','#2a4d3a'); }
+  });
+
+  document.getElementById('lawn').addEventListener('input', e => {
+    const t = e.target.value/100;
+    document.querySelector('.lawn-noise').style.opacity = (.2 + t*.8);
+    document.querySelector('.app').style.filter = `brightness(${0.85 + t*0.3})`;
+  });
+
+  document.getElementById('grid-toggle').addEventListener('change', e => {
+    document.querySelector('.lawn-grid').style.display = e.target.checked ? '' : 'none';
+  });
+
+  // tool group interaction — only one of select/stamp/brush/remove on at a time
+  const toolGroup = document.querySelector('.toolgroup');
+  if (toolGroup) {
+    toolGroup.querySelectorAll('.tg-btn').forEach(b => b.addEventListener('click', () => {
+      toolGroup.querySelectorAll('.tg-btn').forEach(x => { x.classList.remove('on'); x.setAttribute('aria-pressed','false'); });
+      b.classList.add('on'); b.setAttribute('aria-pressed','true');
+    }));
+  }
+  // overwrite toggle (second toolgroup) — independent on/off
+  const ovBtn = document.querySelectorAll('.toolgroup')[1]?.querySelector('.tg-btn');
+  ovBtn?.addEventListener('click', () => {
+    const on = ovBtn.classList.toggle('on');
+    ovBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  // hotbar interaction
+  document.querySelectorAll('.hslot').forEach(s => s.addEventListener('click', () => {
+    document.querySelectorAll('.hslot').forEach(x => x.classList.remove('active'));
+    s.classList.add('active');
+  }));
+</script>
+</body>
+</html>

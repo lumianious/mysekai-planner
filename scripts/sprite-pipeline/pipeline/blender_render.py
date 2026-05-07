@@ -107,13 +107,25 @@ def _setup_camera_and_light(tile_w: int, tile_d: int):
     cam.data.ortho_scale = ortho_scale
     bpy.context.scene.camera = cam
 
+    # 主光：近顶光（轻微倾斜留少量立体感）+ 较高 energy 还原游戏内明亮观感
     bpy.ops.object.light_add(
         type="SUN",
         location=(center.x, center.y, maxs.z + max(size_xy, 0.5) + 10),
     )
     sun = bpy.context.object
-    sun.data.energy = 3.0
-    sun.rotation_euler = (math.radians(45), math.radians(20), 0)
+    sun.data.energy = 3.5
+    sun.rotation_euler = (math.radians(25), math.radians(15), 0)
+
+    # 环境光（World 背景强度）抬高暗部，避免阴影侧死黑
+    world = bpy.context.scene.world
+    if world is None:
+        world = bpy.data.worlds.new("World")
+        bpy.context.scene.world = world
+    world.use_nodes = True
+    bg = world.node_tree.nodes.get("Background")
+    if bg is not None:
+        bg.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+        bg.inputs["Strength"].default_value = 0.6
 
 
 # ======== 渲染配置 ========
@@ -124,6 +136,13 @@ def _configure_render(scene, width: int, height: int) -> None:
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"
     scene.render.film_transparent = True
+    # 色彩管理：Blender 4+ 默认 AgX/Filmic 会"电影感"压低饱和度；
+    # 游戏 UI 缩略图是纯 sRGB，用 Standard 才能跟 in-game iso thumbnail 同饱和。
+    try:
+        scene.view_settings.view_transform = "Standard"
+        scene.view_settings.look = "None"
+    except Exception:
+        pass
 
 
 # ======== 入口 ========
