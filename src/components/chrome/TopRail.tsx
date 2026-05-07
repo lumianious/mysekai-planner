@@ -39,27 +39,33 @@ export function TopRail({ fixtureMap, costIndex: _costIndex }: TopRailProps) {
       className="flex items-center"
       style={{ height: 44, gap: 8 }}
     >
-      {/* 左侧弹性间距 —— 顶栏所有功能项右对齐，左边留给画布呼吸 */}
-      <div className="flex-1" />
+      {/* 左侧弹性间距 —— pointer-events:none 让画布/catalog 的点击穿透到下面 */}
+      <div className="flex-1" style={{ pointerEvents: 'none' }} />
 
-      <CostPill current={costSummary.current} max={costSummary.max} />
-      <AutosavePill />
-      <AreaLevelDropdown />
-      {/* 导入/导出/重置 ToolButton 放在白色药丸里，保持顶栏视觉一致 */}
+      {/* 右侧可见 pill 集合恢复 pointer-events 以保留交互 */}
       <div
         className="flex items-center"
-        style={{
-          height: 32,
-          padding: '0 4px',
-          background: '#ffffff',
-          borderRadius: 'var(--radius-pill-inner)',
-          boxShadow: 'var(--shadow-md)',
-          gap: 2,
-        }}
+        style={{ gap: 8, pointerEvents: 'auto' }}
       >
-        <ImportButton />
-        <ExportButton />
-        <ResetButton />
+        <CostPill current={costSummary.current} max={costSummary.max} />
+        <AutosavePill />
+        <AreaLevelDropdown />
+        {/* 导入/导出/重置 ToolButton 放在白色药丸里，保持顶栏视觉一致 */}
+        <div
+          className="flex items-center"
+          style={{
+            height: 32,
+            padding: '0 4px',
+            background: '#ffffff',
+            borderRadius: 'var(--radius-pill-inner)',
+            boxShadow: 'var(--shadow-md)',
+            gap: 2,
+          }}
+        >
+          <ImportButton />
+          <ExportButton />
+          <ResetButton />
+        </div>
       </div>
     </div>
   )

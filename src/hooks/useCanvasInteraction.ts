@@ -15,12 +15,14 @@ const MAX_SCALE = 3.0
 
 export function useCanvasInteraction() {
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 })
-  const [stageScale, setStageScaleLocal] = useState(1)
+  // stageScale 单一真实源 = store；ZoomDock 写入 store 后画布立即响应
+  const stageScale = useEditorStore((s) => s.stageScale)
+  const setStageScaleStore = useEditorStore((s) => s.setStageScale)
 
-  const setStageScale = useCallback((scale: number) => {
-    setStageScaleLocal(scale)
-    useEditorStore.getState().setStageScale(scale)
-  }, [])
+  const setStageScale = useCallback(
+    (scale: number) => setStageScaleStore(scale),
+    [setStageScaleStore],
+  )
 
   const handleWheel = useCallback((e: KonvaEventObject<WheelEvent>) => {
     e.evt.preventDefault()

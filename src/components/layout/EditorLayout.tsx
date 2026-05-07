@@ -17,8 +17,8 @@ import { useEditorStore } from '../../stores/editorStore'
 export function EditorLayout() {
   const { fixtures, mainGenres, fixtureMap, costIndex, loading, error } =
     useFixtureData()
-  // 持久化值若来自旧版本（TOP_MARGIN=16）会让轨被顶栏遮挡，这里强制至少 68
-  const catalogTop = Math.max(68, useEditorStore((s) => s.catalogTop))
+  // 允许 catalog 贴到屏顶；与 top-rail 重叠时由 z-index 决定可点击性
+  const catalogTop = Math.max(16, useEditorStore((s) => s.catalogTop))
 
   return (
     <Tooltip.Provider delayDuration={300}>
@@ -32,11 +32,18 @@ export function EditorLayout() {
         <EditorCanvas fixtureMap={fixtureMap} />
       </div>
 
-      {/* Slot A — Top rail (h:44, top:16, left:16, right:16) */}
+      {/* Slot A — Top rail (h:44, top:16, left:16, right:16)
+          槽位本身透明、空白区让点击穿透；TopRail 的可见 pill 自行恢复 pointer-events */}
       <div
         data-chrome-slot="top-rail"
         className="absolute z-20"
-        style={{ top: 16, left: 16, right: 16, height: 44 }}
+        style={{
+          top: 16,
+          left: 16,
+          right: 16,
+          height: 44,
+          pointerEvents: 'none',
+        }}
       >
         {!loading && !error && (
           <TopRail fixtureMap={fixtureMap} costIndex={costIndex} />
@@ -44,7 +51,8 @@ export function EditorLayout() {
       </div>
 
       {/* Slot B — Catalog (top: catalogTop, left:16, h:740)
-          catalogTop 来自 store，由 CatalogRail 顶部的 grip 拖拽更新 */}
+          catalogTop 来自 store，由 CatalogRail 顶部的 grip 拖拽更新。
+          顶栏槽位是透明容器，可见 pill 都在右侧 —— catalog 在左侧无需 z-index 让位。 */}
       {!loading && !error && (
         <div
           data-chrome-slot="catalog"

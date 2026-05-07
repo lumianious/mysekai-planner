@@ -3,7 +3,7 @@
 // OUTPUT: Konva Group（彩色矩形 + 名称标签 + 选中指示器 + 系统锁标识 + 闪烁动画）
 // POS: src/components/canvas/PlacedItem.tsx — 单个放置物品的画布渲染
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Group, Rect, Text, Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
 import useImage from 'use-image'
@@ -13,6 +13,7 @@ import { getEffectiveSize } from '../../utils/grid'
 import { getFixtureColor } from '../../utils/color'
 import { getGroundSubtype } from '../../data/fixtures'
 import { getSpriteEntrySync, resolveSpriteUrl } from '../../data/spriteManifest'
+import { getTilePattern } from '../../utils/croppedTile'
 import { useEditorStore } from '../../stores/editorStore'
 import type { PlacedItem as PlacedItemType, Fixture, ToolMode } from '../../types/editor'
 
@@ -133,18 +134,26 @@ export const PlacedItem = React.memo(function PlacedItem({
   //   - 3D 家具 -> iso thumbnail（HID 风格）
   //   - manifest 未命中 -> getFixtureColor 旧路径（D-17 回退）
   const groundSubtype = getGroundSubtype(fixture)
-  const isGroundItem =
-    groundSubtype !== null ||
-    fixture.mysekaiSettableLayoutType === 'floor_appearance'
+  const manifestEntryEarly = getSpriteEntrySync(fixture.assetbundleName)
+  // 「地面项」= 视觉上是平面贴片，按格子无缝拼接（rug/road/color-tile/fence/floor texture）。
+  // 权威信号：manifest mode === '2d'（管线已根据 layoutType + handleType 分类）。
+  // 回退：manifest 未命中时沿用旧启发式（groundSubtype / floor_appearance）。
+  const isGroundItem = manifestEntryEarly
+    ? manifestEntryEarly.mode === '2d'
+    : groundSubtype !== null ||
+      fixture.mysekaiSettableLayoutType === 'floor_appearance'
   // dominantColor 底色仅给"应贴满方格"的项目用（road / color-tile / floor_appearance）；
   // rug 形状非矩形（扇贝边），底色会在透明边缘外溢成方块光晕。
   const usesUnderlay =
     isGroundItem && groundSubtype !== 'rug' && groundSubtype !== 'fence'
-  const manifestEntry = getSpriteEntrySync(fixture.assetbundleName)
-  const groundColor =
-    usesUnderlay && manifestEntry?.dominantColor
+  const manifestEntry = manifestEntryEarly
+  // dominantColor 缺失时回退到 getFixtureColor（颜色码或类型主色），保证 road / 色块
+  // 始终有不透明底色，相邻拼接时网格绿不会从 sprite 透明像素中漏出。
+  const groundColor = usesUnderlay
+    ? manifestEntry?.dominantColor
       ? `rgb(${manifestEntry.dominantColor.join(',')})`
-      : null
+      : fillColor
+    : null
   // 地面项：solid Rect 保证可连接 + topdown sprite 叠加（iso thumbnail 会显示 3D 视角不适合地面）
   // 非地面（家具）：直接用 thumbnail（HID 风格）
   const groundUrl = isGroundItem
@@ -162,6 +171,38 @@ export const PlacedItem = React.memo(function PlacedItem({
   // rug 走"无底色 + topdown 直贴"路径（usesUnderlay=false 时无 groundColor 但仍是地面项）
   const renderGroundOnly = !groundColor && renderGroundTexture
 
+  // ======== sprite 自然比例（contain-fit） ========
+  // iso thumbnail 是方形文件；非方形足迹（2×6 床、4×2 沙发）等比缩放后居中，
+  // 用虚线边框标示真实占地。地面项保持全填充（贴片需要无缝拼接）。
+  const spriteNaturalW = spriteImg?.naturalWidth ?? 0
+  const spriteNaturalH = spriteImg?.naturalHeight ?? 0
+  const spriteFitScale =
+    renderSprite && spriteNaturalW > 0 && spriteNaturalH > 0
+      ? Math.min(pixelWidth / spriteNaturalW, pixelHeight / spriteNaturalH)
+      : 1
+  const spriteDrawW = spriteNaturalW * spriteFitScale
+  const spriteDrawH = spriteNaturalH * spriteFitScale
+  const spriteOffsetX = (pixelWidth - spriteDrawW) / 2
+  const spriteOffsetY = (pixelHeight - spriteDrawH) / 2
+  // 一致性原则：所有 3D 物件都画足迹底板，无论 sprite 比例是否匹配
+  // —— 用户认知模型："3D 物件总有 pad；2D 贴片总是无缝铺开"。
+  const showFootprintBorder = renderSprite
+
+  // ======== 路面核心瓦片铺贴（路 / 色块 / 地板纹理） ========
+  // 游戏 source asset 用 snake-shape 编码 tile 间连接关系（连接臂 = 透明），
+  // 引擎按邻居动态拼合；我们没有连接逻辑，所以从单个源 tile 中裁中心 60% 的"实心核心"
+  // 作为图案单元，跨 fixture 无缝铺贴时就是一片均匀路面（与游戏内观感一致）。
+  const renderTiledGround =
+    usesUnderlay &&
+    groundImg !== undefined &&
+    groundStatus === 'loaded' &&
+    groundImg.naturalWidth > 0
+  const tilePattern = useMemo(
+    () =>
+      renderTiledGround && groundImg ? getTilePattern(groundImg, w) : null,
+    [renderTiledGround, groundImg, w],
+  )
+
   return (
     <Group
       x={item.x * TILE_SIZE}
@@ -172,8 +213,38 @@ export const PlacedItem = React.memo(function PlacedItem({
       onTap={handleClick}
       onDragEnd={handleDragEnd}
     >
-      {/* 主体：地面 = solid color + thumbnail 叠加；家具 = sprite；fallback = 彩色矩形 */}
-      {groundColor ? (
+      {/* 主体：tiled ground core > solid underlay > rug 直贴 > 家具 sprite > fallback */}
+      {renderTiledGround && tilePattern ? (
+        <>
+          {/* 全瓦模式下采样的底色：让源 tile 内剩余少量透明像素显出 mortar 而非草地 */}
+          {tilePattern.underlayColor && (
+            <Rect
+              width={pixelWidth}
+              height={pixelHeight}
+              fill={tilePattern.underlayColor}
+            />
+          )}
+          <Rect
+            width={pixelWidth}
+            height={pixelHeight}
+            fillPatternImage={tilePattern.canvas}
+            fillPatternRepeat="repeat"
+            fillPatternScaleX={TILE_SIZE / tilePattern.sourceTilePx}
+            fillPatternScaleY={TILE_SIZE / tilePattern.sourceTilePx}
+            fillPatternOffsetX={
+              tilePattern.mode === 'full-tile'
+                ? item.x * tilePattern.sourceTilePx
+                : 0
+            }
+            fillPatternOffsetY={
+              tilePattern.mode === 'full-tile'
+                ? item.y * tilePattern.sourceTilePx
+                : 0
+            }
+            listening={false}
+          />
+        </>
+      ) : groundColor ? (
         <>
           <Rect width={pixelWidth} height={pixelHeight} fill={groundColor} />
           {renderGroundTexture && (
@@ -192,11 +263,25 @@ export const PlacedItem = React.memo(function PlacedItem({
           height={pixelHeight}
         />
       ) : renderSprite ? (
-        <KonvaImage
-          image={spriteImg}
-          width={pixelWidth}
-          height={pixelHeight}
-        />
+        <>
+          {/* 足迹底板：深色淡填充 + 实线描边，与白色虚线网格区分；同时充当点击命中区 */}
+          <Rect
+            width={pixelWidth}
+            height={pixelHeight}
+            fill={showFootprintBorder ? 'rgba(30,41,59,0.10)' : 'rgba(0,0,0,0.001)'}
+            stroke={showFootprintBorder ? 'rgba(30,41,59,0.55)' : undefined}
+            strokeWidth={showFootprintBorder ? 1 / stageScale : 0}
+            cornerRadius={2}
+          />
+          <KonvaImage
+            image={spriteImg}
+            x={spriteOffsetX}
+            y={spriteOffsetY}
+            width={spriteDrawW}
+            height={spriteDrawH}
+            listening={false}
+          />
+        </>
       ) : (
         <Rect
           width={pixelWidth}

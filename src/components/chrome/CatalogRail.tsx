@@ -44,9 +44,9 @@ interface CatalogRailProps {
   fixtureMap: Map<number, Fixture>
 }
 
-// 视口顶安全区：避免轨上滑到顶栏 chrome（top:16, height:44, z-20）下方
-// 如果允许 < 68，grip 会被顶栏遮挡，导致拖回的入口失效
-const TOP_MARGIN = 68
+// 视口顶安全区：允许轨贴到屏幕顶（与 top-rail 同高），由 EditorLayout 的 z-index
+// 确保 grip 始终可点击（catalog z 高于 top-rail）。
+const TOP_MARGIN = 16
 const MIN_VISIBLE_HEIGHT = 300
 
 export function CatalogRail({
