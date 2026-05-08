@@ -4,7 +4,11 @@
 //
 // 中间件组合：persist(temporal(creator)) —— 外层 persist 写 localStorage，内层 temporal 管 undo
 // 持久化字段（partialize）：placedItems / placedEdges / areaLevel / gridSize / isEditorReady
+//                       + chrome（catalogCollapsed/catalogTop/costPanelOpen/floatbarX/activeCategory）
+//                       + inventory
 // 不持久化：undo 历史、工具模式、选中项、预览旋转、热栏、stageScale、flashItemIds、activeFixtureId、overwriteEnabled
+// Phase 9 plan 02 新增运行时瞬态字段（不入 persist，不入 temporal — D-08）：
+//   activeSubGenreId / searchActiveBeforeQuery
 
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
@@ -169,7 +173,12 @@ export const useEditorStore = create<EditorState>()(
       catalogTop: 76,
       costPanelOpen: false,
       floatbarX: 0.5,
-      activeCategory: 'all',
+      activeCategory: 'all' as number | 'all',
+      // Phase 9 plan 02: transient（不入 persist，不入 temporal）— D-08
+      activeSubGenreId: null as number | null,
+      searchActiveBeforeQuery: null as
+        | { mainId: number | 'all'; subId: number | null }
+        | null,
       // Phase 7 plan 02: 自动保存时间戳（运行时态，由 persist storage 包装器写入；不进入 partialize）
       lastSaveAt: null as number | null,
 
@@ -374,7 +383,12 @@ export const useEditorStore = create<EditorState>()(
       setCostPanelOpen: (open) => set({ costPanelOpen: open }),
       toggleCostPanel: () => set((s) => ({ costPanelOpen: !s.costPanelOpen })),
       setFloatbarX: (x) => set({ floatbarX: Math.max(0, Math.min(1, x)) }),
-      setActiveCategory: (category) => set({ activeCategory: category }),
+      // Phase 9 plan 02: 切换 mainGenre 时重置 subGenre（避免悬挂 id —— RESEARCH pitfall §2）
+      setActiveCategory: (category) =>
+        set({ activeCategory: category, activeSubGenreId: null }),
+      setActiveSubGenreId: (id) => set({ activeSubGenreId: id }),
+      setSearchActiveBeforeQuery: (snap) =>
+        set({ searchActiveBeforeQuery: snap }),
     }),
     {
       limit: 50, // 超过 GRID-09 最低 20 步要求
@@ -393,7 +407,8 @@ export const useEditorStore = create<EditorState>()(
   ),
     {
       name: DESIGN_STORAGE_KEY,
-      version: 3,
+      // Phase 9 plan 02: v3 → v4 — activeCategory 字符串 → number | 'all'
+      version: 4,
       // Phase 7 plan 02: 包装 localStorage 以在每次 setItem 后捕获 lastSaveAt
       // 注意：不能让 lastSaveAt 进入 partialize（否则形成 setState→setItem→setState 死循环）
       storage: createJSONStorage(() => ({
@@ -435,6 +450,11 @@ export const useEditorStore = create<EditorState>()(
             floatbarX: typeof migrated.floatbarX === 'number' ? migrated.floatbarX : fraction,
             catalogTop: typeof migrated.catalogTop === 'number' ? migrated.catalogTop : 76,
           }
+        }
+        if (fromVersion < 4) {
+          // Phase 9 plan 02: Phase 7 Phase7Category 字符串无干净 mainGenreId 映射；
+          // 统一兜底到 'all'（D-04 / CATL-08 / RESEARCH Code Example 4）
+          migrated = { ...migrated, activeCategory: 'all' as const }
         }
         return migrated
       },

@@ -136,7 +136,13 @@ export interface EditorState {
   catalogTop: number          // px from viewport top — drag-controlled vertical position
   costPanelOpen: boolean
   floatbarX: number           // 0..1 normalized horizontal position of the floatbar pill center
-  activeCategory: string
+  // Phase 9 plan 02: activeCategory 从 Phase7Category 字符串改为 mainGenreId | 'all'
+  activeCategory: number | 'all'
+  // Phase 9 plan 02: transient（不入 persist，不入 temporal）— D-08
+  // 切 mainGenre 时由 setActiveCategory 重置为 null（RESEARCH pitfall §2）
+  activeSubGenreId: number | null
+  // Phase 9 plan 02: 搜索激活前的分类快照，用于 D-15 清空搜索时回填
+  searchActiveBeforeQuery: { mainId: number | 'all'; subId: number | null } | null
   // Phase 7 plan 02: 自动保存时间戳（仅运行时态，由 persist storage 包装器写入；不进入 partialize）
   lastSaveAt: number | null
 
@@ -172,5 +178,10 @@ export interface EditorState {
   setCostPanelOpen: (open: boolean) => void
   toggleCostPanel: () => void
   setFloatbarX: (x: number) => void
-  setActiveCategory: (category: string) => void
+  // Phase 9 plan 02: 切 mainGenre 时重置 activeSubGenreId（pitfall §2）
+  setActiveCategory: (category: number | 'all') => void
+  setActiveSubGenreId: (id: number | null) => void
+  setSearchActiveBeforeQuery: (
+    snap: { mainId: number | 'all'; subId: number | null } | null,
+  ) => void
 }
