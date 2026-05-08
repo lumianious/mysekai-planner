@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 09-03-PLAN.md
-last_updated: "2026-05-08T08:44:20.600Z"
+stopped_at: Completed 09-04-PLAN.md
+last_updated: "2026-05-08T08:48:50.075Z"
 last_activity: 2026-05-08
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 36
-  completed_plans: 33
+  completed_plans: 34
   percent: 87
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 09 (catalog-overhaul-genre-driven-categories-with-search) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-05-08
 
@@ -77,6 +77,7 @@ Progress: [█████████░] 87%
 | Phase 09 P02 | 7min | 1 tasks | 3 files |
 | Phase 09 P01 | 10min | 3 tasks | 6 files |
 | Phase 09 P03 | 6min | 1 tasks | 2 files |
+| Phase 09 P04 | 18min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -163,6 +164,9 @@ Recent decisions affecting current work:
 - [Phase 09]: deriveOutdoorMainGenres preserves source-order of allGenres (no resort)
 - [Phase 09]: FixtureMainGenre.assetbundleName promoted to required type field; seq relaxed to optional (live JSON has no seq)
 - [Phase 09]: CatalogRail two-region layout: top-pinned grip+hamburger, bottom scrollable button column with overflowY:auto + scrollbarWidth:none (D-09)
+- [Phase 09]: Phase 9 plan 04: snapshot/restore call order is load-bearing — setActiveCategory must run BEFORE setActiveSubGenreId on restore (setActiveCategory atomically zeroes activeSubGenreId, so the reverse order would clobber the restored subId)
+- [Phase 09]: Phase 9 plan 04: CategoryFilter generalized via items: {id;name}[] (kept filename) — both FixtureMainGenre and FixtureSubGenre satisfy the shape structurally, no  needed (RESEARCH Pitfall §5)
+- [Phase 09]: Phase 9 plan 04: CatalogGrid jsdom-only initialRect + observeElementRect override (NODE_ENV==='test' gated) so virtual rows render in RTL smoke tests; production behavior unchanged
 
 ### Pending Todos
 
@@ -174,6 +178,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-08T08:44:20.598Z
-Stopped at: Completed 09-03-PLAN.md
+Last session: 2026-05-08T08:48:50.072Z
+Stopped at: Completed 09-04-PLAN.md
 Resume file: None

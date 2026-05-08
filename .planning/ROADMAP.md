@@ -215,5 +215,5 @@ Plans:
 - [x] 09-01-PLAN.md — Wave 0 test stubs (5 files) + `deriveOutdoorMainGenres` helper + `genreIcons.ts` lucide table (CATL-06, CATL-09)
 - [x] 09-02-PLAN.md — Store migration: persist v3→v4 + activeCategory retype + activeSubGenreId/searchActiveBeforeQuery transient fields + setActiveCategory atomic reset (CATL-08)
 - [x] 09-03-PLAN.md — Rewire CatalogRail.tsx to derived list + getGenreIcon + vertical scroll (CATL-05 rail half, CATL-06, CATL-09)
-- [ ] 09-04-PLAN.md — Rewire CatalogSidebar.tsx: filterByGenre + searchFixtures + chip strip + breadcrumb + snapshot/restore; generalize CategoryFilter; thread subGenres prop (CATL-05 sidebar half, CATL-07, CATL-10, CATL-11)
+- [x] 09-04-PLAN.md — Rewire CatalogSidebar.tsx: filterByGenre + searchFixtures + chip strip + breadcrumb + snapshot/restore; generalize CategoryFilter; thread subGenres prop (CATL-05 sidebar half, CATL-07, CATL-10, CATL-11)
 - [ ] 09-05-PLAN.md — Cleanup: delete Phase7Category + filterByPhase7Category + drop broken seq sort + L2 doc update + UAT checkpoint (CATL-05 final gate)
