@@ -14,9 +14,15 @@ import { useEditorStore, setHoveredFixtureId } from '../../stores/editorStore'
 interface CatalogItemProps {
   fixture: Fixture
   isActive: boolean
+  // Phase 9 D-14：搜索激活时由父级传入 mainGenre 名以渲染面包屑；否则 null/undefined → 不渲染
+  breadcrumbMainGenreName?: string | null
 }
 
-export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
+export function CatalogItem({
+  fixture,
+  isActive,
+  breadcrumbMainGenreName,
+}: CatalogItemProps) {
   const [imgError, setImgError] = useState(false)
   const setActiveFixture = useEditorStore((s) => s.setActiveFixture)
 
@@ -78,6 +84,30 @@ export function CatalogItem({ fixture, isActive }: CatalogItemProps) {
           <span className="absolute bottom-0 right-0 px-1 text-[10px] bg-black/70 text-white/90 rounded-tl-md font-mono">
             {fixture.gridSize.width}×{fixture.gridSize.depth}
           </span>
+
+          {/* Phase 9 D-14：搜索激活时显示 mainGenre 面包屑 */}
+          {breadcrumbMainGenreName && (
+            <span
+              aria-hidden
+              className="absolute"
+              style={{
+                left: 2,
+                bottom: 2,
+                padding: '2px 6px',
+                background: '#fff8e7',
+                color: '#4f6a8e',
+                fontFamily: '"M PLUS Rounded 1c", system-ui, sans-serif',
+                fontWeight: 800,
+                fontSize: 11,
+                lineHeight: 1,
+                borderRadius: 6,
+                boxShadow: 'var(--shadow-sm)',
+                pointerEvents: 'none',
+              }}
+            >
+              {breadcrumbMainGenreName}
+            </span>
+          )}
         </div>
       </Tooltip.Trigger>
 
