@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-05-08T08:35:15.060Z"
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-05-08T08:38:09.876Z"
 last_activity: 2026-05-08
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 36
-  completed_plans: 31
+  completed_plans: 32
   percent: 87
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 ## Current Position
 
 Phase: 09 (catalog-overhaul-genre-driven-categories-with-search) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-08
 
@@ -75,6 +75,7 @@ Progress: [█████████░] 87%
 | Phase 07-editor-chrome-redesign P05 | 3min | 2 tasks | 3 files |
 | Phase 07-editor-chrome-redesign P06 | 3min | 2 tasks | 3 files |
 | Phase 09 P02 | 7min | 1 tasks | 3 files |
+| Phase 09 P01 | 10min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -157,6 +158,8 @@ Recent decisions affecting current work:
 - [Phase 07-editor-chrome-redesign]: CostPanelPopover defers unmount 200ms so closing scale/opacity transition has time to play
 - [Phase 07-editor-chrome-redesign]: Popover owns dialog chrome (header + close X + role/aria); CostPanel body is fragment-style and reusable
 - [Phase 09]: [Phase 09] persist v3→v4 migrate coerces all old Phase7Category strings to 'all' (lossless); activeSubGenreId/searchActiveBeforeQuery transient (D-08, excluded from persist + temporal partialize); setActiveCategory atomically resets activeSubGenreId
+- [Phase 09]: Lucide-only icon path canonical for genre rail; CDN attempt skipped (RESEARCH Open Question §1)
+- [Phase 09]: deriveOutdoorMainGenres preserves source-order of allGenres (no resort)
 
 ### Pending Todos
 
@@ -168,6 +171,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-08T08:35:15.058Z
-Stopped at: Completed 09-02-PLAN.md
+Last session: 2026-05-08T08:38:09.874Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
