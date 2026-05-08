@@ -1,20 +1,29 @@
-// ======== 分类过滤芯片栏 ========
-// INPUT: genres 列表, activeGenreId, onSelect 回调
-// OUTPUT: 水平滚动的分类芯片行
+// ======== 分类过滤芯片栏（通用 ChipStrip）========
+// INPUT: items（{id, name}[]）, activeId（number | null）, onSelect 回调,
+//        allLabel?（默认 '全部'）, allAriaLabel?（默认 '全てのカテゴリ'）
+// OUTPUT: 水平滚动的分类芯片行；首个 "全部" 芯片调用 onSelect(null)
 // POS: src/components/catalog/CategoryFilter.tsx — 主分类筛选
+// 复用：mainGenre 和 subGenre 共享同一渲染契约 (Phase 9)
 
-import type { FixtureMainGenre } from '../../types/editor'
+interface ChipStripItem {
+  id: number
+  name: string
+}
 
 interface CategoryFilterProps {
-  genres: FixtureMainGenre[]
-  activeGenreId: number | null
+  items: ChipStripItem[]
+  activeId: number | null
   onSelect: (id: number | null) => void
+  allLabel?: string
+  allAriaLabel?: string
 }
 
 export function CategoryFilter({
-  genres,
-  activeGenreId,
+  items,
+  activeId,
   onSelect,
+  allLabel = '全部',
+  allAriaLabel = '全てのカテゴリ',
 }: CategoryFilterProps) {
   return (
     <div
@@ -23,28 +32,29 @@ export function CategoryFilter({
     >
       <button
         type="button"
+        aria-label={allAriaLabel}
         className={`px-2.5 py-1 rounded-md text-xs cursor-pointer transition-all
-          ${activeGenreId === null
+          ${activeId === null
             ? 'bg-accent text-surface font-medium'
             : 'bg-surface text-muted hover:text-primary hover:bg-surface-hover'
           }`}
         onClick={() => onSelect(null)}
       >
-        全部
+        {allLabel}
       </button>
 
-      {genres.map((genre) => (
+      {items.map((item) => (
         <button
-          key={genre.id}
+          key={item.id}
           type="button"
           className={`px-2.5 py-1 rounded-md text-xs cursor-pointer transition-all
-            ${activeGenreId === genre.id
+            ${activeId === item.id
               ? 'bg-accent text-surface font-medium'
               : 'bg-surface text-muted hover:text-primary hover:bg-surface-hover'
             }`}
-          onClick={() => onSelect(genre.id)}
+          onClick={() => onSelect(item.id)}
         >
-          {genre.name}
+          {item.name}
         </button>
       ))}
     </div>

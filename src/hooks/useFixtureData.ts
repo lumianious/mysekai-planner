@@ -1,13 +1,13 @@
 // ======== 家具数据 Hook ========
-// INPUT: fetchFixtures, filterOutdoorFixtures, fetchMainGenres,
+// INPUT: fetchFixtures, filterOutdoorFixtures, fetchMainGenres, fetchSubGenres,
 //        loadSpriteManifest, fetchMaterials/Blueprints/MaterialCosts
-// OUTPUT: fixtures, mainGenres, fixtureMap, costIndex, loading, error
-// POS: src/hooks/useFixtureData.ts — 获取并缓存家具 + 分类 + 精灵清单 + 成本索引
+// OUTPUT: fixtures, mainGenres, subGenres, fixtureMap, costIndex, loading, error
+// POS: src/hooks/useFixtureData.ts — 获取并缓存家具 + 分类（含子分类）+ 精灵清单 + 成本索引
 
 import { useState, useEffect, useMemo, useRef } from 'react'
-import type { Fixture, FixtureMainGenre } from '../types/editor'
+import type { Fixture, FixtureMainGenre, FixtureSubGenre } from '../types/editor'
 import { fetchFixtures, filterOutdoorFixtures } from '../data/fixtures'
-import { fetchMainGenres } from '../data/genres'
+import { fetchMainGenres, fetchSubGenres } from '../data/genres'
 import { loadSpriteManifest } from '../data/spriteManifest'
 import {
   fetchMaterials,
@@ -22,6 +22,7 @@ export function useFixtureData() {
   // 比 fixtures 多包含 system 类型（house 等）—— 不进入目录但参与画布渲染查找
   const [allOutdoorFixtures, setAllOutdoorFixtures] = useState<Fixture[]>([])
   const [mainGenres, setMainGenres] = useState<FixtureMainGenre[]>([])
+  const [subGenres, setSubGenres] = useState<FixtureSubGenre[]>([])
   const [costIndex, setCostIndex] = useState<CostIndex | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -42,10 +43,11 @@ export function useFixtureData() {
       try {
         // 并行加载家具数据 + 主分类 + 精灵清单 + 成本三件套（Phase 4）
         // 精灵清单失败不阻塞主流程（loadSpriteManifest 内部 D-17 回退到空 Map）
-        const [allFixtures, genres, , materials, blueprints, materialCosts] =
+        const [allFixtures, genres, subs, , materials, blueprints, materialCosts] =
           await Promise.all([
             fetchFixtures(),
             fetchMainGenres(),
+            fetchSubGenres(),
             loadSpriteManifest(),
             fetchMaterials(),
             fetchBlueprints(),
@@ -71,6 +73,7 @@ export function useFixtureData() {
         setFixtures(outdoorFixtures)
         setAllOutdoorFixtures(allOutdoor)
         setMainGenres(relevantGenres)
+        setSubGenres(subs)
         setCostIndex(buildCostIndex(materials, blueprints, materialCosts))
       } catch (err) {
         if (controller.signal.aborted) return
@@ -89,5 +92,5 @@ export function useFixtureData() {
     }
   }, [])
 
-  return { fixtures, mainGenres, fixtureMap, costIndex, loading, error }
+  return { fixtures, mainGenres, subGenres, fixtureMap, costIndex, loading, error }
 }

@@ -1,6 +1,6 @@
 // ======== 编辑器主布局（Phase 7 重构） ========
-// INPUT: editorStore（chrome state）, useFixtureData hook
-// OUTPUT: 画布全屏 + 六个绝对定位 chrome 槽位（A–F），槽内容由后续 plan 02–06 填充
+// INPUT: editorStore（chrome state）, useFixtureData hook（fixtures + mainGenres + subGenres）
+// OUTPUT: 画布全屏 + 六个绝对定位 chrome 槽位（A–F），Slot B 接 fixtures/mainGenres/subGenres
 // POS: src/components/layout/EditorLayout.tsx — 编辑器页面骨架（chrome shell）
 
 import * as Tooltip from '@radix-ui/react-tooltip'
@@ -15,7 +15,7 @@ import { useFixtureData } from '../../hooks/useFixtureData'
 import { useEditorStore } from '../../stores/editorStore'
 
 export function EditorLayout() {
-  const { fixtures, mainGenres, fixtureMap, costIndex, loading, error } =
+  const { fixtures, mainGenres, subGenres, fixtureMap, costIndex, loading, error } =
     useFixtureData()
   // 允许 catalog 贴到屏顶；与 top-rail 重叠时由 z-index 决定可点击性
   const catalogTop = Math.max(16, useEditorStore((s) => s.catalogTop))
@@ -62,6 +62,7 @@ export function EditorLayout() {
           <CatalogRail
             fixtures={fixtures}
             mainGenres={mainGenres}
+            subGenres={subGenres}
             fixtureMap={fixtureMap}
           />
         </div>

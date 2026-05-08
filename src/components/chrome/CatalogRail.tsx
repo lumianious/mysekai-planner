@@ -25,6 +25,7 @@ const ALL_ENTRY: { id: 'all'; name: string; assetbundleName: string } = {
 interface CatalogRailProps {
   fixtures: Fixture[]
   mainGenres: FixtureMainGenre[]
+  subGenres: FixtureSubGenre[]
   fixtureMap: Map<number, Fixture>
 }
 
@@ -40,6 +41,7 @@ type RailEntry =
 export function CatalogRail({
   fixtures,
   mainGenres,
+  subGenres,
   fixtureMap,
 }: CatalogRailProps) {
   const collapsed = useEditorStore((s) => s.catalogCollapsed)
@@ -294,6 +296,7 @@ export function CatalogRail({
           <CatalogSidebar
             fixtures={fixtures}
             mainGenres={mainGenres}
+            subGenres={subGenres}
             fixtureMap={fixtureMap}
           />
         </div>
