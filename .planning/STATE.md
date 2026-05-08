@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Awaiting checkpoint:human-verify on 08-01 (Task 3 — live site verification)"
-last_updated: "2026-05-07T09:33:33.772Z"
+stopped_at: Phase 9 context gathered
+last_updated: "2026-05-08T04:01:10.912Z"
 last_activity: 2026-05-07 -- Phase 08 execution started
 progress:
-  total_phases: 9
+  total_phases: 10
   completed_phases: 7
   total_plans: 31
   completed_plans: 30
@@ -79,6 +79,7 @@ Progress: [█████████░] 87%
 
 ### Roadmap Evolution
 
+- **2026-05-07** — Phase 9 added: catalog overhaul. Drive categories from in-game `mysekaiFixtureMainGenreId` instead of name-regex heuristic; add 9 missing tabs (ぬいぐるみ 473, 一般 380, 小物 117, 壁掛け 79, 壁 27, 床 27, 家 21, 柵 7, 大型 2); drop fake 棚 heuristic category; add search/text-filter for large genres. Reason: ~970 fixtures only show under 全部, plushies and small items hard to find.
 - **2026-04-11** — Phase 02.1 inserted after Phase 2: "Fence edge-based model and unified drag tool" (URGENT). Reason: human verification revealed two architectural mistakes in Phase 2's fence implementation — (1) fences should live on grid lines/edges, not in tile cells, so they can coexist with road tiles on the same grid square; (2) fence interaction should be unified with road drag-paint, not a separate click-line tool. Phase 02.1 will re-architect fences as edge-based items `{x, y, orientation: 'h' | 'v'}`, delete the line-tool components/hook/test added in 02-04, and apply axis-locked drag-paint (no diagonals). Replaces Phase 2 D-34/D-35/D-36.
 
 ### Decisions
@@ -165,6 +166,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-07T09:33:33.765Z
-Stopped at: Awaiting checkpoint:human-verify on 08-01 (Task 3 — live site verification)
-Resume file: None
+Last session: 2026-05-08T04:01:10.906Z
+Stopped at: Phase 9 context gathered
+Resume file: .planning/phases/09-catalog-overhaul-genre-driven-categories-with-search/09-CONTEXT.md
