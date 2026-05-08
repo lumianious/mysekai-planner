@@ -194,3 +194,26 @@ Phases execute in: 1 -> 2 -> 3 -> 5 -> 4 -> 6 (Phase 5 pulled forward to de-risk
 | 6. Internationalization | 0/TBD | Not started | - |
 | 7. Editor Chrome Redesign | 6/6 | Complete | 2026-05-06 |
 | 8. Deploy to GitHub Pages | 0/1 | Planning complete | - |
+| 9. Catalog overhaul — genre-driven categories with search | 0/5 | Planning complete | - |
+
+### Phase 9: Catalog overhaul — genre-driven categories with search
+
+**Goal:** Replace Phase 7's 8 hardcoded heuristic-string categories with a category system driven by `mysekaiFixtureMainGenres.json` (14 curated outdoor genres derived empirically), present subGenres as a chip strip in the catalog body, and rewire search so it bypasses the active category and shows a genre breadcrumb on each result while remembering the prior selection for restore-on-clear.
+**Requirements**: CATL-05, CATL-06, CATL-07, CATL-08, CATL-09, CATL-10, CATL-11
+**Depends on:** Phase 8
+**Success Criteria** (what must be TRUE):
+  1. Catalog rail content list is derived from game data (`mysekaiFixtureMainGenres.json` ∩ outdoor fixtures) — heuristic regex matching for shelf/plant/block/display deleted wholesale
+  2. SubGenre chip strip renders inside the catalog body when the active mainGenre has ≥2 outdoor subgenres; '全部' chip resets it; selection is in-memory only (not persisted)
+  3. Search bypasses the active category, shows a mainGenre breadcrumb on each result tile, and restores the prior `{mainId, subId}` on clear
+  4. Persist version 3 → 4 with a lossless migrate that coerces every old `Phase7Category` string to `'all'`
+  5. Each rail button renders a lucide icon via a stable `assetbundleName → ElementType` mapping (no CDN fetch — empirically all 30+ candidate paths return 404)
+**Plans:** 5 plans
+**UI hint**: yes
+**Design contract**: `.planning/phases/09-catalog-overhaul-genre-driven-categories-with-search/09-UI-SPEC.md`
+
+Plans:
+- [ ] 09-01-PLAN.md — Wave 0 test stubs (5 files) + `deriveOutdoorMainGenres` helper + `genreIcons.ts` lucide table (CATL-06, CATL-09)
+- [ ] 09-02-PLAN.md — Store migration: persist v3→v4 + activeCategory retype + activeSubGenreId/searchActiveBeforeQuery transient fields + setActiveCategory atomic reset (CATL-08)
+- [ ] 09-03-PLAN.md — Rewire CatalogRail.tsx to derived list + getGenreIcon + vertical scroll (CATL-05 rail half, CATL-06, CATL-09)
+- [ ] 09-04-PLAN.md — Rewire CatalogSidebar.tsx: filterByGenre + searchFixtures + chip strip + breadcrumb + snapshot/restore; generalize CategoryFilter; thread subGenres prop (CATL-05 sidebar half, CATL-07, CATL-10, CATL-11)
+- [ ] 09-05-PLAN.md — Cleanup: delete Phase7Category + filterByPhase7Category + drop broken seq sort + L2 doc update + UAT checkpoint (CATL-05 final gate)
