@@ -117,55 +117,8 @@ export function getGroundSubtype(fixture: Fixture): GroundSubtype | null {
   return null
 }
 
-// ======== Phase 7 目录分类过滤 ========
-// INPUT: fixtures, category（UI-SPEC §Component Inventory 固定 8 类）
-// OUTPUT: 过滤后的 fixtures
-// POS: src/data/fixtures.ts — Phase 7 目录壳分类（与 Phase 1 mainGenres 不同）
-//
-// 注意：游戏数据中没有 shelf/plant/block/display 顶层字段，因此这些类目使用
-// 名称启发式匹配 — Phase 7 范围是 chrome 布局，并非完美分类。未来若数据扩展
-// 提供更精确字段，可在此函数内替换实现。
-
-export type Phase7Category =
-  | 'all'
-  | 'display'
-  | 'canvas'
-  | 'rug'
-  | 'road'
-  | 'shelf'
-  | 'plant'
-  | 'block'
-
-export function filterByPhase7Category(
-  fixtures: Fixture[],
-  category: Phase7Category,
-): Fixture[] {
-  if (category === 'all') return fixtures
-  return fixtures.filter((f) => {
-    const sub = getGroundSubtype(f) // 'road' | 'rug' | 'fence' | 'color-tile' | null
-    if (category === 'road') return sub === 'road' || sub === 'color-tile'
-    if (category === 'rug') return sub === 'rug'
-    if (category === 'canvas')
-      return (
-        f.mysekaiSettableLayoutType === 'floor_appearance' ||
-        f.mysekaiSettableLayoutType === 'wall_appearance'
-      )
-    // 启发式名称匹配 — 游戏数据无 shelf/plant/block 顶层字段
-    const name = f.name ?? ''
-    const lower = name.toLowerCase()
-    if (category === 'plant')
-      return /植|花|tree|plant|flower/.test(lower) || /植|花/.test(name)
-    if (category === 'shelf')
-      return /棚|shelf|rack|display/.test(lower) || /棚/.test(name)
-    if (category === 'block')
-      return /ブロック|block|cube/.test(lower) || /ブロック/.test(name)
-    if (category === 'display')
-      return (
-        /ディスプレイ|display|sign|frame/.test(lower) || /ディスプレイ/.test(name)
-      )
-    return false
-  })
-}
+// Phase 9: 删除 Phase7Category + filterByPhase7Category（启发式正则替换为游戏数据驱动 — D-03）
+// 类目改由 mysekaiFixtureMainGenreId / mysekaiFixtureSubGenreId 驱动；过滤走 filterByGenre()。
 
 // ======== Brush 工具资格检查 ========
 // 判断某家具能否通过 Brush 工具放置（道/柵/カラータイル 即可，地毯用 Stamp 模式）
