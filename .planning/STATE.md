@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 9 context gathered
-last_updated: "2026-05-08T04:01:10.912Z"
-last_activity: 2026-05-07 -- Phase 08 execution started
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-05-08T08:35:15.060Z"
+last_activity: 2026-05-08
 progress:
   total_phases: 10
   completed_phases: 7
-  total_plans: 31
-  completed_plans: 30
+  total_plans: 36
+  completed_plans: 31
   percent: 87
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-09)
 
 **Core value:** Users can visually plan their MySekai outdoor layout and know exactly what materials they need to build it.
-**Current focus:** Phase 08 — deploy-github-pages
+**Current focus:** Phase 09 — catalog-overhaul-genre-driven-categories-with-search
 
 ## Current Position
 
-Phase: 08 (deploy-github-pages) — EXECUTING
-Plan: 1 of 1
-Status: Executing Phase 08
-Last activity: 2026-05-07 -- Phase 08 execution started
+Phase: 09 (catalog-overhaul-genre-driven-categories-with-search) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-05-08
 
 Progress: [█████████░] 87%
 
@@ -74,6 +74,7 @@ Progress: [█████████░] 87%
 | Phase 07-editor-chrome-redesign P04 | 19min | 2 tasks | 5 files |
 | Phase 07-editor-chrome-redesign P05 | 3min | 2 tasks | 3 files |
 | Phase 07-editor-chrome-redesign P06 | 3min | 2 tasks | 3 files |
+| Phase 09 P02 | 7min | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -155,6 +156,7 @@ Recent decisions affecting current work:
 - [Phase 07-editor-chrome-redesign]: Hotbar drag-from-catalog deferred — plan 05 preserves click-only behavior; assignHotbar action exists but no UI invokes it yet
 - [Phase 07-editor-chrome-redesign]: CostPanelPopover defers unmount 200ms so closing scale/opacity transition has time to play
 - [Phase 07-editor-chrome-redesign]: Popover owns dialog chrome (header + close X + role/aria); CostPanel body is fragment-style and reusable
+- [Phase 09]: [Phase 09] persist v3→v4 migrate coerces all old Phase7Category strings to 'all' (lossless); activeSubGenreId/searchActiveBeforeQuery transient (D-08, excluded from persist + temporal partialize); setActiveCategory atomically resets activeSubGenreId
 
 ### Pending Todos
 
@@ -166,6 +168,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-08T04:01:10.906Z
-Stopped at: Phase 9 context gathered
-Resume file: .planning/phases/09-catalog-overhaul-genre-driven-categories-with-search/09-CONTEXT.md
+Last session: 2026-05-08T08:35:15.058Z
+Stopped at: Completed 09-02-PLAN.md
+Resume file: None
