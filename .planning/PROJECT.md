@@ -14,7 +14,7 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 
 - [x] Top-down 2D grid editor matching in-game MySekai outdoor area dimensions (Phase 1)
 - [x] Place, move, rotate, and remove furniture/decorations on the grid (Phase 1)
-- [x] Furniture catalog with search/filter sourced from sekai.best data (Phase 1)
+- [x] Furniture catalog with search/filter sourced from sekai.best data (Phase 1, overhauled in Phase 9 to genre-driven categories with subGenre chip strip and breadcrumb-on-search)
 - [x] CDN isometric thumbnails from storage.sekai.best for catalog browsing (Phase 1)
 - [x] Road and fence placement tools (Phase 2)
 - [x] Auto-save / auto-load designs to localStorage (Phase 3)
@@ -61,6 +61,8 @@ Users can visually plan their MySekai outdoor layout and know exactly what mater
 | sssekai + Blender for sprite generation | No top-down sprites exist on CDN; 3D models must be rendered offline | — Pending |
 | CDN thumbnails for catalog only | Isometric perspective doesn't work on top-down grid; use for browsing | — Pending |
 | Outdoor area only | Indoor areas are separate feature with different constraints; focus scope | — Pending |
+| Catalog driven by `mainGenre` from live game data, not heuristic regexes | Heuristics broke when JP fixtures used kanji/kana the regex didn't anticipate; live `mysekaiFixtureMainGenres.json` is the single source of truth | ✓ Phase 9 |
+| Catalog icons via bundled lucide-react, not CDN | All probed `storage.sekai.best/...icon_*` paths returned 404; sekai-viewer itself doesn't use icons. lucide avoids 14× 404s on every rail mount | ✓ Phase 9 |
 
 ## Evolution
 
@@ -80,4 +82,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-04 after Phase 7 (editor chrome redesign) completion*
+*Last updated: 2026-05-08 after Phase 9 (catalog overhaul — genre-driven categories with search) completion*
