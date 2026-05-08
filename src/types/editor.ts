@@ -55,7 +55,10 @@ export interface FixtureMainGenre {
   id: number
   name: string
   mysekaiFixtureMainGenreType: string
-  seq: number
+  // Phase 9 新增: lucide 图标查询键，对应 sekai-master-db-diff JSON 中的 assetbundleName 字段
+  assetbundleName: string
+  // 注: 上游 JSON 不存在 seq 字段；此字段保留为可选以兼容旧 mock fixture
+  seq?: number
 }
 
 export interface FixtureSubGenre {
